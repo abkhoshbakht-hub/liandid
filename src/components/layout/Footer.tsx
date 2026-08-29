@@ -130,7 +130,7 @@ export default function Footer() {
             © {new Date().getFullYear()} {settings.footerCopyright || 'لیان دید. تمامی حقوق محفوظ است.'}
           </p>
           <a href="https://liandesign.ir" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-white/50 hover:text-[#C9A96E] transition-colors text-sm">
-            <Image src="/liandesign-logo.png" alt="لیان دیزاین" width={40} height={40} className="rounded-sm" />
+            <Image src="/liandesign.logo.png" alt="لیان دیزاین" width={40} height={40} className="rounded-sm" />
             <span>طراحی و تولید: <span className="font-bold">لیان دیزاین</span></span>
           </a>
         </div>
