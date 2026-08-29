@@ -1,0 +1,592 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>راهنمای مدیریت - لیان دید</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+:root{--navy:#1B365D;--navy-light:#2a4a7a;--navy-dark:#0f2440;--gold:#C9A96E;--gold-light:#d4bc8e;--gold-dark:#b8944e;--bg:#f5f5f5;--card-bg:#fff;--text:#333;--text-light:#666;--border:#e0e0e0;--success:#28a745;--warning:#ffc107;--danger:#dc3545;--info:#17a2b8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Vazirmatn',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.8;direction:rtl;font-size:15px}
+
+/* Cover Page */
+.cover-page{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--navy-dark) 0%,var(--navy) 40%,var(--navy-light) 100%);color:#fff;text-align:center;position:relative;overflow:hidden;page-break-after:always;padding:60px 30px}
+.cover-page::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:url('/liandesign.logo.png') center center no-repeat;background-size:300px;opacity:0.04}
+.cover-page::after{content:'';position:absolute;top:-100px;left:-100px;width:400px;height:400px;background:radial-gradient(circle,var(--gold) 0%,transparent 70%);opacity:0.06;border-radius:50%}
+.cover-logo{width:180px;height:auto;margin-bottom:40px;position:relative;z-index:1;filter:drop-shadow(0 4px 20px rgba(0,0,0,0.3))}
+.cover-divider{width:120px;height:3px;background:var(--gold);margin:20px auto;position:relative;z-index:1;border-radius:2px}
+.cover-title{font-size:38px;font-weight:900;margin-bottom:15px;position:relative;z-index:1;text-shadow:0 2px 10px rgba(0,0,0,0.3)}
+.cover-subtitle{font-size:20px;color:var(--gold-light);margin-bottom:10px;position:relative;z-index:1;font-weight:500}
+.cover-site{font-size:16px;color:rgba(255,255,255,0.7);margin-bottom:40px;position:relative;z-index:1}
+.cover-producer{position:relative;z-index:1;margin-top:60px;padding:20px 40px;border:1px solid rgba(201,169,110,0.3);border-radius:12px;background:rgba(255,255,255,0.05)}
+.cover-producer .name{font-size:18px;font-weight:700;color:var(--gold);margin-bottom:5px}
+.cover-producer .phone{font-size:14px;color:rgba(255,255,255,0.6)}
+.cover-date{position:relative;z-index:1;margin-top:30px;font-size:14px;color:rgba(255,255,255,0.4)}
+
+/* Watermark */
+.container{max-width:1100px;margin:0 auto;padding:20px;position:relative}
+.container::before{content:'';position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:400px;height:400px;background:url('/liandesign.logo.png') center center no-repeat;background-size:contain;opacity:0.025;pointer-events:none;z-index:0}
+
+/* Page Footer */
+.page-footer{text-align:center;padding:15px;margin-top:30px;border-top:2px solid var(--gold);font-size:11px;color:var(--text-light);background:linear-gradient(135deg,rgba(27,54,93,0.03),rgba(201,169,110,0.05));border-radius:0 0 12px 12px}
+.page-footer .footer-brand{font-weight:700;color:var(--navy)}
+.page-footer .footer-phone{color:var(--gold-dark);direction:ltr;display:inline-block}
+.guide-header{background:linear-gradient(135deg,var(--navy-dark),var(--navy),var(--navy-light));color:#fff;padding:50px 30px;text-align:center;border-radius:0 0 20px 20px;margin-bottom:30px;position:relative;overflow:hidden}
+.guide-header::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A96E' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");opacity:.5}
+.guide-header h1{font-size:32px;font-weight:900;margin-bottom:10px;position:relative;z-index:1}
+.guide-header .subtitle{font-size:18px;color:var(--gold-light);position:relative;z-index:1}
+.guide-header .site-name{font-size:24px;color:var(--gold);margin-top:15px;position:relative;z-index:1}
+.guide-header .version{font-size:13px;color:rgba(255,255,255,.6);margin-top:20px;position:relative;z-index:1}
+.toc{background:var(--card-bg);border-radius:12px;padding:30px;margin-bottom:30px;box-shadow:0 2px 15px rgba(0,0,0,.08);border:1px solid var(--border)}
+.toc h2{color:var(--navy);font-size:20px;margin-bottom:20px;padding-bottom:10px;border-bottom:3px solid var(--gold);display:inline-block}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px}
+.toc-item{padding:8px 12px;border-radius:6px;font-size:14px}
+.toc-item:hover{background:var(--bg)}
+.toc-item a{color:var(--navy);text-decoration:none;display:flex;align-items:center;gap:8px}
+.toc-item .num{background:var(--navy);color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.section{background:var(--card-bg);border-radius:12px;padding:35px;margin-bottom:25px;box-shadow:0 2px 15px rgba(0,0,0,.08);border:1px solid var(--border);page-break-inside:avoid}
+.section-header{display:flex;align-items:center;gap:15px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid var(--border)}
+.section-icon{width:50px;height:50px;background:linear-gradient(135deg,var(--navy),var(--navy-light));color:var(--gold);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.section-title{font-size:22px;font-weight:800;color:var(--navy)}
+.section-title small{display:block;font-size:13px;font-weight:400;color:var(--text-light);margin-top:3px}
+.subsection{margin-bottom:25px;padding:20px;background:#fafbfc;border-radius:10px;border:1px solid #eef0f2}
+.subsection-title{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:15px;display:flex;align-items:center;gap:8px}
+.subsection-title .icon{color:var(--gold)}
+.step{display:flex;gap:15px;margin-bottom:15px;padding:12px 15px;background:#fff;border-radius:8px;border:1px solid #eee;align-items:flex-start}
+.step-num{background:var(--navy);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:2px}
+.step-content{flex:1;font-size:14px}
+.step-content strong{color:var(--navy)}
+.step-content code{background:#e8f0fe;color:var(--navy);padding:2px 8px;border-radius:4px;font-size:13px;font-family:'Vazirmatn',monospace;direction:ltr;display:inline-block}
+.note{background:#fff3cd;border:1px solid #ffc107;border-right:4px solid #ffc107;padding:12px 16px;border-radius:8px;margin:15px 0;font-size:13px;color:#856404}
+.note.info{background:#d1ecf1;border-color:var(--info);border-right-color:var(--info);color:#0c5460}
+.note.success{background:#d4edda;border-color:var(--success);border-right-color:var(--success);color:#155724}
+.note.danger{background:#f8d7da;border-color:var(--danger);border-right-color:var(--danger);color:#721c24}
+.field-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+.field-table th{background:var(--navy);color:#fff;padding:10px 12px;text-align:right;font-weight:600}
+.field-table td{padding:8px 12px;border-bottom:1px solid #eee}
+.field-table tr:nth-child(even){background:#f9fafb}
+.field-table th:first-child{border-radius:0 8px 0 0}
+.field-table th:last-child{border-radius:8px 0 0 0}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge-draft{background:#ffc107;color:#333}
+.badge-pending{background:#17a2b8;color:#fff}
+.badge-published{background:#28a745;color:#fff}
+.badge-archived{background:#6c757d;color:#fff}
+.tip-box{background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:1px solid var(--success);border-right:4px solid var(--success);padding:15px 18px;border-radius:8px;margin:15px 0;font-size:13px}
+.tip-box strong{color:var(--success)}
+.highlight{background:linear-gradient(135deg,#fff8e1,#fff3cd);border:1px solid var(--gold);border-right:4px solid var(--gold);padding:15px 18px;border-radius:8px;margin:15px 0;font-size:13px}
+.highlight strong{color:var(--gold-dark)}
+.tab-demo{display:flex;gap:3px;margin-bottom:10px;flex-wrap:wrap}
+.tab-item{padding:6px 14px;background:#e9ecef;border-radius:6px;font-size:12px;color:#555}
+.tab-item.active{background:var(--navy);color:#fff}
+.menu-demo{background:var(--navy-dark);color:#fff;border-radius:10px;padding:15px;font-size:13px;direction:rtl}
+.menu-demo .menu-item{padding:8px 15px;border-radius:6px;margin-bottom:4px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.menu-demo .menu-item:hover{background:var(--navy-light)}
+.menu-demo .menu-item.active{background:var(--gold);color:var(--navy-dark)}
+.status-flow{display:flex;gap:10px;align-items:center;margin:15px 0;flex-wrap:wrap}
+.status-box{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:600}
+.status-arrow{font-size:18px;color:#aaa}
+.login-demo{background:linear-gradient(135deg,var(--navy-dark),var(--navy));border-radius:12px;padding:25px;color:#fff;text-align:center;max-width:350px;margin:15px auto}
+.login-demo .input-demo{width:100%;padding:10px 15px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;margin-bottom:10px;font-size:13px;text-align:center}
+.login-demo .btn-demo{width:100%;padding:10px;border-radius:8px;border:none;background:var(--gold);color:var(--navy-dark);font-weight:700;font-size:14px}
+.hero-demo{background:#f0f2f5;border:2px dashed #ccc;border-radius:10px;padding:20px;margin:10px 0}
+.slot-demo{background:#fff;border:1px solid #ddd;border-radius:8px;padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.slot-demo .btn-sm{padding:4px 12px;border-radius:6px;font-size:12px;border:1px solid var(--navy);color:var(--navy);background:#fff}
+.category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:10px 0}
+.category-card{background:#fff;border:1px solid #ddd;border-radius:8px;padding:12px;text-align:center;font-size:13px;transition:all .2s}
+.category-card:hover{border-color:var(--navy);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.category-card .cat-icon{font-size:24px;margin-bottom:5px}
+.print-only{display:none}
+.guide-footer{text-align:center;padding:30px;color:var(--text-light);font-size:13px;border-top:1px solid var(--border);margin-top:30px}
+.guide-footer .site-colors{display:flex;gap:10px;justify-content:center;margin-top:10px}
+.guide-footer .color-dot{width:20px;height:20px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 5px rgba(0,0,0,.2)}
+@media print{@page{margin:15mm 10mm 25mm 10mm}body{font-size:11px;line-height:1.6;background:#fff}.container{max-width:100%;padding:0}.cover-page{min-height:auto;padding:80px 30px;background:var(--navy)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.cover-page::before{opacity:0.06}.guide-header{background:var(--navy)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:30px;border-radius:0;margin-bottom:20px}.guide-header::before{display:none}.section{box-shadow:none;border:1px solid #ddd;page-break-inside:avoid;padding:20px;margin-bottom:15px}.subsection{page-break-inside:avoid}.step{page-break-inside:avoid}.toc{page-break-after:always}.toc-grid{grid-template-columns:1fr 1fr}.print-only{display:block!important}.no-print{display:none!important}.section-icon,.step-num,.note,.tip-box,.highlight,.field-table th,.badge,.menu-demo,.login-demo{-webkit-print-color-adjust:exact;print-color-adjust:exact}a{text-decoration:none;color:inherit}.page-footer{position:fixed;bottom:0;left:0;right:0;border-radius:0;border-top:2px solid var(--gold);background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@media(max-width:768px){.container{padding:10px}.guide-header{padding:30px 20px}.guide-header h1{font-size:22px}.section{padding:20px}.toc-grid{grid-template-columns:1fr}.step{flex-direction:column;gap:8px}.category-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- طرح جلد -->
+<div class="cover-page">
+  <img src="/liandesign.logo.png" alt="لیان دیزاین" class="cover-logo" />
+  <div class="cover-divider"></div>
+  <div class="cover-title">راهنمای جامع مدیریت سایت</div>
+  <div class="cover-subtitle">لیان دید | پایگاه خبری تحلیلی استان بوشهر</div>
+  <div class="cover-site">راهنمای کامل پنل مدیریت ویژه مدیران و ویراستاران</div>
+  <div class="cover-producer">
+    <div class="name">تهیه کننده: لیان دیزاین</div>
+    <div class="phone">تلفن تماس: <span style="direction:ltr">09938866331</span></div>
+  </div>
+  <div class="cover-date">مرداد ۱۴۰۵ | نسخه ۱.۰</div>
+</div>
+
+<div class="container">
+<div class="guide-header">
+<h1>راهنمای جامع مدیریت سایت</h1>
+<div class="site-name">لیان دید | خبرگزاری استان بوشهر</div>
+<div class="subtitle">راهنمای کامل پنل مدیریت ویژه مدیران و ویراستاران</div>
+<div class="version">نسخه ۱.۰ | مرداد ۱۴۰۵</div>
+</div>
+<div class="toc">
+<h2>فهرست مطالب</h2>
+<div class="toc-grid">
+<div class="toc-item"><a href="#login"><span class="num">۱</span>ورود به پنل مدیریت</a></div>
+<div class="toc-item"><a href="#dashboard-overview"><span class="num">۲</span>نمای کلی داشبورد</a></div>
+<div class="toc-item"><a href="#header-settings"><span class="num">۳</span>تنظیمات هدر</a></div>
+<div class="toc-item"><a href="#homepage"><span class="num">۴</span>صفحه اصلی</a></div>
+<div class="toc-item"><a href="#site-tabs"><span class="num">۵</span>تب‌های سایت</a></div>
+<div class="toc-item"><a href="#static-pages"><span class="num">۶</span>صفحات ایستا</a></div>
+<div class="toc-item"><a href="#news"><span class="num">۷</span>اخبار</a></div>
+<div class="toc-item"><a href="#management"><span class="num">۸</span>مدیریت</a></div>
+<div class="toc-item"><a href="#footer"><span class="num">۹</span>فوتر</a></div>
+<div class="toc-item"><a href="#shutdown"><span class="num">۱۰</span>خاموش کردن سیستم</a></div>
+</div>
+</div>
+<div class="section" id="login">
+<div class="section-header">
+<div class="section-icon">&#x1F510;</div>
+<div class="section-title">ورود به پنل مدیریت<small>Login to Admin Panel</small></div>
+</div>
+<div class="step">
+<div class="step-num">۱</div>
+<div class="step-content">آدرس مرورگر خود را باز کنید و آدرس زیر را وارد کنید:<br><code>https://yourdomain.com/secure-a2x-admin</code>
+<div class="note info">آدرس ورود امن بوده و از طریق مسیر عادی قابل دسترسی نیست.</div>
+</div></div>
+<div class="step">
+<div class="step-num">۲</div>
+<div class="step-content">صفحه ورود نمایش داده می‌شود. فرم ورود شامل دو فیلد است:<br>• <strong>نام کاربری (ایمیل):</strong> ایمیل مدیریت خود را وارد کنید<br>• <strong>رمز عبور:</strong> رمز عبور خود را وارد کنید</div></div>
+<div class="step">
+<div class="step-num">۳</div>
+<div class="step-content">اطلاعات پیش‌فرض ورود به صورت زیر است:
+<div class="login-demo">
+<div style="font-size:18px;font-weight:800;color:#C9A96E;margin-bottom:20px;">لیان دید</div>
+<input class="input-demo" type="text" value="admin@liandid.ir" readonly>
+<input class="input-demo" type="password" value="•••••••••••" readonly>
+<button class="btn-demo">ورود</button>
+</div>
+<table class="field-table">
+<tr><th>فیلد</th><th>مقدار</th></tr>
+<tr><td>نام کاربری</td><td><code>admin@liandid.ir</code></td></tr>
+<tr><td>رمز عبور</td><td><code>admin123</code></td></tr>
+</table>
+</div></div>
+<div class="step">
+<div class="step-num">۴</div>
+<div class="step-content">پس از ورود موفق، به صفحه اصلی داشبورد هدایت می‌شوید.
+<div class="note danger">&#9888;&#65039; حتماً پس از اولین ورود، رمز عبور پیش‌فرض را تغییر دهید.</div>
+</div></div>
+</div>
+<div class="section" id="dashboard-overview">
+<div class="section-header">
+<div class="section-icon">&#x1F4CA;</div>
+<div class="section-title">نمای کلی داشبورد<small>Dashboard Overview</small></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#9776;</span> نوار کناری (سایدبار)</div>
+<div class="step"><div class="step-num">۱</div><div class="step-content">سایدبار در سمت راست صفحه قرار دارد و شامل تمام بخش‌های مدیریتی است. هر بخش دارای آیکون اختصاصی و عنوان فارسی است.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">برخی بخش‌ها دارای زیرمجموعه هستند. با کلیک روی بخش اصلی، زیرمجموعه‌ها نمایش داده می‌شوند.
+<div class="menu-demo">
+<div class="menu-item active">&#127968; صفحه اصلی</div>
+<div class="menu-item">&#9881;&#65039; تنظیمات هدر &#9662;</div>
+<div class="menu-item" style="padding-right:40px;">&#8226; لوگو</div>
+<div class="menu-item" style="padding-right:40px;">&#8226; پروانه انتشار</div>
+<div class="menu-item" style="padding-right:40px;">&#8226; منوی ناوبری</div>
+<div class="menu-item">&#128240; اخبار</div>
+<div class="menu-item">&#128193; مدیریت</div>
+</div>
+</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">با کلیک روی هر آیتم منو، وارد آن بخش می‌شوید. بخش فعال با رنگ متمایز (زرد/طلایی) مشخص می‌شود.</div></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128204;</span> نوار بالایی (هدر ادمین)</div>
+<div class="step"><div class="step-num">۱</div><div class="step-content">در نوار بالایی، <strong>تاریخ و ساعت</strong> فعلی سیستم نمایش داده می‌شود.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">دکمه <strong>خاموش کردن سیستم</strong> در نوار بالایی قرار دارد. با کلیک روی آن می‌توانید سیستم را خاموش کنید (قبل از خاموشی، از ذخیره پشتیبان اطمینان حاصل کنید).</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">در نسخه موبایل، سایدبار به صورت آیکونی نمایش داده می‌شود و با کلیک روی آیکون منو (&#9776;) باز می‌شود.</div></div>
+</div>
+</div>
+<div class="section" id="header-settings">
+<div class="section-header">
+<div class="section-icon">&#9881;&#65039;</div>
+<div class="section-title">تنظیمات هدر<small>Header Settings</small></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128444;&#65039;</span> لوگو (Logo)</div>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>تنظیمات هدر</strong> کلیک کنید، سپس <strong>لوگو</strong> را انتخاب کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">صفحه تنظیمات لوگو نمایش داده می‌شود. در اینجا می‌توانید:<br>• لوگوی فعلی سایت را مشاهده کنید<br>• با کلیک روی دکمه <strong>انتخاب فایل</strong>، تصویر جدید آپلود کنید</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">فرمت‌های مجاز: <strong>PNG, SVG, JPG</strong><br>ابعاد پیشنهادی: حداقل ۲۰۰&#215;۶۰ پیکسل</div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content">پس از انتخاب فایل، روی دکمه <strong>ذخیره</strong> کلیک کنید. لوگوی جدید فوراً در سایت نمایش داده می‌شود.</div></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128220;</span> پروانه انتشار (License)</div>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>پروانه انتشار</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">در فرم نمایش داده شده، شماره پروانه انتشار وزارت فرهنگ و ارشاد اسلامی را وارد کنید.</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">شماره پروانه در فوتر سایت نمایش داده می‌شود. پس از وارد کردن، روی <strong>ذخیره</strong> کلیک کنید.</div></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#8505;&#65039;</span> درباره ما (About)</div>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>درباره ما</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">در صفحه باز شده، لینک صفحه درباره ما را تنظیم کنید. متن اصلی درباره ما در بخش <strong>صفحات ایستا</strong> قابل ویرایش است.</div></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128222;</span> تماس با ما (Contact)</div>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>تماس با ما</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">فیلدهای موجود در فرم:
+<table class="field-table">
+<tr><th>فیلد</th><th>توضیح</th></tr>
+<tr><td>تلفن</td><td>شماره تلفن دفتر مرکزی</td></tr>
+<tr><td>فکس</td><td>شماره فکس (اختیاری)</td></tr>
+<tr><td>ایمیل</td><td>آدرس ایمیل تماس</td></tr>
+<tr><td>آدرس</td><td>آدرس کامل دفتر خبرگزاری</td></tr>
+<tr><td>کد پستی</td><td>کد پستی دفتر</td></tr>
+</table></div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">اطلاعات را تکمیل کرده و روی <strong>ذخیره</strong> کلیک کنید.</div></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128269;</span> جستجو (Search)</div>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>جستجو</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">متن پیش‌فرض فیلد جستجو (placeholder) را تنظیم کنید. به عنوان مثال: <code>جستجوی اخبار...</code></div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">پس از ذخیره، این متن در باکس جستجوی سایت نمایش داده می‌شود.</div></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128203;</span> منوی ناوبری (Navigation Menu)</div>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>منوی ناوبری</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">لیست آیتم‌های منوی فعلی نمایش داده می‌شود. هر آیتم شامل موارد زیر است:
+<table class="field-table">
+<tr><th>فیلد</th><th>توضیح</th></tr>
+<tr><td>عنوان</td><td>نام نمایشی آیتم در منو</td></tr>
+<tr><td>لینک</td><td>آدرس URL مقصد</td></tr>
+<tr><td>ترتیب</td><td>اولویت نمایش (عدد کمتر = اولویت بالاتر)</td></tr>
+<tr><td>فعال</td><td>آیا آیتم نمایش داده شود یا خیر</td></tr>
+</table></div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content"><strong>افزودن آیتم جدید:</strong> روی دکمه <strong>افزودن آیتم</strong> کلیک کنید. فرم جدیدی باز می‌شود. عنوان و لینک را وارد کرده و ذخیره کنید.</div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content"><strong>ویرایش آیتم:</strong> روی دکمه <strong>ویرایش</strong> کنار آیتم مورد نظر کلیک کنید. اطلاعات را تغییر دهید و ذخیره کنید.</div></div>
+<div class="step"><div class="step-num">۵</div><div class="step-content"><strong>حذف آیتم:</strong> روی دکمه <strong>حذف</strong> کلیک کنید و در پنجره تأیید، گزینه تأیید را بزنید.</div></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128241;</span> شبکه‌های اجتماعی (Social Media)</div>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>شبکه‌های اجتماعی</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">لینک‌های شبکه‌های اجتماعی خود را در فیلدهای مربوطه وارد کنید:
+<table class="field-table">
+<tr><th>شبکه اجتماعی</th><th>فرمت لینک</th></tr>
+<tr><td>تلگرام (Telegram)</td><td><code>https://t.me/username</code></td></tr>
+<tr><td>اینستاگرام (Instagram)</td><td><code>https://instagram.com/username</code></td></tr>
+<tr><td>بله (Bale)</td><td><code>https://ble.ir/username</code></td></tr>
+</table></div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">لینک‌ها در فوتر و هدر سایت نمایش داده می‌شوند. پس از وارد کردن، روی <strong>ذخیره</strong> کلیک کنید.</div></div>
+</div>
+</div>
+<div class="section" id="homepage">
+<div class="section-header">
+<div class="section-icon">&#127968;</div>
+<div class="section-title">صفحه اصلی<small>Homepage Settings</small></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128444;&#65039;</span> هیرو (Hero Section)</div>
+<p style="margin-bottom:15px;font-size:14px;color:var(--text-light);">بخش هیرو، اسلایدر اصلی صفحه اول سایت است که اخبار مهم را نمایش می‌دهد. این بخش شامل چند اسلات (slot) است که هر کدام می‌توانند یک خبر را نمایش دهند.</p>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>صفحه اصلی</strong> کلیک کنید، سپس <strong>هیرو</strong> را انتخاب کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">لیست اسلات‌های هیرو نمایش داده می‌شود. هر اسلات شامل موارد زیر است:
+<div class="hero-demo">
+<div class="slot-demo"><div><strong>اسلات ۱:</strong> عنوان خبر فعلی<br><small style="color:#999;">وضعیت: فعال</small></div><button class="btn-sm">ویرایش</button></div>
+<div class="slot-demo"><div><strong>اسلات ۲:</strong> عنوان خبر فعلی<br><small style="color:#999;">وضعیت: فعال</small></div><button class="btn-sm">ویرایش</button></div>
+<div class="slot-demo"><div><strong>اسلات ۳:</strong> خالی<br><small style="color:#999;">وضعیت: غیرفعال</small></div><button class="btn-sm">ویرایش</button></div>
+</div></div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">روی دکمه <strong>ویرایش</strong> کنار اسلات مورد نظر کلیک کنید. پنجره ویرایش باز می‌شود که دو تب دارد:</div></div>
+<div style="background:#f0f4f8;border-radius:10px;padding:20px;margin:15px 0;">
+<div class="tab-demo"><div class="tab-item active">انتخاب از آرشیو اخبار</div><div class="tab-item">نوشتن خبر اختصاصی</div></div>
+<div style="background:#fff;border-radius:8px;padding:15px;border:1px solid #ddd;">
+<strong>تب اول: انتخاب از آرشیو اخبار</strong>
+<div class="step" style="margin-top:10px;"><div class="step-num">۱</div><div class="step-content">در این تب، یک باکس جستجو وجود دارد. عنوان خبر مورد نظر را تایپ کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">نتایج جستجو نمایش داده می‌شوند. خبر مورد نظر را انتخاب کنید.</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">پس از انتخاب، اطلاعات خبر (عنوان، تصویر، خلاصه) به صورت خودکار پر می‌شود. روی <strong>ذخیره</strong> کلیک کنید.</div></div>
+</div>
+<div style="background:#fff;border-radius:8px;padding:15px;border:1px solid #ddd;margin-top:10px;">
+<strong>تب دوم: نوشتن خبر اختصاصی</strong>
+<div class="step" style="margin-top:10px;"><div class="step-num">۱</div><div class="step-content">فیلدهای زیر را پر کنید:
+<table class="field-table" style="margin-top:10px;">
+<tr><th>فیلد</th><th>توضیح</th></tr>
+<tr><td>عنوان خبر</td><td>عنوان اصلی خبر که در هیرو نمایش داده می‌شود</td></tr>
+<tr><td>محتوا</td><td>متن کوتاه خلاصه خبر (حداکثر ۲۵۰ کاراکتر)</td></tr>
+<tr><td>لینک تصویر</td><td>آدرس URL تصویر شاخص خبر</td></tr>
+<tr><td>لینک مقاله</td><td>آدرس URL مقاله اصلی (اختیاری - اگر خالی باشد لینک خودکار ساخته می‌شود)</td></tr>
+</table></div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">پس از تکمیل فیلدها، روی <strong>ذخیره</strong> کلیک کنید.</div></div>
+<div class="tip-box"><strong>نکته مهم:</strong> اخبار اختصاصی که در این بخش نوشته می‌شوند، به صورت خودکار در جدول مقالات با دسته‌بندی «اخبار اختصاصی لیان دید» ذخیره می‌شوند و در بخش <strong>اخبار سایت</strong> قابل مشاهده و ویرایش هستند.</div>
+</div>
+</div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128240;</span> آخرین اخبار (Latest News)</div>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>صفحه اصلی</strong> کلیک کنید، سپس <strong>آخرین اخبار</strong> را انتخاب کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">در این بخش می‌توانید اسلات‌های آخرین اخبار را مدیریت کنید. هر اسلات مانند بخش هیرو عمل می‌کند و دو تب «انتخاب از آرشیو اخبار» و «نوشتن خبر اختصاصی» دارد.</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">روی دکمه <strong>ویرایش</strong> هر اسلات کلیک کنید و اطلاعات خبر را وارد یا انتخاب کنید.</div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content">پس از ذخیره، آخرین اخبار در بخش مربوطه صفحه اصلی نمایش داده می‌شوند.</div></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128209;</span> تحلیل خبر (Analysis)</div>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>تحلیل خبر</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">اسلات‌های تحلیل خبر را مدیریت کنید. این بخش مشابه هیرو عمل می‌کند و می‌توانید اخبار تحلیلی را از آرشیو انتخاب یا به صورت اختصاصی بنویسید.</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">اخبار تحلیلی در بخش تحلیل صفحه اصلی نمایش داده می‌شوند.</div></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128197;</span> مناسبت‌های تقویمی (Calendar Events)</div>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>مناسبت‌های تقویمی</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">لیست مناسبت‌های فعلی نمایش داده می‌شود. هر مناسبت شامل موارد زیر است:
+<table class="field-table">
+<tr><th>فیلد</th><th>توضیح</th></tr>
+<tr><td>عنوان مناسبت</td><td>نام مناسبت (مثلاً: روز خلیج فارس)</td></tr>
+<tr><td>تاریخ</td><td>تاریخ شمسی مناسبت</td></tr>
+<tr><td>توضیحات</td><td>توضیح کوتاه درباره مناسبت (اختیاری)</td></tr>
+</table></div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content"><strong>افزودن مناسبت جدید:</strong> روی دکمه <strong>افزودن</strong> کلیک کنید. عنوان و تاریخ را وارد کرده و ذخیره کنید.</div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content"><strong>ویرایش مناسبت:</strong> روی دکمه <strong>ویرایش</strong> کنار مناسبت مورد نظر کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۵</div><div class="step-content"><strong>حذف مناسبت:</strong> روی دکمه <strong>حذف</strong> کلیک کنید و تأیید کنید.</div></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#9889;</span> اخبار لحظه‌ای (External/Instant News)</div>
+<p style="margin-bottom:15px;font-size:14px;color:var(--text-light);">اخبار لحظه‌ای برای نمایش اخبار از منابع خارجی استفاده می‌شود. این اخبار با ذکر نام منبع نمایش داده می‌شوند.</p>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>اخبار لحظه‌ای</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">لیست اخبار لحظه‌ای فعلی نمایش داده می‌شود. روی دکمه <strong>افزودن خبر جدید</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">فیلدهای زیر را پر کنید:
+<table class="field-table">
+<tr><th>فیلد</th><th>توضیح</th></tr>
+<tr><td>عنوان خبر</td><td>عنوان کوتاه خبر</td></tr>
+<tr><td>متن خبر</td><td>متن خلاصه خبر</td></tr>
+<tr><td>نام منبع</td><td>نام منبع خبر (مثلاً: ایرنا، تسنیم، فارس)</td></tr>
+<tr><td>لینک منبع</td><td>آدرس URL خبر اصلی در منبع</td></tr>
+</table></div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content">پس از تکمیل، روی <strong>ذخیره</strong> کلیک کنید. خبر لحظه‌ای در بخش مربوطه صفحه اصلی نمایش داده می‌شود.</div></div>
+<div class="note info">اخبار لحظه‌ای برخلاف اخبار عادی، فقط شامل متن کوتاه و لینک منبع هستند و نیاز به آپلود تصویر ندارند.</div>
+</div>
+</div>
+<div class="section" id="site-tabs">
+<div class="section-header">
+<div class="section-icon">&#128195;</div>
+<div class="section-title">تب‌های سایت<small>Site Tabs / Categories</small></div>
+</div>
+<p style="margin-bottom:20px;font-size:14px;color:var(--text-light);">تب‌های سایت شامل دسته‌بندی‌های اصلی اخبار هستند که در منوی ناوبری سایت نمایش داده می‌شوند. هر تب به صفحه مقالات آن دسته‌بندی لینک می‌شود.</p>
+<div class="category-grid">
+<div class="category-card"><div class="cat-icon">&#127963;</div><strong>سیاسی</strong><br><small>Political</small></div>
+<div class="category-card"><div class="cat-icon">&#128176;</div><strong>اقتصادی</strong><br><small>Economic</small></div>
+<div class="category-card"><div class="cat-icon">&#128101;</div><strong>اجتماعی</strong><br><small>Social</small></div>
+<div class="category-card"><div class="cat-icon">&#127758;</div><strong>بین‌الملل</strong><br><small>International</small></div>
+<div class="category-card"><div class="cat-icon">&#128187;</div><strong>فناوری</strong><br><small>Technology</small></div>
+<div class="category-card"><div class="cat-icon">&#9917;</div><strong>ورزشی</strong><br><small>Sports</small></div>
+<div class="category-card"><div class="cat-icon">&#127912;</div><strong>فرهنگی</strong><br><small>Cultural</small></div>
+<div class="category-card"><div class="cat-icon">&#128300;</div><strong>علمی</strong><br><small>Scientific</small></div>
+<div class="category-card"><div class="cat-icon">&#128248;</div><strong>گالری</strong><br><small>Gallery</small></div>
+</div>
+<div class="step" style="margin-top:20px;"><div class="step-num">۱</div><div class="step-content">هر تب از منوی سایدبار قابل دسترسی است. با کلیک روی هر تب، وارد صفحه مقالات آن دسته‌بندی می‌شوید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">برای مدیریت دسته‌بندی‌ها (افزودن، ویرایش، حذف)، از بخش <strong>مدیریت &#8594; دسته‌بندی‌ها</strong> اقدام کنید.</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">هنگام ایجاد مقاله جدید، دسته‌بندی مورد نظر را از لیست انتخاب کنید تا مقاله در تب مربوطه نمایش داده شود.</div></div>
+</div>
+<div class="section" id="static-pages">
+<div class="section-header">
+<div class="section-icon">&#128221;</div>
+<div class="section-title">صفحات ایستا<small>Static Pages</small></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#9998;&#65039;</span> ویرایش صفحات (Edit Pages)</div>
+<p style="margin-bottom:15px;font-size:14px;color:var(--text-light);">صفحات ایستا شامل صفحاتی مانند درباره ما، تماس با ما، حریم خصوصی، شرایط استفاده و غیره هستند. این صفحات با متن ساده نوشته می‌شوند و به صورت خودکار به HTML تبدیل می‌شوند.</p>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>صفحات ایستا</strong> کلیک کنید، سپس <strong>ویرایش صفحات</strong> را انتخاب کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">لیست صفحات ایستا نمایش داده می‌شود. روی دکمه <strong>ویرایش</strong> کنار صفحه مورد نظر کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">در ویرایشگر متن، محتوای صفحه را ویرایش کنید. می‌توانید از متن ساده استفاده کنید، سیستم به صورت خودکار پاراگراف‌ها و خطوط جدید را به HTML تبدیل می‌کند.</div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content">پس از اتمام ویرایش، روی <strong>ذخیره</strong> کلیک کنید. تغییرات فوراً در سایت اعمال می‌شود.</div></div>
+<div class="tip-box"><strong>نکته:</strong> برای صفحاتی مانند درباره ما و تماس با ما، می‌توانید اطلاعات پایه را در بخش <strong>تنظیمات هدر</strong> تنظیم کنید و متن تفصیلی را در اینجا بنویسید.</div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128220;</span> پیام مدیر مسئول (Manager's Message)</div>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>پیام مدیر مسئول</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">ویرایشگر متن باز می‌شود. در اینجا می‌توانید متن پیام مدیر مسئول درباره راه‌اندازی سایت را بنویسید یا ویرایش کنید.</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">این پیام در صفحه اصلی سایت در بخش مخصوص پیام مدیر مسئول نمایش داده می‌شود.</div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content">پس از نوشتن متن، روی <strong>ذخیره</strong> کلیک کنید.</div></div>
+</div>
+</div>
+<div class="section" id="news">
+<div class="section-header">
+<div class="section-icon">&#128240;</div>
+<div class="section-title">اخبار<small>News</small></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128196;</span> اخبار سایت (Site Articles)</div>
+<p style="margin-bottom:15px;font-size:14px;color:var(--text-light);">در این بخش می‌توانید اخبار و مقالات سایت را ایجاد، ویرایش و مدیریت کنید.</p>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>اخبار</strong> کلیک کنید، سپس <strong>اخبار سایت</strong> را انتخاب کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">لیست اخبار فعلی نمایش داده می‌شود. هر خبر شامل اطلاعات زیر است:
+<table class="field-table">
+<tr><th>ستون</th><th>توضیح</th></tr>
+<tr><td>عنوان</td><td>عنوان خبر</td></tr>
+<tr><td>دسته‌بندی</td><td>دسته‌بندی خبر (سیاسی، اقتصادی و...)</td></tr>
+<tr><td>وضعیت</td><td>وضعیت انتشار خبر</td></tr>
+<tr><td>نویسنده</td><td>نام نویسنده</td></tr>
+<tr><td>تاریخ</td><td>تاریخ ایجاد یا ویرایش</td></tr>
+</table></div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content"><strong>ایجاد خبر جدید:</strong> روی دکمه <strong>افزودن خبر جدید</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content">فرم ایجاد خبر شامل فیلدهای زیر است:
+<table class="field-table">
+<tr><th>فیلد</th><th>توضیح</th></tr>
+<tr><td>عنوان</td><td>عنوان اصلی خبر (اجباری)</td></tr>
+<tr><td>محتوا</td><td>متن اصلی خبر با ویرایشگر متن غنی (Rich Text Editor)</td></tr>
+<tr><td>دسته‌بندی</td><td>انتخاب دسته‌بندی خبر از لیست</td></tr>
+<tr><td>تصویر شاخص</td><td>آپلود یا انتخاب تصویر شاخص خبر</td></tr>
+<tr><td>وضعیت</td><td>حالت انتشار خبر (پیش‌نویس، در انتظار، منتشر شده، بایگانی)</td></tr>
+<tr><td>برچسب‌ها</td><td>برچسب‌های مرتبط با خبر (با کاما جدا کنید)</td></tr>
+<tr><td>منبع</td><td>نام منبع خبر (اختیاری)</td></tr>
+<tr><td>متای SEO</td><td>عنوان و توضیحات متا برای موتورهای جستجو</td></tr>
+</table></div></div>
+<div class="step"><div class="step-num">۵</div><div class="step-content"><strong>وضعیت‌های خبر:</strong>
+<div class="status-flow">
+<div class="status-box" style="background:#ffc107;color:#333;">پیش‌نویس (DRAFT)</div>
+<div class="status-arrow">&#8592;&#8594;</div>
+<div class="status-box" style="background:#17a2b8;color:#fff;">در انتظار (PENDING)</div>
+<div class="status-arrow">&#8594;</div>
+<div class="status-box" style="background:#28a745;color:#fff;">منتشر شده (PUBLISHED)</div>
+<div class="status-arrow">&#8594;</div>
+<div class="status-box" style="background:#6c757d;color:#fff;">بایگانی (ARCHIVED)</div>
+</div>
+<table class="field-table">
+<tr><th>وضعیت</th><th>توضیح</th></tr>
+<tr><td><span class="badge badge-draft">پیش‌نویس</span></td><td>خبر ذخیره شده ولی هنوز منتشر نشده است</td></tr>
+<tr><td><span class="badge badge-pending">در انتظار</span></td><td>خبر برای بررسی و تأیید ارسال شده</td></tr>
+<tr><td><span class="badge badge-published">منتشر شده</span></td><td>خبر در سایت قابل مشاهده است</td></tr>
+<tr><td><span class="badge badge-archived">بایگانی</span></td><td>خبر از نمایش عمومی حذف شده ولی در پایگاه باقی است</td></tr>
+</table></div></div>
+<div class="step"><div class="step-num">۶</div><div class="step-content"><strong>ویرایش خبر:</strong> در لیست اخبار، روی دکمه <strong>ویرایش</strong> کنار خبر مورد نظر کلیک کنید. اطلاعات را تغییر دهید و ذخیره کنید.</div></div>
+<div class="step"><div class="step-num">۷</div><div class="step-content"><strong>حذف خبر:</strong> روی دکمه <strong>حذف</strong> کلیک کنید و در پنجره تأیید، گزینه تأیید را بزنید.</div></div>
+<div class="note info">اخبار اختصاصی که در بخش <strong>هیرو</strong> و <strong>آخرین اخبار</strong> با تب «نوشتن خبر اختصاصی» ایجاد می‌شوند، به صورت خودکار در این بخش با دسته‌بندی «اخبار اختصاصی لیان دید» ذخیره می‌شوند.</div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128172;</span> ارسالی مخاطبین (User Submissions)</div>
+<p style="margin-bottom:15px;font-size:14px;color:var(--text-light);">اخباری که بازدیدکنندگان سایت از طریق فرم ارسال خبر، خبری را برای سایت ارسال کرده‌اند.</p>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>ارسالی مخاطبین</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">لیست اخبار ارسالی بازدیدکنندگان نمایش داده می‌شود. هر ارسالی شامل نام فرستنده، عنوان، متن و تاریخ است.</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">برای مشاهده جزئیات یک ارسالی، روی آن کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content">می‌توانید ارسالی را <strong>تأیید</strong> کنید (به صورت خبر منتشر شده درآید)، <strong>ویرایش</strong> کنید و سپس منتشر کنید، یا <strong>حذف</strong> کنید.</div></div>
+</div>
+</div>
+<div class="section" id="management">
+<div class="section-header">
+<div class="section-icon">&#128193;</div>
+<div class="section-title">مدیریت<small>Management</small></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128194;</span> دسته‌بندی‌ها (Categories)</div>
+<p style="margin-bottom:15px;font-size:14px;color:var(--text-light);">دسته‌بندی‌ها برای طبقه‌بندی اخبار و مقالات استفاده می‌شوند. هر دسته‌بندی دارای نام، آدرس اختصاری، آیکون، رنگ و ترتیب نمایش است.</p>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>مدیریت</strong> کلیک کنید، سپس <strong>دسته‌بندی‌ها</strong> را انتخاب کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">لیست دسته‌بندی‌های فعلی نمایش داده می‌شود. هر دسته‌بندی شامل موارد زیر است:
+<table class="field-table">
+<tr><th>فیلد</th><th>توضیح</th></tr>
+<tr><td>نام</td><td>نام فارسی دسته‌بندی (مثلاً: سیاسی)</td></tr>
+<tr><td>آدرس اختصاری (Slug)</td><td>نام انگلیسی برای URL (مثلاً: political)</td></tr>
+<tr><td>آیکون</td><td>آیکون نمایشی دسته‌بندی</td></tr>
+<tr><td>رنگ</td><td>رنگ اختصاصی دسته‌بندی</td></tr>
+<tr><td>ترتیب</td><td>اولویت نمایش در منو</td></tr>
+</table></div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content"><strong>افزودن دسته‌بندی جدید:</strong> روی دکمه <strong>افزودن دسته‌بندی</strong> کلیک کنید. فیلدها را پر کرده و ذخیره کنید.</div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content"><strong>ویرایش دسته‌بندی:</strong> روی دکمه <strong>ویرایش</strong> کنار دسته‌بندی مورد نظر کلیک کنید. اطلاعات را تغییر دهید و ذخیره کنید.</div></div>
+<div class="step"><div class="step-num">۵</div><div class="step-content"><strong>حذف دسته‌بندی:</strong> روی دکمه <strong>حذف</strong> کلیک کنید و تأیید کنید. توجه: حذف دسته‌بندی‌ای که خبر دارد ممکن است باعث از بین رفتن ارتباط اخبار شود.</div></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#127759;</span> شهرها (Regions / Cities)</div>
+<p style="margin-bottom:15px;font-size:14px;color:var(--text-light);">مدیریت شهرها و مناطق استان بوشهر. هر خبر می‌تواند به یک شهر خاص اختصاص داشته باشد.</p>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>شهرها</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">لیست شهرهای استان بوشهر نمایش داده می‌شود (بوشهر، بندر بوشهر، برازجان، گناوه، خارگ، کنگان و...).</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content"><strong>افزودن شهر جدید:</strong> روی دکمه <strong>افزودن</strong> کلیک کنید. نام شهر و آدرس اختصاری را وارد کرده و ذخیره کنید.</div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content"><strong>ویرایش یا حذف شهر:</strong> از دکمه‌های <strong>ویرایش</strong> و <strong>حذف</strong> کنار هر شهر استفاده کنید.</div></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128172;</span> نظرات (Comments)</div>
+<p style="margin-bottom:15px;font-size:14px;color:var(--text-light);">مدیریت نظرات کاربران روی اخبار. نظرات پیش از نمایش عمومی باید تأیید شوند.</p>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>نظرات</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">لیست نظرات ارسالی کاربران نمایش داده می‌شود. هر نظر شامل نام نویسنده، متن نظر، خبر مربوطه و تاریخ است.</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content"><strong>تأیید نظر:</strong> روی دکمه <strong>تأیید</strong> کلیک کنید تا نظر در سایت نمایش داده شود.</div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content"><strong>رد نظر:</strong> روی دکمه <strong>رد</strong> کلیک کنید تا نظر تأیید نشود و از نمایش عمومی حذف شود.</div></div>
+<div class="step"><div class="step-num">۵</div><div class="step-content"><strong>حذف نظر:</strong> روی دکمه <strong>حذف</strong> کلیک کنید تا نظر به طور کامل حذف شود.</div></div>
+<div class="note info">نظرات پیش‌فرض در حالت «در انتظار تأیید» هستند و پس از تأیید شما در سایت نمایش داده می‌شوند.</div>
+</div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128232;</span> خبرنامه (Newsletter)</div>
+<p style="margin-bottom:15px;font-size:14px;color:var(--text-light);">مدیریت ایمیل‌های مشترکین خبرنامه. کاربرانی که در خبرنامه سایت عضو شده‌اند.</p>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>خبرنامه</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">لیست ایمیل‌های مشترکین نمایش داده می‌شود. هر اشتراک شامل ایمیل، تاریخ عضویت و وضعیت فعال بودن است.</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">می‌توانید ایمیل مشترکین را <strong>مشاهده</strong> و <strong>حذف</strong> کنید.</div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content">برای ارسال خبرنامه، از ابزارهای خارجی مانند Mailchimp استفاده کنید و لیست ایمیل‌ها را از این بخش استخراج کنید.</div></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128101;</span> کاربران (Users)</div>
+<p style="margin-bottom:15px;font-size:14px;color:var(--text-light);">مدیریت کاربران مدیریتی و نویسندگان سایت. هر کاربر دارای سطح دسترسی خاصی است.</p>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>کاربران</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">لیست کاربران فعلی نمایش داده می‌شود. هر کاربر شامل موارد زیر است:
+<table class="field-table">
+<tr><th>فیلد</th><th>توضیح</th></tr>
+<tr><td>نام</td><td>نام و نام خانوادگی کاربر</td></tr>
+<tr><td>ایمیل</td><td>ایمیل ورود کاربر</td></tr>
+<tr><td>نقش</td><td>سطح دسترسی کاربر (مدیر، نویسنده)</td></tr>
+<tr><td>وضعیت</td><td>فعال یا غیرفعال بودن حساب</td></tr>
+</table></div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content"><strong>افزودن کاربر جدید:</strong> روی دکمه <strong>افزودن کاربر</strong> کلیک کنید. اطلاعات زیر را وارد کنید:<br>• نام و نام خانوادگی<br>• ایمیل (برای ورود)<br>• رمز عبور<br>• نقش (مدیر یا نویسنده)</div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content"><strong>ویرایش کاربر:</strong> روی دکمه <strong>ویرایش</strong> کنار کاربر مورد نظر کلیک کنید. اطلاعات را تغییر دهید و ذخیره کنید.</div></div>
+<div class="step"><div class="step-num">۵</div><div class="step-content"><strong>حذف کاربر:</strong> روی دکمه <strong>حذف</strong> کلیک کنید و تأیید کنید. توجه: حذف مدیر اصلی توصیه نمی‌شود.</div></div>
+<div class="note danger">هشدار: رمز عبور کاربران جدید را به صورت امن ارسال کنید و هرگز آن را در مکان‌های عمومی ذخیره نکنید.</div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128248;</span> رسانه (Media)</div>
+<p style="margin-bottom:15px;font-size:14px;color:var(--text-light);">آپلود و مدیریت تصاویر و فایل‌های چندرسانه‌ای سایت.</p>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>رسانه</strong> کلیک کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">کتابخانه رسانه نمایش داده می‌شود. فایل‌های آپلود شده قبلی را می‌توانید مشاهده کنید.</div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content"><strong>آپلود فایل جدید:</strong> روی دکمه <strong>آپلود</strong> کلیک کنید و فایل مورد نظر را انتخاب کنید. فرمت‌های مجاز: JPG, PNG, GIF, SVG, PDF, MP4</div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content"><strong>حذف فایل:</strong> روی فایل مورد نظر کلیک کنید و سپس دکمه <strong>حذف</strong> را بزنید.</div></div>
+<div class="step"><div class="step-num">۵</div><div class="step-content"><strong>کپی لینک:</strong> روی فایل کلیک کنید و لینک URL آن را کپی کنید تا در مقالات استفاده کنید.</div></div>
+<div class="tip-box"><strong>نکته:</strong> برای بهینه‌سازی سرعت سایت، تصاویر را قبل از آپلود فشرده‌سازی (compress) کنید. حداکثر اندازه پیشنهادی: ۵۰۰ کیلوبایت.</div>
+</div>
+</div>
+<div class="section" id="footer">
+<div class="section-header">
+<div class="section-icon">&#128279;</div>
+<div class="section-title">فوتر<small>Footer Settings</small></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#9881;&#65039;</span> تنظیمات فوتر (Footer Settings)</div>
+<p style="margin-bottom:15px;font-size:14px;color:var(--text-light);">در این بخش می‌توانید محتوا و لینک‌های فوتر (پابرگ) سایت را مدیریت کنید.</p>
+<div class="step"><div class="step-num">۱</div><div class="step-content">از سایدبار روی <strong>فوتر</strong> کلیک کنید، سپس <strong>تنظیمات فوتر</strong> را انتخاب کنید.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">فیلدهای قابل تنظیم در فوتر:
+<table class="field-table">
+<tr><th>فیلد</th><th>توضیح</th></tr>
+<tr><td>متن فوتر</td><td>متن توضیحی که در بالای فوتر نمایش داده می‌شود</td></tr>
+<tr><td>لینک‌های مفید</td><td>لینک‌هایی مانند درباره ما، تماس با ما، حریم خصوصی</td></tr>
+<tr><td>کپی‌رایت</td><td>متن کپی‌رایت در پایین فوتر (مثلاً: تمامی حقوق محفوظ است)</td></tr>
+<tr><td>لینک شبکه‌های اجتماعی</td><td>لینک‌های شبکه‌های اجتماعی (از بخش تنظیمات هدر نیز قابل تنظیم است)</td></tr>
+<tr><td>شماره پروانه</td><td>شماره پروانه انتشار (از بخش پروانه انتشار تنظیم می‌شود)</td></tr>
+</table></div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content">اطلاعات را تکمیل کرده و روی <strong>ذخیره</strong> کلیک کنید. تغییرات فوراً در فوتر سایت اعمال می‌شود.</div></div>
+</div>
+</div>
+<div class="section" id="shutdown">
+<div class="section-header">
+<div class="section-icon">&#128274;</div>
+<div class="section-title">خاموش کردن سیستم<small>System Shutdown</small></div>
+</div>
+<div class="subsection">
+<div class="subsection-title"><span class="icon">&#128274;</span> خاموش کردن سیستم (Shutdown)</div>
+<p style="margin-bottom:15px;font-size:14px;color:var(--text-light);">این بخش برای خاموش کردن موقت سایت و ایجاد پشتیبان استفاده می‌شود.</p>
+<div class="step"><div class="step-num">۱</div><div class="step-content">دکمه <strong>خاموش کردن سیستم</strong> در نوار بالایی (هدر ادمین) قرار دارد.</div></div>
+<div class="step"><div class="step-num">۲</div><div class="step-content">با کلیک روی این دکمه، پنجره‌ای باز می‌شود که شامل گزینه‌های زیر است:
+<div class="note danger">&#9888;&#65039; قبل از خاموش کردن سیستم، حتماً از پشتیبان (Backup) استفاده کنید. این عمل غیرقابل بازگشت است.</div>
+<table class="field-table" style="margin-top:15px;">
+<tr><th>گزینه</th><th>توضیح</th></tr>
+<tr><td>ذخیره پشتیبان</td><td>قبل از خاموشی، یک فایل پشتیبان از کل سیستم ایجاد می‌شود</td></tr>
+<tr><td>خاموش کردن</td><td>سایت را به حالت تعمیراتی (Maintenance Mode) درآورده و از دسترس خارج می‌کند</td></tr>
+</table></div></div>
+<div class="step"><div class="step-num">۳</div><div class="step-content"><strong>مراحل خاموشی:</strong><br>۱. ابتدا گزینه <strong>ذخیره پشتیبان</strong> را فعال کنید<br>۲. سپس روی دکمه <strong>خاموش کردن</strong> کلیک کنید<br>۳. در پنجره تأیید نهایی، <strong>تأیید</strong> را بزنید</div></div>
+<div class="step"><div class="step-num">۴</div><div class="step-content">پس از خاموشی، سایت برای بازدیدکنندگان پیام «سایت در حال تعمیرات است» را نمایش می‌دهد. فقط مدیران می‌توانند با آدرس امن وارد شوند.</div></div>
+<div class="note info">برای روشن کردن مجدد سیستم، با آدرس امن وارد شوید و از همین بخش سیستم را مجدداً فعال کنید.</div>
+</div>
+</div>
+<div class="page-footer">
+  <span class="footer-brand">تهیه کننده: لیان دیزاین</span> | 
+  <span class="footer-phone">تلفن تماس: 09938866331</span> | 
+  <span>نسخه ۱.۰ راهنمای مدیریت سایت لیان دید | مرداد ۱۴۰۵</span>
+</div>
+</div>
+</body>
+</html>

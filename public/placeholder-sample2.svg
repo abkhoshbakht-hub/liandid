@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1B365D"/>
+      <stop offset="100%" style="stop-color:#2E5090"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#C9A96E" stroke-width="0.3" opacity="0.15"/>
+    </pattern>
+    <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#C9A96E;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#C9A96E;stop-opacity:0.08"/>
+      <stop offset="100%" style="stop-color:#C9A96E;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg)"/>
+  <rect width="800" height="450" fill="url(#grid)"/>
+  <rect width="800" height="67.5" y="382.5" fill="url(#shine)"/>
+  <circle cx="740" cy="60" r="120" fill="#C9A96E" opacity="0.06"/>
+  <circle cx="770" cy="30" r="80" fill="#C9A96E" opacity="0.04"/>
+  <circle cx="80" cy="410" r="100" fill="#C9A96E" opacity="0.05"/>
+  <line x1="40" y1="415" x2="760" y2="415" stroke="#C9A96E" stroke-width="2" opacity="0.3"/>
+  <rect x="40" y="418" width="60" height="4" rx="2" fill="#C9A96E" opacity="0.5"/>
+  <text x="400" y="211" text-anchor="middle" fill="white" font-family="Vazirmatn, Tahoma, Arial" font-size="22" font-weight="700" opacity="0.95">
+    <tspan x="400" dy="0">امام جمعه بوشهر</tspan>
+  </text>
+  <text x="40" y="35" fill="#C9A96E" font-family="Vazirmatn, Tahoma, Arial" font-size="13" font-weight="500" opacity="0.8">بوشهر نیوز</text>
+  <rect x="40" y="45" width="90" height="26" rx="13" fill="#C9A96E" opacity="0.2"/><text x="85" y="62" text-anchor="middle" fill="#C9A96E" font-family="Vazirmatn, Tahoma, Arial" font-size="12" font-weight="500">اقتصادی</text>
+</svg>

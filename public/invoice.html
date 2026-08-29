@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لیست عملکرد و محاسبه دستمزد - سایت لیان دید</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+:root{--navy:#1B365D;--gold:#C9A96E;--bg:#fafbfc}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Vazirmatn',Tahoma,Arial,sans-serif;color:#1a1a1a;line-height:1.8;font-size:13px;background:var(--bg)}
+.page{max-width:950px;margin:0 auto;padding:30px 20px}
+.cover{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,#0f2440,#1B365D,#2a4a7a);color:#fff;text-align:center;page-break-after:always;position:relative;overflow:hidden}
+.cover::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(201,169,110,0.12) 0%,transparent 70%);border-radius:50%}
+.cover-badge{background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);border-radius:50px;padding:8px 30px;font-size:12px;color:#C9A96E;margin-bottom:30px;position:relative;z-index:1}
+.cover h1{font-size:38px;font-weight:900;margin-bottom:8px;position:relative;z-index:1}
+.cover h2{font-size:20px;font-weight:500;color:rgba(255,255,255,0.7);margin-bottom:5px;position:relative;z-index:1}
+.cover .gold{color:#C9A96E;font-weight:700}
+.cover .divider{width:100px;height:3px;background:#C9A96E;margin:20px auto;position:relative;z-index:1;border-radius:2px}
+.cover .info-box{border:1px solid rgba(201,169,110,0.3);border-radius:16px;padding:20px 40px;margin-top:30px;position:relative;z-index:1;background:rgba(255,255,255,0.05)}
+.cover .info-box p{font-size:14px;margin-bottom:3px}
+.cover .info-box .big{font-size:18px;font-weight:700;color:#C9A96E}
+.cover .date{position:relative;z-index:1;margin-top:25px;font-size:12px;color:rgba(255,255,255,0.4)}
+.section-title{font-size:18px;font-weight:800;color:var(--navy);margin:25px 0 12px;padding-bottom:8px;border-bottom:3px solid var(--gold);display:inline-block}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12px}
+th{background:var(--navy);color:#fff;padding:8px 10px;text-align:right;font-weight:600;font-size:11px}
+td{padding:6px 10px;border-bottom:1px solid #eee;font-size:12px}
+tr:nth-child(even){background:#f8f9fa}
+tr:hover{background:#f0f4f8}
+.price{font-weight:700;color:var(--gold);font-size:13px;white-space:nowrap}
+.old-price{text-decoration:line-through;color:#aaa;font-size:11px;font-weight:400;margin-left:5px}
+.section-total{background:linear-gradient(135deg,#f8f5f0,#fdf9f3);border:1px solid #e8dcc8;border-radius:8px;padding:10px 15px;margin:10px 0;text-align:left;font-size:13px}
+.section-total .amount{font-size:18px;font-weight:800;color:var(--gold)}
+.note{background:#e8f0fe;border:1px solid #1B365D;border-right:4px solid #1B365D;padding:10px 14px;border-radius:8px;margin:12px 0;font-size:12px;color:#1B365D}
+.note.green{background:#d4edda;border-color:#28a745;border-right-color:#28a745;color:#155724}
+.footer{text-align:center;padding:20px;margin-top:30px;border-top:2px solid var(--gold);font-size:11px;color:#666}
+.footer .brand{font-weight:700;color:var(--navy);font-size:13px}
+@media print{@page{margin:12mm 8mm 18mm 8mm}body{font-size:10px}.cover{min-height:auto;padding:80px 20px;background:var(--navy)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.page{padding:0}th,td{padding:5px 8px;font-size:9px}.section-title{font-size:14px}.section-total .amount{font-size:14px}}
+@media(max-width:768px){.page{padding:15px 10px}.cover h1{font-size:24px}.cover h2{font-size:14px}}
+</style>
+</head>
+<body>
+<div class="cover">
+  <div class="cover-badge">محاسبه هزینه و دستمزد</div>
+  <h1>لیست عملکرد و <span class="gold">محاسبه دستمزد</span></h1>
+  <h2>سایت خبری <span class="gold">لیان دید</span></h2>
+  <h2>پایگاه خبری تحلیلی استان بوشهر</h2>
+  <div class="divider"></div>
+  <div class="info-box">
+    <p>تهیه کننده: <span class="big">لیان دیزاین</span></p>
+    <p>تلفن تماس: <span class="big" style="direction:ltr;display:inline-block">09938866331</span></p>
+    <p style="margin-top:12px">تاریخ تنظیم: <span class="big">شهریور ۱۴۰۵</span></p>
+  </div>
+  <div class="date">قیمت‌ها بر اساس نرخ بازار شهریور ۱۴۰۵ با ۲۰٪ تخفیف ویژه</div>
+</div>
+<div class="page">
+<div class="note">
+  <strong>توضیح:</strong> کلیه قیمت‌ها بر اساس نرخ‌های بازار طراحی سایت در شهریور ۱۴۰۵ محاسبه شده و <strong>۲۰٪ تخفیف ویژه</strong> روی تمام آیتم‌ها اعمال گردیده است.
+</div>
+
+<!-- بخش ۱ -->
+<div class="section-title">بخش ۱: طراحی و توسعه رابط کاربری (Frontend)</div>
+<table>
+<tr><th>ردیف</th><th>شرح خدمت</th><th>توضیح</th><th>مبلغ (تومان)</th></tr>
+<tr><td>۱</td><td>طراحی ریسپانسیو صفحه اصلی</td><td>سازگار با موبایل، تبلت و دسکتاپ با Tailwind CSS</td><td class="price">۶,۴۰۰,۰۰۰ <span class="old-price">۸,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲</td><td>هدر اختصاصی با تصویر پرچم</td><td>بک‌گراند تصویری، لوگو، جستجو و منوی ناوبری</td><td class="price">۲,۴۰۰,۰۰۰ <span class="old-price">۳,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۳</td><td>نوار ابزاری بالای هدر</td><td>تاریخ شمسی، پروانه انتشار، لینک شبکه اجتماعی</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۴</td><td>منوی ناوبری اصلی</td><td>۸ دسته اصلی با ۴۷ زیرمجموعه کشویی</td><td class="price">۲,۰۰۰,۰۰۰ <span class="old-price">۲,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۵</td><td>نوار اخبار لحظه‌ای (Ticker)</td><td>اسکرول اخبار فوری با انیمیشن</td><td class="price">۲,۰۰۰,۰۰۰ <span class="old-price">۲,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۶</td><td>تایمر شمارش معکوس مناسبت‌ها</td><td>۷۰+ رویداد تقویمی شمسی با شمارش معکوس</td><td class="price">۲,۰۰۰,۰۰۰ <span class="old-price">۲,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۷</td><td>تایمر قیمت بازار</td><td>دلار، یورو، سکه، طلا از ۳ API با کش ۵ دقیقه</td><td class="price">۲,۴۰۰,۰۰۰ <span class="old-price">۳,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۸</td><td>بخش هیرو (بنر اصلی)</td><td>اسلایدر اخبار ویژه با تصویر و عنوان</td><td class="price">۳,۲۰۰,۰۰۰ <span class="old-price">۴,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۹</td><td>بخش آخرین اخبار</td><td>grid اخبار با تصویر شاخص و دسته‌بندی</td><td class="price">۲,۴۰۰,۰۰۰ <span class="old-price">۳,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۰</td><td>بخش تحلیل خبر</td><td>خبر تحلیلی ویژه با طراحی خاص</td><td class="price">۲,۰۰۰,۰۰۰ <span class="old-price">۲,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۱</td><td>تب‌های دسته‌بندی</td><td>تب‌های ناوبری برای فیلتر اخبار صفحه اصلی</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۲</td><td>فید RSS خبری</td><td>نمایش اخبار RSS در صفحه اصلی</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۳</td><td>بنر ارسال خبر</td><td>SubmitBanner پویا از دیتابیس</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۴</td><td>فوتر کامل</td><td>اطلاعات تماس، لینک‌ها، شبکه اجتماعی، خبرنامه</td><td class="price">۲,۴۰۰,۰۰۰ <span class="old-price">۳,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۵</td><td>صفحه خبر (مقاله)</td><td>نمایش کامل خبر با تصویر، متن، نظرات و اخبار مرتبط</td><td class="price">۲,۸۰۰,۰۰۰ <span class="old-price">۳,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۶</td><td>صفحه دسته‌بندی</td><td>لیست اخبار هر دسته با فیلتر و صفحه‌بندی</td><td class="price">۲,۰۰۰,۰۰۰ <span class="old-price">۲,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۷</td><td>صفحه زیرمجموعه</td><td>لیست اخبار هر زیرمجموعه</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۸</td><td>صفحه جستجو</td><td>جستجوی پیشرفته اخبار با فیلتر</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۹</td><td>صفحه درباره ما</td><td>معرفی سایت با قابلیت ویرایش از داشبورد</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۰</td><td>صفحه تماس با ما</td><td>فرم ارسال پیام + اطلاعات تماس</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۱</td><td>صفحه گالری</td><td>نمایش تصاویر با آپلود از داشبورد</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۲</td><td>صفحه ارسال خبر توسط مخاطب</td><td>فرم ارسال خبر با آپلود فایل</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۳</td><td>صفحه حریم خصوصی</td><td>سیاست حفظ حریم خصوصی</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۴</td><td>صفحه قوانین</td><td>شرایط و قوانین استفاده</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۵</td><td>صفحه استان‌ها</td><td>نمایش ۳۱ استان و شهرهای ایران</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۶</td><td>پیام مدیر مسئول</td><td>صفحه اختصاصی پیام مدیر با تصویر</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۷</td><td>نقشه تعاملی بوشهر</td><td>SVG نقشه ۱۱ شهرستان با لینک</td><td class="price">۲,۸۰۰,۰۰۰ <span class="old-price">۳,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۸</td><td>بخش تحلیل‌ها</td><td>کامپوننت تحلیل خبر ویژه صفحه اصلی</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۹</td><td>صفحه راهاندازی سایت</td><td>صفحه معرفی اولیه سایت</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۳۰</td><td>صفحه ۴۰۴ اختصاصی</td><td>صفحه خطا با طراحی حرفه‌ای</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+</table>
+<div class="section-total">جمع بخش ۱: <span class="amount">۴۸,۰۰۰,۰۰۰ تومان</span></div>
+
+<!-- بخش ۲ -->
+<div class="section-title">بخش ۲: پنل مدیریت (Admin Dashboard)</div>
+<table>
+<tr><th>ردیف</th><th>شرح خدمت</th><th>توضیح</th><th>مبلغ (تومان)</th></tr>
+<tr><td>۱</td><td>سیستم احراز هویت</td><td>ورود امن با NextAuth + JWT + bcrypt</td><td class="price">۳,۲۰۰,۰۰۰ <span class="old-price">۴,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲</td><td>صفحه ورود امن</td><td>فرم ورود با آدرس مخفی /secure-a2x-admin</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۳</td><td>سایدبار مدیریت</td><td>منوی ۸ بخش با آیکون و پیش‌نمایش زنده</td><td class="price">۲,۴۰۰,۰۰۰ <span class="old-price">۳,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۴</td><td>پیشخوان داشبورد</td><td>آمار اخبار، انتظار تایید، ارسالی‌ها، مشترکین</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۵</td><td>مدیریت اخبار (مقالات)</td><td>CRUD کامل با وضعیت، دسته، برچسب، تصویر شاخص، SEO، زمان‌بندی شمسی</td><td class="price">۴,۸۰۰,۰۰۰ <span class="old-price">۶,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۶</td><td>مدیریت دسته‌بندی‌ها</td><td>ایجاد، ویرایش، حذف با آیکون، رنگ و ترتیب</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۷</td><td>مدیریت صفحه اصلی</td><td>۲۰ باکس قابل تنظیم با انتخاب از آرشیو یا نوشتن اختصاصی</td><td class="price">۴,۰۰۰,۰۰۰ <span class="old-price">۵,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۸</td><td>مدیریت اخبار خارجی (RSS)</td><td>فیلتر، تایید/رد/حذف دسته‌ای، تعیین منطقه</td><td class="price">۳,۲۰۰,۰۰۰ <span class="old-price">۴,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۹</td><td>مدیریت مناسبت‌های تقویمی</td><td>۷۰+ رویداد شمسی با ایجاد/ویرایش/حذف</td><td class="price">۲,۰۰۰,۰۰۰ <span class="old-price">۲,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۰</td><td>مدیریت اخبار لحظه‌ای</td><td>اخبار فوری با نام منبع و لینک</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۱</td><td>مدیریت نظرات</td><td>تایید، حذف، مدیریت نظرات کاربران</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۲</td><td>مدیریت خبرنامه</td><td>مشاهده و مدیریت ایمیل مشترکین</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۳</td><td>مدیریت کاربران</td><td>ایجاد، ویرایش، حذف با نقش و دسترسی‌های جزئی</td><td class="price">۲,۴۰۰,۰۰۰ <span class="old-price">۳,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۴</td><td>مدیریت شهرها و مناطق</td><td>تخصیص اخبار به ۱۱ شهرستان بوشهر</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۵</td><td>مدیریت رسانه (آپلود فایل)</td><td>آپلود، لیست، کپی URL، حذف تصاویر</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۶</td><td>مدیریت گالری</td><td>آپلود تصویر با نوار پیشرفت و مدیریت</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۷</td><td>مدیریت فوتر</td><td>ویرایش محتوا و لینک‌های فوتر</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۸</td><td>تنظیمات هدر</td><td>ویرایش لوگو، پروانه انتشار، جستجو، OG Image</td><td class="price">۲,۴۰۰,۰۰۰ <span class="old-price">۳,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۹</td><td>مدیریت شبکه‌های اجتماعی</td><td>لینک تلگرام، اینستاگرام، روبیکا، بله</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۰</td><td>صفحات ایستا (CMS)</td><td>ویرایش صفحات ثابت با متن ساده و تبدیل خودکار به HTML</td><td class="price">۲,۴۰۰,۰۰۰ <span class="old-price">۳,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۱</td><td>مدیریت ارسالی مخاطبین</td><td>بررسی و تایید/رد اخبار ارسالی با یادداشت مدیر</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۲</td><td>بخش خبر اختصاصی</td><td>نوشتن و مدیریت اخبار اختصاصی صفحه اصلی</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۳</td><td>آرشیو خودکار اخبار اختصاصی</td><td>ذخیره خودکار در جدول مقالات با دسته اختصاصی</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۴</td><td>اشتراک‌گذاری شبکه اجتماعی</td><td>ارسال خودکار به بله و روبیکا</td><td class="price">۲,۰۰۰,۰۰۰ <span class="old-price">۲,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۵</td><td>پیش‌نمایش زنده سایت</td><td>نمایش پیش‌نمایش تغییرات در سایدبار</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۶</td><td>پیکربندی زمان‌بندی انتشار</td><td>انتخاب تاریخ و ساعت شمسی برای انتشار</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۷</td><td>کنترل دسترسی نقش‌ها</td><td>تفاوت دسترسی ADMIN و AUTHOR با ۷ مجوز جزئی</td><td class="price">۲,۰۰۰,۰۰۰ <span class="old-price">۲,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۸</td><td>سیستم بکاپ‌گیری</td><td>پشتیبان‌گیری کامل با انتخاب مسیر ذخیره‌سازی</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۹</td><td>خاموش کردن ایمن سیستم</td><td>خاموشی با سوال بکاپ قبل از اجرا</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۳۰</td><td>تغییر رمز عبور</td><td>فرم تغییر رمز با تایید رمز فعلی</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۳۱</td><td>سیستم فراموشی رمز</td><td>بازیابی رمز با شماره موبایل و کد OTP</td><td class="price">۲,۰۰۰,۰۰۰ <span class="old-price">۲,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۳۲</td><td>راهنمای تعاملی داشبورد</td><td>آموزش ۸ بخش با آکاردئون تعاملی</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+</table>
+<div class="section-total">جمع بخش ۲: <span class="amount">۵۷,۶۰۰,۰۰۰ تومان</span></div>
+
+<!-- بخش ۳ -->
+<div class="section-title">بخش ۳: بک‌اند و API</div>
+<table>
+<tr><th>ردیف</th><th>شرح خدمت</th><th>توضیح</th><th>مبلغ (تومان)</th></tr>
+<tr><td>۱</td><td>پایگاه داده Prisma/SQLite</td><td>۱۲ مدل داده با روابط کامل</td><td class="price">۳,۲۰۰,۰۰۰ <span class="old-price">۴,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲</td><td>API احراز هویت NextAuth</td><td>JWT + Credentials + نقش</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۳</td><td>API اخبار (مقالات)</td><td>CRUD + فیلتر + صفحه‌بندی + زمان‌بندی</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۴</td><td>API دسته‌بندی‌ها</td><td>مدیریت دسته‌بندی‌ها</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۵</td><td>API صفحه اصلی</td><td>مدیریت باکس‌های صفحه اصلی</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۶</td><td>API تنظیمات</td><td>ذخیره و بازیابی کلید-مقدار تنظیمات</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۷</td><td>API آپلود فایل</td><td>آپلود تصاویر به public/uploads</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۸</td><td>API مدیریت رسانه</td><td>لیست فایل‌های آپلود شده</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۹</td><td>API نظرات</td><td>ارسال + دریافت نظرات تایید شده</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۰</td><td>API خبرنامه</td><td>اشتراک + ایمیل خوش‌آمدگویی + اطلاع‌رسانی انتشار</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۱</td><td>API کاربران</td><td>مدیریت کاربران و دسترسی‌ها</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۲</td><td>API ارسالی مخاطبین</td><td>دریافت و مدیریت اخبار ارسالی</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۳</td><td>API اخبار خارجی (RSS)</td><td>فیلتر و مدیریت اخبار خارجی</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۴</td><td>API مناسبت‌ها</td><td>مدیریت رویدادهای تقویمی</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۵</td><td>API صفحات ایستا</td><td>مدیریت محتوای صفحات ثابت</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۶</td><td>API شهرها و مناطق</td><td>مدیریت مناطق جغرافیایی</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۷</td><td>API تغییر رمز</td><td>تغییر رمز با تایید رمز فعلی</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۸</td><td>API فراموشی رمز</td><td>تولید و ذخیره OTP</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۹</td><td>API ریست رمز</td><td>تایید OTP و تغییر رمز</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۰</td><td>API بکاپ و خاموشی</td><td>پشتیبان‌گیری و خاموشی ایمن</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۱</td><td>API اشتراک‌گذاری اجتماعی</td><td>ارسال به بله و روبیکا</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۲</td><td>API قیمت بازار</td><td>دریافت قیمت‌ها از ۳ API با کش</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۳</td><td>API جستجو</td><td>جستجوی اخبار بر اساس عنوان و محتوا</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۴</td><td>API برچسب‌ها</td><td>ایجاد و لیست برچسب‌ها</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۵</td><td>API تگ‌ها</td><td>مدیریت برچسب‌های اخبار</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۶</td><td>API فید RSS</td><td>تولید فید XML سایت و هر دسته</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۷</td><td>API مقاله عمومی</td><td>دریافت جزئیات مقاله + افزایش بازدید</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۸</td><td>API placeholder</td><td>تولید تصویر SVG جایگزین با رنگ دسته</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲۹</td><td>میان‌افزار امنیتی (Middleware)</td><td>محافظت از مسیرهای ادمین</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+</table>
+<div class="section-total">جمع بخش ۳: <span class="amount">۲۶,۸۰۰,۰۰۰ تومان</span></div>
+
+<!-- بخش ۴ -->
+<div class="section-title">بخش ۴: سئو و بهینه‌سازی</div>
+<table>
+<tr><th>ردیف</th><th>شرح خدمت</th><th>توضیح</th><th>مبلغ (تومان)</th></tr>
+<tr><td>۱</td><td>تگ‌های متای پویا</td><td>generateMetadata برای همه صفحات با OG و canonical</td><td class="price">۲,۴۰۰,۰۰۰ <span class="old-price">۳,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲</td><td>فایل robots.txt</td><td>تنظیمات خزش موتورهای جستجو</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۳</td><td>فایل sitemap.xml</td><td>نقشه سایت پویا با همه مقالات و دسته‌ها</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۴</td><td>ساختار URL بهینه</td><td>مسیرهای فارسی و خوانا برای همه صفحات</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۵</td><td>JSON-LD (داده‌های ساختاریافته)</td><td>NewsArticle schema برای گوگل نیوز</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۶</td><td>OG Image پویا</td><td>تصویر OG از دیتابیس با fallback</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۷</td><td>بهینه‌سازی تصاویر</td><td>استفاده از next/image برای بهینه لود</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۸</td><td>پیکربندی دامنه‌های تصویر</td><td>۱۶ دامنه خبرگزاری مجاز برای بارگذاری</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۹</td><td>فید RSS XML</td><td>تولید خودکار فید RSS سایت و هر دسته</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۰</td><td>بهینه‌سازی build</td><td>بهینه‌سازی production build و کاهش حجم</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+</table>
+<div class="section-total">جمع بخش ۴: <span class="amount">۸,۸۰۰,۰۰۰ تومان</span></div>
+
+<!-- بخش ۵ -->
+<div class="section-title">بخش ۵: امنیت</div>
+<table>
+<tr><th>ردیف</th><th>شرح خدمت</th><th>توضیح</th><th>مبلغ (تومان)</th></tr>
+<tr><td>۱</td><td>رمزگذاری رمزها</td><td>bcrypt برای رمزهای عبور</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲</td><td>توکن JWT</td><td>احراز هویت stateless با انقضا ۲ ساعت</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۳</td><td>محافظت مسیرها</td><td>Middleware برای محافظت از صفحات ادمین</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۴</td><td>آدرس مخفی ادمین</td><td>/secure-a2x-admin به جای /admin</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۵</td><td>کنترل دسترسی نقش‌ها</td><td>تفاوت دسترسی ADMIN و AUTHOR با ۷ مجوز</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۶</td><td>محافظت API</td><td>تایید احراز هویت در همه APIهای ادمین</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۷</td><td>جلوگیری از حذف خود</td><td>کاربر نمی‌تواند خودش را حذف کند</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۸</td><td>جلوگیری از حذف دسته شلوغ</td><td>حذف دسته فقط در صورت خالی بودن</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+</table>
+<div class="section-total">جمع بخش ۵: <span class="amount">۶,۰۰۰,۰۰۰ تومان</span></div>
+
+<!-- بخش ۶ -->
+<div class="section-title">بخش ۶: طراحی ریسپانسیو و UI/UX</div>
+<table>
+<tr><th>ردیف</th><th>شرح خدمت</th><th>توضیح</th><th>مبلغ (تومان)</th></tr>
+<tr><td>۱</td><td>ریسپانسیو کامل</td><td>سازگاری با تمام اندازه صفحه‌نمایش</td><td class="price">۳,۲۰۰,۰۰۰ <span class="old-price">۴,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲</td><td>پالت رنگ اختصاصی</td><td>سرمه‌ای #1B365D + طلایی #C9A96E</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۳</td><td>فونت وزیر</td><td>فونت فارسی حرفه‌ای Vazirmatn</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۴</td><td>آیکون‌های SVG اختصاصی</td><td>آیکون‌های دستی برای منوها و بخش‌ها</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۵</td><td>انیمیشن‌ها و ترنزیشن‌ها</td><td>افکت‌های hover و transition</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۶</td><td>منوی موبایل</td><td>همبرگری منو برای موبایل با صفحه کامل</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۷</td><td>قالب‌بندی فارسی (RTL)</td><td>جهت راست به چپ برای همه عناصر</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۸</td><td>کارت‌های خبری</td><td>قالب نمایش اخبار با تصویر شاخص</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۹</td><td>انیمیشن بارگذاری</td><td>لودینگ اسپینر برای همه صفحات</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۰</td><td>اسکرولبار اختصاصی</td><td>نوار اسکرول با رنگ سایت</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۱</td><td>پیش‌نمایش در داشبورد</td><td>نمایش زنده تغییرات در سایدبار</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+</table>
+<div class="section-total">جمع بخش ۶: <span class="amount">۱۱,۶۰۰,۰۰۰ تومان</span></div>
+
+<!-- بخش ۷ -->
+<div class="section-title">بخش ۷: محتوا و سیستم‌های محتوایی</div>
+<table>
+<tr><th>ردیف</th><th>شرح خدمت</th><th>توضیح</th><th>مبلغ (تومان)</th></tr>
+<tr><td>۱</td><td>سیستم اخبار کامل</td><td>ایجاد، ویرایش، حذف، دسته، برچسب، وضعیت، تصویر شاخص، SEO</td><td class="price">۲,۴۰۰,۰۰۰ <span class="old-price">۳,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲</td><td>صفحات ایستا (CMS)</td><td>ویرایش صفحات ثابت با متن ساده</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۳</td><td>سیستم نظرات</td><td>ارسال و مدیریت نظرات کاربران</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۴</td><td>خبرنامه ایمیلی</td><td>اشتراک + ایمیل خوش‌آمدگویی + اطلاع‌رسانی انتشار</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۵</td><td>گالری تصاویر</td><td>آپلود و نمایش تصاویر</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۶</td><td>ارسال خبر توسط مخاطب</td><td>فرم ارسال اخبار با آپلود فایل</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۷</td><td>تقویم مناسبت‌ها</td><td>۷۰+ رویداد تقویمی شمسی</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۸</td><td>اخبار لحظه‌ای</td><td>اخبار فوری از خبرگزاری‌ها</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۹</td><td>آرشیو خودکار</td><td>ذخیره اخبار اختصاصی در آرشیو</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۰</td><td>پیام مدیر مسئول</td><td>صفحه اختصاصی پیام مدیر</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۱</td><td>تصویر جایگزین خودکار</td><td>تولید SVG placeholder با رنگ دسته</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+</table>
+<div class="section-total">جمع بخش ۷: <span class="amount">۱۵,۶۰۰,۰۰۰ تومان</span></div>
+
+<!-- بخش ۸ -->
+<div class="section-title">بخش ۸: خبرخوان (RSS) و یکپارچه‌سازی</div>
+<table>
+<tr><th>ردیف</th><th>شرح خدمت</th><th>توضیح</th><th>مبلغ (تومان)</th></tr>
+<tr><td>۱</td><td>خبرخوان خودکار</td><td>دریافت اخبار از ۱۱ منبع (۶ بوشهری + ۵ ملی)</td><td class="price">۳,۲۰۰,۰۰۰ <span class="old-price">۴,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲</td><td>طبقه‌بندی خودکار</td><td>طبقه‌بندی به ۸ دسته با ۴۷ زیرمجموعه</td><td class="price">۲,۴۰۰,۰۰۰ <span class="old-price">۳,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۳</td><td>تشخیص منطقه بوشهر</td><td>تشخیص خودکار ۱۱ شهرستان با کلمات کلیدی</td><td class="price">۲,۴۰۰,۰۰۰ <span class="old-price">۳,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۴</td><td>زمان‌بندی دریافت</td><td>بروزرسانی هر ۱۰ دقیقه با debounce</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۵</td><td>حذف تکراری</td><td>جلوگیری از درج اخبار تکراری</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۶</td><td>استخراج تصویر</td><td>استخراج تصویر از enclosure/media:content/HTML</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۷</td><td>تأیید خودکار اخبار بوشهر</td><td>اخبار بوشهر خودکار تایید می‌شوند</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۸</td><td>اشتراک‌گذاری شبکه اجتماعی</td><td>ارسال خودکار به بله و روبیکا</td><td class="price">۲,۰۰۰,۰۰۰ <span class="old-price">۲,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۹</td><td>فید RSS XML</td><td>تولید فید سایت و هر دسته</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+</table>
+<div class="section-total">جمع بخش ۸: <span class="amount">۱۴,۸۰۰,۰۰۰ تومان</span></div>
+
+<!-- بخش ۹ -->
+<div class="section-title">بخش ۹: زیرساخت و استقرار</div>
+<table>
+<tr><th>ردیف</th><th>شرح خدمت</th><th>توضیح</th><th>مبلغ (تومان)</th></tr>
+<tr><td>۱</td><td>پیکربندی Next.js 16</td><td>تنظیمات webpack و build و ۱۶ دامنه تصویر</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲</td><td>پیکربندی Tailwind CSS v4</td><td>تنظیمات رنگ و طراحی</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۳</td><td>پیکربندی Prisma ORM</td><td>اتصال و مدیریت دیتابیس SQLite</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۴</td><td>فایل‌های محیطی (.env)</td><td>تنظیمات محیط تولید و توسعه</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۵</td><td>سیستم فونت</td><td>بارگذاری فونت وزیر از Google Fonts</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۶</td><td>سیستم جلسه (Session)</td><td>ذخیره نشست کاربران</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۷</td><td>فایل‌های اسکریپت</td><td>۵۹ اسکریپت مفید برای مدیریت و دیباگ</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۸</td><td>تنظیمات Nginx</td><td>فایل پیکربندی reverse proxy</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۹</td><td>تنظیمات PM2</td><td>فایل پیکربندی مدیریت پروسه</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۰</td><td>تایپ‌اسکریپت کامل</td><td>تایپ کامل برای همه APIها و کامپوننت‌ها</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۱۱</td><td>فایل‌های راهنما</td><td>types, hooks, providers, lib</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+</table>
+<div class="section-total">جمع بخش ۹: <span class="amount">۸,۸۰۰,۰۰۰ تومان</span></div>
+
+<!-- بخش ۱۰ -->
+<div class="section-title">بخش ۱۰: راهنما و مستندات</div>
+<table>
+<tr><th>ردیف</th><th>شرح خدمت</th><th>توضیح</th><th>مبلغ (تومان)</th></tr>
+<tr><td>۱</td><td>راهنمای PDF جامع</td><td>راهنمای تصویری مدیریت سایت با طرح جلد و واترمارک</td><td class="price">۲,۴۰۰,۰۰۰ <span class="old-price">۳,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۲</td><td>راهنمای تعاملی داشبورد</td><td>آموزش ۸ بخش با آکاردئون تعاملی</td><td class="price">۱,۶۰۰,۰۰۰ <span class="old-price">۲,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۳</td><td>فایل آموزش PDF</td><td>مستند آموزشی کامل با طرح جلد حرفه‌ای</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۴</td><td>فایل‌های seed</td><td>اسکریپت‌های ایجاد داده اولیه</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۵</td><td>فایل‌های دیباگ</td><td>اسکریپت‌های تست و عیب‌یابی</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+</table>
+<div class="section-total">جمع بخش ۱۰: <span class="amount">۶,۰۰۰,۰۰۰ تومان</span></div>
+
+<!-- بخش ۱۱ -->
+<div class="section-title">بخش ۱۱: تست و بهینه‌سازی</div>
+<table>
+<tr><th>ردیف</th><th>شرح خدمت</th><th>توضیح</th><th>مبلغ (تومان)</th></tr>
+<tr><td>۱</td><td>تست عملکرد</td><td>بررسی عملکرد همه صفحات و APIها</td><td class="price">۲,۰۰۰,۰۰۰ <span class="old-price">۲,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲</td><td>تست ریسپانسیو</td><td>بررسی نمایش در موبایل، تبلت، دسکتاپ</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۳</td><td>تست امنیت</td><td>بررسی آسیب‌پذیری‌ها و محافظت API</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۴</td><td>رفع باگ‌ها</td><td>رفع مشکلات و خطاهای احتمالی</td><td class="price">۲,۰۰۰,۰۰۰ <span class="old-price">۲,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۵</td><td>بکاپ‌گیری اولیه</td><td>تهیه نسخه پشتیبان از کل پروژه</td><td class="price">۴۰۰,۰۰۰ <span class="old-price">۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۶</td><td>رفع مشکل Turbopack</td><td>مigrasi از Turbopack به webpack</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۷</td><td>رفع مشکل سازگاری</td><td>رفع تداخل نسخه‌ها و وابستگی‌ها</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+</table>
+<div class="section-total">جمع بخش ۱۱: <span class="amount">۸,۴۰۰,۰۰۰ تومان</span></div>
+
+<!-- بخش ۱۲ -->
+<div class="section-title">بخش ۱۲: نقشه و داده‌های جغرافیایی بوشهر</div>
+<table>
+<tr><th>ردیف</th><th>شرح خدمت</th><th>توضیح</th><th>مبلغ (تومان)</th></tr>
+<tr><td>۱</td><td>نقشه تعاملی SVG بوشهر</td><td>نقشه ۱۱ شهرستان با لینک و هاور</td><td class="price">۲,۸۰۰,۰۰۰ <span class="old-price">۳,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۲</td><td>سیستم تشخیص منطقه</td><td>تشخیص خودکار شهرستان با کلمات کلیدی</td><td class="price">۲,۰۰۰,۰۰۰ <span class="old-price">۲,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۳</td><td>صفحه شهرها</td><td>لیست شهرهای بوشهر</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۴</td><td>صفحه روستاها</td><td>لیست روستاهای بوشهر</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۵</td><td>صفحه جزئیات شهرستان</td><td>اخبار هر شهرستان</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+<tr><td>۶</td><td>صفحه استان‌ها</td><td>نمایش ۳۱ استان ایران</td><td class="price">۸۰۰,۰۰۰ <span class="old-price">۱,۰۰۰,۰۰۰</span></td></tr>
+<tr><td>۷</td><td>تخصیص منطقه به اخبار</td><td>تخصیص دستی اخبار به ۱۱ شهرستان</td><td class="price">۱,۲۰۰,۰۰۰ <span class="old-price">۱,۵۰۰,۰۰۰</span></td></tr>
+</table>
+<div class="section-total">جمع بخش ۱۲: <span class="amount">۱۰,۴۰۰,۰۰۰ تومان</span></div>
+
+<!-- جمع کل -->
+<div style="background:linear-gradient(135deg,#1B365D,#2a4a7a);color:#fff;border-radius:16px;padding:25px;margin-top:30px;text-align:center">
+  <div style="font-size:14px;margin-bottom:5px">جمع کل قبل از تخفیف</div>
+  <div style="font-size:18px;color:rgba(255,255,255,0.5);text-decoration:line-through">۲۶۵,۰۰۰,۰۰۰ تومان</div>
+  <div style="font-size:14px;margin:8px 0;color:#C9A96E">تخفیف ویژه ۲۰٪</div>
+  <div style="font-size:14px;margin-bottom:5px">جمع کل نهایی (با ۲۰٪ تخفیف)</div>
+  <div style="font-size:38px;font-weight:900;color:#C9A96E">۲۱۲,۰۰۰,۰۰۰ تومان</div>
+  <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:8px">دویست و دوازده میلیون تومان</div>
+</div>
+
+<div class="note green" style="margin-top:15px">
+  <strong>توجه:</strong> این لیست شامل کلیه کارهای انجام شده در طراحی، توسعه، پیاده‌سازی، تست و مستندسازی سایت خبری لیان دید می‌باشد. قیمت‌ها بر اساس نرخ‌های بازار شهریور ۱۴۰۵ محاسبه شده و <strong>۲۰٪ تخفیف ویژه</strong> روی تمام آیتم‌ها اعمال گردیده است. این سند صرفاً جهت ارائه به خریدار تهیه شده و قابل انتشار عمومی نیست.
+</div>
+
+<div class="footer">
+  <div class="brand">تهیه کننده: لیان دیزاین</div>
+  <div>تلفن تماس: 09938866331</div>
+  <div style="margin-top:5px">شهریور ۱۴۰۵</div>
+</div>
+</div>
+</body>
+</html>

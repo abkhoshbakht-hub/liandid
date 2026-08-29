@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لیست امکانات و عملکرد سایت لیان دید</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+:root{--navy:#1B365D;--gold:#C9A96E;--bg:#fafbfc}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Vazirmatn',Tahoma,Arial,sans-serif;color:#1a1a1a;line-height:1.9;font-size:14px;background:var(--bg)}
+.page{max-width:900px;margin:0 auto;padding:30px 20px}
+.cover{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,#0f2440,#1B365D,#2a4a7a);color:#fff;text-align:center;page-break-after:always;position:relative;overflow:hidden}
+.cover::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(201,169,110,0.12) 0%,transparent 70%);border-radius:50%}
+.cover-badge{background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);border-radius:50px;padding:8px 30px;font-size:13px;color:#C9A96E;margin-bottom:30px;position:relative;z-index:1}
+.cover h1{font-size:40px;font-weight:900;margin-bottom:8px;position:relative;z-index:1}
+.cover h2{font-size:20px;font-weight:500;color:rgba(255,255,255,0.7);margin-bottom:5px;position:relative;z-index:1}
+.cover .gold{color:#C9A96E;font-weight:700}
+.cover .divider{width:100px;height:3px;background:#C9A96E;margin:20px auto;position:relative;z-index:1;border-radius:2px}
+.cover .info-box{border:1px solid rgba(201,169,110,0.3);border-radius:16px;padding:20px 40px;margin-top:30px;position:relative;z-index:1;background:rgba(255,255,255,0.05)}
+.cover .info-box p{font-size:14px;margin-bottom:3px}
+.cover .info-box .big{font-size:18px;font-weight:700;color:#C9A96E}
+.cover .date{position:relative;z-index:1;margin-top:25px;font-size:12px;color:rgba(255,255,255,0.4)}
+.section-title{font-size:20px;font-weight:800;color:var(--navy);margin:30px 0 15px;padding-bottom:10px;border-bottom:3px solid var(--gold);display:inline-block}
+.section-title .count{background:var(--gold);color:#fff;font-size:12px;padding:2px 10px;border-radius:20px;margin-right:8px;font-weight:600}
+ul.feature-list{list-style:none;margin:10px 0 20px}
+ul.feature-list li{padding:8px 15px;border-bottom:1px solid #f0f0f0;font-size:13px;display:flex;align-items:center;gap:10px}
+ul.feature-list li:last-child{border-bottom:none}
+ul.feature-list li::before{content:'';width:8px;height:8px;background:var(--gold);border-radius:50%;flex-shrink:0}
+.footer{text-align:center;padding:25px;margin-top:30px;border-top:2px solid var(--gold);font-size:12px;color:#666}
+.footer .brand{font-weight:700;color:var(--navy);font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin:25px 0}
+.stat-box{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:15px;text-align:center}
+.stat-box .num{font-size:28px;font-weight:900;color:var(--gold)}
+.stat-box .label{font-size:11px;color:#888;margin-top:3px}
+@media print{@page{margin:12mm 8mm 18mm 8mm}body{font-size:11px}.cover{min-height:auto;padding:80px 20px;background:var(--navy)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.page{padding:0}}
+@media(max-width:768px){.page{padding:15px 10px}.cover h1{font-size:24px}.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="cover">
+  <div class="cover-badge">فهرست امکانات و عملکرد</div>
+  <h1>سایت خبری <span class="gold">لیان دید</span></h1>
+  <h2>پایگاه خبری تحلیلی استان بوشهر</h2>
+  <div class="divider"></div>
+  <div class="info-box">
+    <p>تهیه کننده: <span class="big">لیان دیزاین</span></p>
+    <p>تلفن تماس: <span class="big" style="direction:ltr;display:inline-block">09938866331</span></p>
+    <p style="margin-top:12px">تاریخ تنظیم: <span class="big">شهریور ۱۴۰۵</span></p>
+  </div>
+  <div class="date">نسخه ۱.۰ سایت خبری لیان دید</div>
+</div>
+<div class="page">
+
+<div class="stats">
+  <div class="stat-box"><div class="num">۲۰</div><div class="label">صفحه عمومی</div></div>
+  <div class="stat-box"><div class="num">۲۰</div><div class="label">صفحه داشبورد</div></div>
+  <div class="stat-box"><div class="num">۲۸</div><div class="label">وب سرویس API</div></div>
+  <div class="stat-box"><div class="num">۱۲</div><div class="label">مدل دیتابیس</div></div>
+</div>
+
+<!-- بخش ۱ -->
+<div class="section-title">بخش ۱: رابط کاربری و صفحات عمومی <span class="count">۳۰ آیتم</span></div>
+<ul class="feature-list">
+  <li>صفحه اصلی ریسپانسیو با چندین بخش تعاملی</li>
+  <li>هدر اختصاصی با تصویر پرچم و نوار ابزاری</li>
+  <li>نوار ابزاری بالای هدر (تاریخ شمسی، پروانه انتشار، شبکه اجتماعی)</li>
+  <li>منوی ناوبری اصلی با ۸ دسته و ۴۷ زیرمجموعه کشویی</li>
+  <li>نوار اخبار لحظه‌ای (Ticker) با انیمیشن اسکرول</li>
+  <li>تایمر شمارش معکوس مناسبت‌های تقویمی (۷۰+ رویداد)</li>
+  <li>تایمر قیمت بازار (دلار، یورو، سکه، طلا) با کش ۵ دقیقه</li>
+  <li>بخش هیرو (بنر اصلی) با اسلایدر اخبار ویژه</li>
+  <li>بخش آخرین اخبار با grid تصاویر شاخص</li>
+  <li>بخش تحلیل خبر ویژه با طراحی خاص</li>
+  <li>تب‌های دسته‌بندی برای فیلتر اخبار صفحه اصلی</li>
+  <li>فید RSS خبری در صفحه اصلی</li>
+  <li>بنر ارسال خبر (SubmitBanner) پویا از دیتابیس</li>
+  <li>فوتر کامل با اطلاعات تماس، لینک‌ها و خبرنامه</li>
+  <li>صفحه خبر (مقاله) با نمایش کامل، نظرات و اخبار مرتبط</li>
+  <li>صفحه دسته‌بندی با فیلتر و صفحه‌بندی</li>
+  <li>صفحه زیرمجموعه</li>
+  <li>صفحه جستجوی پیشرفته اخبار</li>
+  <li>صفحه درباره ما با قابلیت ویرایش از داشبورد</li>
+  <li>صفحه تماس با ما با فرم ارسال پیام</li>
+  <li>صفحه گالری تصاویر با آپلود از داشبورد</li>
+  <li>صفحه ارسال خبر توسط مخاطب با آپلود فایل</li>
+  <li>صفحه حریم خصوصی</li>
+  <li>صفحه قوانین و شرایط استفاده</li>
+  <li>صفحه استان‌ها با نمایش ۳۱ استان ایران</li>
+  <li>پیام مدیر مسئول با تصویر اختصاصی</li>
+  <li>نقشه تعاملی SVG بوشهر با ۱۱ شهرستان</li>
+  <li>بخش تحلیل‌ها (AnalysisSection)</li>
+  <li>صفحه راهاندازی سایت</li>
+  <li>صفحه خطای ۴۰۴ اختصاصی</li>
+</ul>
+
+<!-- بخش ۲ -->
+<div class="section-title">بخش ۲: پنل مدیریت (Admin Dashboard) <span class="count">۳۲ آیتم</span></div>
+<ul class="feature-list">
+  <li>سیستم احراز هویت امن با NextAuth + JWT + bcrypt</li>
+  <li>صفحه ورود با آدرس مخفی (/secure-a2x-admin)</li>
+  <li>سایدبار مدیریت با ۸ بخش و پیش‌نمایش زنده</li>
+  <li>پیشخوان داشبورد با آمار کلی سایت</li>
+  <li>مدیریت کامل اخبار (CRUD) با وضعیت، دسته، برچسب، تصویر شاخص، SEO و زمان‌بندی شمسی</li>
+  <li>مدیریت دسته‌بندی‌ها با آیکون، رنگ و ترتیب</li>
+  <li>مدیریت صفحه اصلی با ۲۰ باکس قابل تنظیم</li>
+  <li>مدیریت اخبار خارجی (RSS) با فیلتر، تایید/رد/حذف دسته‌ای</li>
+  <li>مدیریت مناسبت‌های تقویمی شمسی (۷۰+ رویداد)</li>
+  <li>مدیریت اخبار لحظه‌ای (فوری)</li>
+  <li>مدیریت نظرات (تایید، حذف)</li>
+  <li>مدیریت خبرنامه و ایمیل مشترکین</li>
+  <li>مدیریت کاربران با نقش‌ها و دسترسی‌های جزئی</li>
+  <li>مدیریت شهرها و مناطق بوشهر</li>
+  <li>مدیریت رسانه (آپلود، لیست، کپی URL، حذف تصاویر)</li>
+  <li>مدیریت گالری با نوار پیشرفت</li>
+  <li>مدیریت فوتر (محتوا و لینک‌ها)</li>
+  <li>تنظیمات هدر (لوگو، پروانه انتشار، جستجو، OG Image)</li>
+  <li>مدیریت شبکه‌های اجتماعی (تلگرام، اینستاگرام، روبیکا، بله)</li>
+  <li>صفحات ایستا (CMS) با ویرایش متن ساده و تبدیل خودکار به HTML</li>
+  <li>مدیریت ارسالی مخاطبین با یادداشت مدیر</li>
+  <li>بخش خبر اختصاصی صفحه اصلی</li>
+  <li>آرشیو خودکار اخبار اختصاصی در جدول مقالات</li>
+  <li>اشتراک‌گذاری شبکه اجتماعی (ارسال به بله و روبیکا)</li>
+  <li>پیش‌نمایش زنده سایت در سایدبار</li>
+  <li>پیکربندی زمان‌بندی انتشار با تقویم شمسی</li>
+  <li>کنترل دسترسی نقش‌ها (ADMIN / AUTHOR) با ۷ مجوز جزئی</li>
+  <li>سیستم بکاپ‌گیری کامل با انتخاب مسیر ذخیره‌سازی</li>
+  <li>خاموش کردن ایمن سیستم با تایید بکاپ</li>
+  <li>تغییر رمز عبور با تایید رمز فعلی</li>
+  <li>سیستم فراموشی رمز با شماره موبایل و کد OTP</li>
+  <li>راهنمای تعاملی داشبورد با آکاردئون ۸ بخش</li>
+</ul>
+
+<!-- بخش ۳ -->
+<div class="section-title">بخش ۳: بک‌اند و وب سرویس‌ها <span class="count">۲۹ آیتم</span></div>
+<ul class="feature-list">
+  <li>پایگاه داده Prisma/SQLite با ۱۲ مدل و روابط کامل</li>
+  <li>API احراز هویت NextAuth (JWT + Credentials + نقش)</li>
+  <li>API اخبار (CRUD + فیلتر + صفحه‌بندی + زمان‌بندی)</li>
+  <li>API دسته‌بندی‌ها</li>
+  <li>API صفحه اصلی</li>
+  <li>API تنظیمات (کلید-مقدار)</li>
+  <li>API آپلود فایل</li>
+  <li>API مدیریت رسانه</li>
+  <li>API نظرات (ارسال + دریافت تایید شده)</li>
+  <li>API خبرنامه (اشتراک + ایمیل خوش‌آمدگویی + اطلاع‌رسانی انتشار)</li>
+  <li>API کاربران</li>
+  <li>API ارسالی مخاطبین</li>
+  <li>API اخبار خارجی (RSS)</li>
+  <li>API مناسبت‌های تقویمی</li>
+  <li>API صفحات ایستا</li>
+  <li>API شهرها و مناطق</li>
+  <li>API تغییر رمز</li>
+  <li>API فراموشی رمز (تولید OTP)</li>
+  <li>API ریست رمز (تایید OTP + تغییر رمز)</li>
+  <li>API بکاپ و خاموشی</li>
+  <li>API اشتراک‌گذاری شبکه اجتماعی</li>
+  <li>API قیمت بازار (از ۳ API با کش ۵ دقیقه)</li>
+  <li>API جستجوی اخبار</li>
+  <li>API برچسب‌ها</li>
+  <li>API تگ‌ها</li>
+  <li>API فید RSS XML (سایت و هر دسته)</li>
+  <li>API مقاله عمومی (جزئیات + افزایش بازدید)</li>
+  <li>API placeholder (تصویر SVG جایگزین)</li>
+  <li>میان‌افزار امنیتی (Middleware) برای محافظت از مسیرهای ادمین</li>
+</ul>
+
+<!-- بخش ۴ -->
+<div class="section-title">بخش ۴: سئو و بهینه‌سازی <span class="count">۱۰ آیتم</span></div>
+<ul class="feature-list">
+  <li>تگ‌های متای پویا (generateMetadata) برای همه صفحات</li>
+  <li>فایل robots.txt با تنظیمات خزش موتورهای جستجو</li>
+  <li>فایل sitemap.xml پویا با همه مقالات و دسته‌ها</li>
+  <li>ساختار URL بهینه و خوانا برای همه صفحات</li>
+  <li>JSON-LD (داده‌های ساختاریافته) NewsArticle برای گوگل نیوز</li>
+  <li>OG Image پویا از دیتابیس با fallback</li>
+  <li>بهینه‌سازی تصاویر با next/image</li>
+  <li>پیکربندی ۱۶ دامنه خبرگزاری مجاز برای بارگذاری تصاویر</li>
+  <li>فید RSS XML خودکار (سایت و هر دسته)</li>
+  <li>بهینه‌سازی production build</li>
+</ul>
+
+<!-- بخش ۵ -->
+<div class="section-title">بخش ۵: امنیت <span class="count">۸ آیتم</span></div>
+<ul class="feature-list">
+  <li>رمزگذاری رمزها با bcrypt</li>
+  <li>توکن JWT با انقضای ۲ ساعت</li>
+  <li>محافظت مسیرها با Middleware</li>
+  <li>آدرس مخفی ادمین (/secure-a2x-admin)</li>
+  <li>کنترل دسترسی نقش‌ها با ۷ مجوز جزئی</li>
+  <li>محافظت API (تایید احراز هویت در همه APIهای ادمین)</li>
+  <li>جلوگیری از حذف خود توسط کاربر</li>
+  <li>جلوگیری از حذف دسته در صورت داشتن مقاله</li>
+</ul>
+
+<!-- بخش ۶ -->
+<div class="section-title">بخش ۶: طراحی و UI/UX <span class="count">۱۱ آیتم</span></div>
+<ul class="feature-list">
+  <li>ریسپانسیو کامل (موبایل، تبلت، دسکتاپ)</li>
+  <li>پالت رنگ اختصاصی (سرمه‌ای #1B365D + طلایی #C9A96E)</li>
+  <li>فونت فارسی حرفه‌ای وزیر (Vazirmatn)</li>
+  <li>آیکون‌های SVG اختصاصی برای منوها و بخش‌ها</li>
+  <li>انیمیشن‌ها و ترنزیشن‌ها (hover و transition)</li>
+  <li>منوی موبایل همبرگری با صفحه کامل</li>
+  <li>قالب‌بندی فارسی (RTL) برای همه عناصر</li>
+  <li>کارت‌های خبری با تصویر شاخص</li>
+  <li>انیمیشن بارگذاری (لودینگ اسپینر)</li>
+  <li>اسکرولبار اختصاصی با رنگ سایت</li>
+  <li>پیش‌نمایش زنده تغییرات در داشبورد</li>
+</ul>
+
+<!-- بخش ۷ -->
+<div class="section-title">بخش ۷: محتوا و CMS <span class="count">۱۱ آیتم</span></div>
+<ul class="feature-list">
+  <li>سیستم اخبار کامل (ایجاد، ویرایش، حذف، دسته، برچسب، وضعیت، تصویر شاخص، SEO)</li>
+  <li>صفحات ایستا (CMS) با ویرایش متن ساده</li>
+  <li>سیستم نظرات (ارسال و مدیریت)</li>
+  <li>خبرنامه ایمیلی (اشتراک + خوش‌آمدگویی + اطلاع‌رسانی انتشار)</li>
+  <li>گالری تصاویر با آپلود از داشبورد</li>
+  <li>ارسال خبر توسط مخاطب با آپلود فایل</li>
+  <li>تقویم مناسبت‌ها (۷۰+ رویداد تقویمی شمسی)</li>
+  <li>اخبار لحظه‌ای (فوری) از خبرگزاری‌ها</li>
+  <li>آرشیو خودکار اخبار اختصاصی</li>
+  <li>پیام مدیر مسئول با صفحه اختصاصی</li>
+  <li>تصویر جایگزین خودکار (SVG placeholder با رنگ دسته)</li>
+</ul>
+
+<!-- بخش ۸ -->
+<div class="section-title">بخش ۸: خبرخوان و یکپارچه‌سازی <span class="count">۹ آیتم</span></div>
+<ul class="feature-list">
+  <li>خبرخوان خودکار از ۱۱ منبع (۶ بوشهری + ۵ ملی)</li>
+  <li>طبقه‌بندی خودکار به ۸ دسته با ۴۷ زیرمجموعه</li>
+  <li>تشخیص خودکار منطقه بوشهر (۱۱ شهرستان)</li>
+  <li>زمان‌بندی دریافت هر ۱۰ دقیقه با debounce</li>
+  <li>حذف اخبار تکراری</li>
+  <li>استخراج تصویر از enclosure/media:content/HTML</li>
+  <li>تأیید خودکار اخبار بوشهر</li>
+  <li>اشتراک‌گذاری خودکار شبکه اجتماعی (بله و روبیکا)</li>
+  <li>تولید فید RSS XML (سایت و هر دسته)</li>
+</ul>
+
+<!-- بخش ۹ -->
+<div class="section-title">بخش ۹: زیرساخت و استقرار <span class="count">۱۱ آیتم</span></div>
+<ul class="feature-list">
+  <li>پیکربندی Next.js 16 با ۱۶ دامنه تصویر مجاز</li>
+  <li>پیکربندی Tailwind CSS v4</li>
+  <li>پیکربندی Prisma ORM با SQLite</li>
+  <li>فایل‌های محیطی (.env) برای تولید و توسعه</li>
+  <li>سیستم فونت (بارگذاری وزیر از Google Fonts)</li>
+  <li>سیستم جلسه (Session)</li>
+  <li>۵۹ اسکریپت مفید برای مدیریت و دیباگ</li>
+  <li>فایل پیکربندی Nginx (reverse proxy)</li>
+  <li>فایل پیکربندی PM2 (مدیریت پروسه)</li>
+  <li>تایپ‌اسکریپت کامل برای همه APIها و کامپوننت‌ها</li>
+  <li>فایل‌های راهنما (types, hooks, providers, lib)</li>
+</ul>
+
+<!-- بخش ۱۰ -->
+<div class="section-title">بخش ۱۰: راهنما و مستندات <span class="count">۵ آیتم</span></div>
+<ul class="feature-list">
+  <li>راهنمای PDF جامع با طرح جلد و واترمارک</li>
+  <li>راهنمای تعاملی داشبورد (آکاردئون ۸ بخش)</li>
+  <li>فایل آموزش PDF حرفه‌ای</li>
+  <li>اسکریپت‌های ایجاد داده اولیه (seed)</li>
+  <li>اسکریپت‌های تست و عیب‌یابی (debug)</li>
+</ul>
+
+<!-- بخش ۱۱ -->
+<div class="section-title">بخش ۱۱: تست و بهینه‌سازی <span class="count">۷ آیتم</span></div>
+<ul class="feature-list">
+  <li>تست عملکرد همه صفحات و APIها</li>
+  <li>تست ریسپانسیو (موبایل، تبلت، دسکتاپ)</li>
+  <li>تست امنیت و بررسی آسیب‌پذیری‌ها</li>
+  <li>رفع باگ‌ها و خطاهای احتمالی</li>
+  <li>بکاپ‌گیری اولیه از کل پروژه</li>
+  <li>رفع مشکل Turbopack (مigrasi به webpack)</li>
+  <li>رفع مشکل سازگاری نسخه‌ها و وابستگی‌ها</li>
+</ul>
+
+<!-- بخش ۱۲ -->
+<div class="section-title">بخش ۱۲: نقشه و جغرافیای بوشهر <span class="count">۷ آیتم</span></div>
+<ul class="feature-list">
+  <li>نقشه تعاملی SVG بوشهر با ۱۱ شهرستان</li>
+  <li>سیستم تشخیص خودکار منطقه با کلمات کلیدی</li>
+  <li>صفحه شهرهای بوشهر</li>
+  <li>صفحه روستاهای بوشهر</li>
+  <li>صفحه جزئیات هر شهرستان</li>
+  <li>صفحه استان‌ها (۳۱ استان ایران)</li>
+  <li>تخصیص دستی اخبار به ۱۱ شهرستان</li>
+</ul>
+
+<!-- خلاصه -->
+<div style="background:linear-gradient(135deg,#1B365D,#2a4a7a);color:#fff;border-radius:16px;padding:25px;margin-top:30px;text-align:center">
+  <div style="font-size:16px;margin-bottom:8px">خلاصه عملکرد</div>
+  <div style="font-size:14px;color:rgba(255,255,255,0.7);margin-bottom:15px">
+    ۱۲ بخش | ۱۹۹ آیتم | ۲۰ صفحه عمومی | ۲۰ صفحه داشبورد | ۲۸ وب سرویس | ۱۲ مدل دیتابیس
+  </div>
+  <div style="display:flex;justify-content:center;gap:30px;flex-wrap:wrap">
+    <div><span style="font-size:24px;font-weight:900;color:#C9A96E">Next.js 16</span><div style="font-size:11px;color:rgba(255,255,255,0.5)">فریم‌ورک</div></div>
+    <div><span style="font-size:24px;font-weight:900;color:#C9A96E">React 19</span><div style="font-size:11px;color:rgba(255,255,255,0.5)">رابط کاربری</div></div>
+    <div><span style="font-size:24px;font-weight:900;color:#C9A96E">Prisma</span><div style="font-size:11px;color:rgba(255,255,255,0.5)">ORM</div></div>
+    <div><span style="font-size:24px;font-weight:900;color:#C9A96E">Tailwind</span><div style="font-size:11px;color:rgba(255,255,255,0.5)">طراحی</div></div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="brand">تهیه کننده: لیان دیزاین</div>
+  <div>تلفن تماس: 09938866331</div>
+  <div style="margin-top:5px">شهریور ۱۴۰۵</div>
+</div>
+</div>
+</body>
+</html>
