@@ -220,12 +220,14 @@ export default function Header() {
                         </Link>
                       ))}
                     </div>
+                    {cat.href && (
                     <div className="px-7 py-3.5 bg-gradient-to-l from-gray-50 to-gray-100 border-t border-gray-100">
-                      <Link href={cat.href || `/category/${cat.slug}`} className="text-xs text-[#1B365D] hover:text-[#C9A96E] font-bold transition-colors flex items-center gap-1">
+                      <Link href={cat.href} className="text-xs text-[#1B365D] hover:text-[#C9A96E] font-bold transition-colors flex items-center gap-1">
                         مشاهده همه
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                       </Link>
                     </div>
+                    )}
                   </div>
                 )}
               </li>
