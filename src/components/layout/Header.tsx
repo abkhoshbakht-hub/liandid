@@ -212,7 +212,7 @@ export default function Header() {
                       {cat.subcategories.map((sub, idx) => (
                         <Link
                           key={sub.slug}
-                          href={sub.href || `/category/${cat.slug}/${sub.slug}`}
+                          href={(sub as any).href || `/category/${cat.slug}/${sub.slug}`}
                           className="block px-7 py-3.5 text-[13px] text-gray-600 hover:bg-gradient-to-l hover:from-[#1B365D] hover:to-[#2a4a7a] hover:text-white transition-all border-r-2 border-transparent hover:border-[#C9A96E]"
                           style={{ animationDelay: `${idx * 30}ms` }}
                         >
@@ -304,7 +304,7 @@ export default function Header() {
                       {openDropdown === cat.slug && (
                         <div className="mr-5 border-r-2 border-[#C9A96E] pr-5 mb-2">
                           {cat.subcategories.map((sub) => (
-                            <Link key={sub.slug} href={sub.href || `/category/${cat.slug}/${sub.slug}`} className="block px-5 py-3 text-sm text-gray-500 hover:text-[#1B365D] transition-colors" onClick={() => setIsMenuOpen(false)}>
+                            <Link key={sub.slug} href={(sub as any).href || `/category/${cat.slug}/${sub.slug}`} className="block px-5 py-3 text-sm text-gray-500 hover:text-[#1B365D] transition-colors" onClick={() => setIsMenuOpen(false)}>
                               {sub.name}
                             </Link>
                           ))}
