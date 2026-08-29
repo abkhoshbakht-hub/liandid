@@ -300,7 +300,7 @@ export default function Header() {
                         onClick={() => setOpenDropdown(openDropdown === cat.slug ? null : cat.slug)}
                         className="w-full flex items-center justify-between px-5 py-4 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-all font-medium"
                       >
-                        <span>{cat.name}</span>
+                        <span className="whitespace-nowrap">{cat.name}</span>
                         <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${openDropdown === cat.slug ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                       </button>
                       {openDropdown === cat.slug && (
@@ -314,9 +314,7 @@ export default function Header() {
                       )}
                     </div>
                   ) : (
-                    <Link href={cat.href || `/category/${cat.slug}`} className="block px-5 py-4 text-sm text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-all" onClick={() => setIsMenuOpen(false)}>
-                      {cat.name}
-                    </Link>
+<Link href={cat.href || `/category/${cat.slug}`} className="block px-5 py-4 text-sm text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-all" onClick={() => setIsMenuOpen(false)}><span className="whitespace-nowrap">{cat.name}</span></Link>
                   )}
                 </li>
               ))}
