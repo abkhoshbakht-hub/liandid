@@ -87,8 +87,10 @@ const categories = [
     { name: 'اختراعات', slug: 'ekhtera' },
     { name: 'دانشگاه و پژوهش', slug: 'daneshgah' },
   ]},
-  { name: 'عکس', slug: 'gallery-photos', href: '/gallery' },
-  { name: 'فیلم', slug: 'gallery-videos', href: '/gallery/videos' },
+  { name: 'گالری', slug: 'gallery', subcategories: [
+    { name: 'عکس', slug: 'photos', href: '/gallery' },
+    { name: 'فیلم', slug: 'videos', href: '/gallery/videos' },
+  ]},
 ];
 
 
@@ -210,7 +212,7 @@ export default function Header() {
                       {cat.subcategories.map((sub, idx) => (
                         <Link
                           key={sub.slug}
-                          href={`/category/${cat.slug}/${sub.slug}`}
+                          href={sub.href || `/category/${cat.slug}/${sub.slug}`}
                           className="block px-7 py-3.5 text-[13px] text-gray-600 hover:bg-gradient-to-l hover:from-[#1B365D] hover:to-[#2a4a7a] hover:text-white transition-all border-r-2 border-transparent hover:border-[#C9A96E]"
                           style={{ animationDelay: `${idx * 30}ms` }}
                         >
@@ -219,7 +221,7 @@ export default function Header() {
                       ))}
                     </div>
                     <div className="px-7 py-3.5 bg-gradient-to-l from-gray-50 to-gray-100 border-t border-gray-100">
-                      <Link href={`/category/${cat.slug}`} className="text-xs text-[#1B365D] hover:text-[#C9A96E] font-bold transition-colors flex items-center gap-1">
+                      <Link href={cat.href || `/category/${cat.slug}`} className="text-xs text-[#1B365D] hover:text-[#C9A96E] font-bold transition-colors flex items-center gap-1">
                         مشاهده همه
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                       </Link>
@@ -302,7 +304,7 @@ export default function Header() {
                       {openDropdown === cat.slug && (
                         <div className="mr-5 border-r-2 border-[#C9A96E] pr-5 mb-2">
                           {cat.subcategories.map((sub) => (
-                            <Link key={sub.slug} href={`/category/${cat.slug}/${sub.slug}`} className="block px-5 py-3 text-sm text-gray-500 hover:text-[#1B365D] transition-colors" onClick={() => setIsMenuOpen(false)}>
+                            <Link key={sub.slug} href={sub.href || `/category/${cat.slug}/${sub.slug}`} className="block px-5 py-3 text-sm text-gray-500 hover:text-[#1B365D] transition-colors" onClick={() => setIsMenuOpen(false)}>
                               {sub.name}
                             </Link>
                           ))}
