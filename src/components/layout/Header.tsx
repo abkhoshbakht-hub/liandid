@@ -87,7 +87,8 @@ const categories = [
     { name: 'اختراعات', slug: 'ekhtera' },
     { name: 'دانشگاه و پژوهش', slug: 'daneshgah' },
   ]},
-  { name: 'گالری', slug: 'gallery', href: '/gallery' },
+  { name: 'عکس', slug: 'gallery-photos', href: '/gallery' },
+  { name: 'فیلم', slug: 'gallery-videos', href: '/gallery/videos' },
 ];
 
 
