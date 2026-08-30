@@ -19,6 +19,15 @@ export default function RssNewsFeed() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'all' | 'ملی' | 'بوشهر'>('all');
   const [refreshing, setRefreshing] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   const fetchNews = async (category?: string) => {
     try {
@@ -47,10 +56,15 @@ export default function RssNewsFeed() {
     fetch('/api/rss?refresh=true').then(() => fetchNews(activeTab)).catch(() => setRefreshing(false));
   };
 
+  const MOBILE_INITIAL = 8;
+
   const filteredNews = !news ? [] : (activeTab === 'all'
     ? news
     : news.filter(n => n.category === activeTab)
   );
+
+  const visibleNews = (isMobile && !showMore) ? filteredNews.slice(0, MOBILE_INITIAL) : filteredNews;
+  const hasMore = isMobile && filteredNews.length > MOBILE_INITIAL;
 
   const formatTime = (dateStr: string | null) => {
     if (!dateStr) return '';
@@ -99,7 +113,7 @@ export default function RssNewsFeed() {
           ].map(tab => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => { setActiveTab(tab.key); setShowMore(false); }}
               className={`px-5 py-3 text-[13px] font-bold border-b-2 transition-all ${
                 activeTab === tab.key
                   ? 'border-[#C9A96E] text-[#1B365D]'
@@ -128,7 +142,7 @@ export default function RssNewsFeed() {
           </div>
         ) : (
           <div className="divide-y divide-gray-50">
-            {filteredNews.map((item) => (
+            {visibleNews.map((item) => (
               <a
                 key={item.id}
                 href={item.link}
@@ -170,6 +184,14 @@ export default function RssNewsFeed() {
                 </div>
               </a>
             ))}
+            {hasMore && (
+              <button
+                onClick={() => setShowMore(true)}
+                className="w-full py-3 text-sm font-bold text-[#1B365D] hover:text-[#C9A96E] transition-colors"
+              >
+                اخبار بیشتر
+              </button>
+            )}
           </div>
         )}
       </div>
