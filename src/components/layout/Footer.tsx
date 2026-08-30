@@ -39,9 +39,9 @@ export default function Footer() {
   return (
     <footer className="bg-[#0f2440] mt-12 overflow-hidden">
       <div className="site-container py-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 mb-5">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-5 mb-5">
           {/* ستون اول: لوگو و توضیحات */}
-          <div className="text-center">
+          <div className="text-center col-span-2 md:col-span-2 lg:col-span-1">
             <Link href="/" className="inline-block mb-2">
               <div className="h-[70px] w-[160px] relative">
                 <Image src="/logo.png" alt="لیان دید" fill className="object-contain object-right" sizes="180px" />
