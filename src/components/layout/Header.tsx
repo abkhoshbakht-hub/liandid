@@ -135,8 +135,8 @@ export default function Header() {
 
           {/* سمت راست: لوگو موبایل + خروج و همبرگر */}
           <div className="flex items-center gap-3">
-            <Link href="/" className="lg:hidden">
-              <Image src="/logo.png" alt="لیان دید" width={50} height={50} className="object-contain" />
+            <Link href="/" className="lg:hidden bg-white/90 backdrop-blur-sm rounded-lg p-1 shadow-lg">
+              <Image src="/logo.png" alt="لیان دید" width={45} height={45} className="object-contain" />
             </Link>
             {isAuthenticated && isAdmin && (
               <button onClick={logout} className="px-4 py-2 text-sm text-gray-500 hover:text-red-500 hover:bg-red-50 border border-gray-200 rounded-lg transition-all">
