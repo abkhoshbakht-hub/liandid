@@ -105,7 +105,7 @@ export default function RssNewsFeed() {
 
       {/* تب‌ها */}
       <div className="border-b border-gray-100 px-6">
-        <div className="flex gap-0 justify-center">
+        <div className="flex gap-0 justify-center md:justify-start">
           {[
             { key: 'all' as const, label: 'همه' },
             { key: 'بوشهر' as const, label: 'خبر بوشهر' },
