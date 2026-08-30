@@ -108,8 +108,8 @@ export default function RssNewsFeed() {
         <div className="flex gap-0">
           {[
             { key: 'all' as const, label: 'همه' },
-            { key: 'ملی' as const, label: 'خبرگزاری‌های سراسری' },
             { key: 'بوشهر' as const, label: 'خبر بوشهر' },
+            { key: 'ملی' as const, label: 'خبرگزاری‌های سراسری' },
           ].map(tab => (
             <button
               key={tab.key}
