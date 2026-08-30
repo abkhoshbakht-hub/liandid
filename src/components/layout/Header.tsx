@@ -133,20 +133,19 @@ export default function Header() {
         </div>
         <div className="site-container h-full flex items-center justify-between relative z-10">
 
-          {/* سمت راست: لوگو موبایل + خروج و همبرگر */}
+          {/* سمت راست: خروج */}
           <div className="flex items-center gap-3">
-            <Link href="/" className="lg:hidden bg-white/90 backdrop-blur-sm rounded-lg p-1 shadow-lg">
-              <Image src="/logo.png" alt="لیان دید" width={45} height={45} className="object-contain" />
-            </Link>
             {isAuthenticated && isAdmin && (
               <button onClick={logout} className="px-4 py-2 text-sm text-gray-500 hover:text-red-500 hover:bg-red-50 border border-gray-200 rounded-lg transition-all">
                 خروج
               </button>
             )}
-            <button className="lg:hidden w-10 h-10 flex items-center justify-center text-white bg-[#1B365D]/80 backdrop-blur-sm rounded-lg transition-colors" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} /></svg>
-            </button>
           </div>
+
+          {/* سمت چپ: همبری */}
+          <button className="lg:hidden w-10 h-10 flex items-center justify-center text-white bg-[#1B365D]/80 backdrop-blur-sm rounded-lg transition-colors" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} /></svg>
+          </button>
 
           {/* سمت چپ: جستجو و لینک‌ها */}
           <div className="hidden lg:flex flex-col items-end gap-2">
