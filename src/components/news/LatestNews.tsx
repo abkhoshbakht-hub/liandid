@@ -1,4 +1,7 @@
-import { timeAgo, getCategoryStyle, toPersianDigits } from '@/lib/utils';
+'use client';
+
+import { useState } from 'react';
+import { timeAgo, getCategoryStyle } from '@/lib/utils';
 
 interface NewsItem {
   id: string;
@@ -13,10 +16,17 @@ interface NewsItem {
   isCustom: boolean;
 }
 
+const MOBILE_INITIAL = 8;
+
 export default function LatestNews({ items }: { items: NewsItem[] }) {
+  const [showAll, setShowAll] = useState(false);
+
   if (items.length === 0) {
     return <p className="text-gray-400 text-center py-12 text-sm">خبری موجود نیست</p>;
   }
+
+  const visibleItems = showAll ? items : items.slice(0, MOBILE_INITIAL);
+  const hasMore = items.length > MOBILE_INITIAL;
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden h-full shadow-sm flex flex-col">
@@ -32,7 +42,7 @@ export default function LatestNews({ items }: { items: NewsItem[] }) {
         </div>
       </div>
     <div className="space-y-3 flex-1 min-h-0 overflow-y-auto p-5 pr-2">
-      {items.map((news, index) => (
+      {visibleItems.map((news, index) => (
         <a
           key={news.id}
           href={news.link}
@@ -79,6 +89,15 @@ export default function LatestNews({ items }: { items: NewsItem[] }) {
           </div>
         </a>
       ))}
+
+      {hasMore && !showAll && (
+        <button
+          onClick={() => setShowAll(true)}
+          className="w-full py-3 text-sm font-bold text-[#1B365D] hover:text-[#C9A96E] border border-gray-200 hover:border-[#C9A96E]/40 rounded-xl transition-all duration-300 bg-gray-50 hover:bg-white"
+        >
+          اخبار بیشتر
+        </button>
+      )}
     </div>
     </div>
   );
