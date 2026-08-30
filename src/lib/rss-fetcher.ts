@@ -15,6 +15,10 @@ const parser = new Parser({
   },
 });
 
+function cleanTitle(title: string): string {
+  return title.replace(/\b[a-zA-Z]{2,}\b/g, '').replace(/\s{2,}/g, ' ').trim();
+}
+
 function fetchUrlFollowingRedirects(url: string, maxRedirects = 5): Promise<string> {
   return new Promise((resolve, reject) => {
     const mod = url.startsWith('https') ? https : http;
@@ -76,7 +80,7 @@ async function fetchSource(source: RssSource): Promise<{ title: string; link: st
     for (const item of feed.items.slice(0, 15)) {
       if (!item.title || !item.link) continue;
       results.push({
-        title: item.title,
+        title: cleanTitle(item.title),
         link: item.link,
         description: extractDescription(item as Record<string, unknown>),
         image: extractImage(item as Record<string, unknown>) || '',
@@ -86,28 +90,7 @@ async function fetchSource(source: RssSource): Promise<{ title: string; link: st
       });
     }
   } catch {
-    // Try fallback URL
-    const fallback = rssFallbackSources.find(f => f.name === source.name);
-    if (fallback) {
-      try {
-        const xml = await fetchUrlFollowingRedirects(fallback.url);
-        const feed = await parser.parseString(xml);
-        for (const item of feed.items.slice(0, 15)) {
-          if (!item.title || !item.link) continue;
-          results.push({
-            title: item.title,
-            link: item.link,
-            description: extractDescription(item as Record<string, unknown>),
-            image: extractImage(item as Record<string, unknown>) || '',
-            source: source.name,
-            sourceName: source.name,
-            publishedAt: item.pubDate ? new Date(item.pubDate) : null,
-          });
-        }
-      } catch {
-        // silently skip failed sources
-      }
-    }
+    // silently skip failed sources
   }
 
   return results;

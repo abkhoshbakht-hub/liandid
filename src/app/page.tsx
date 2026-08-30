@@ -104,7 +104,10 @@ async function getHomepageData() {
     const usedIds = new Set([...heroIds, ...breakingIds]);
 
     const latest = allNewsItems.filter(n => !usedIds.has(n.id)).slice(0, 8);
-    latest.forEach(n => usedIds.add(n.id));
+    latest.forEach((n, i) => {
+      usedIds.add(n.id);
+      if (i < 8) n.image = `/latest-news/${i + 1}.jpg`;
+    });
 
     const analysisKeys = ['analysis-1', 'analysis-2', 'analysis-3'];
     const analysis = analysisKeys.map((k, i) => {
