@@ -4,7 +4,6 @@ import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/news/HeroSection';
 import LatestNews from '@/components/news/LatestNews';
 import AnalysisSection from '@/components/news/AnalysisSection';
-import MarketTicker from '@/components/news/MarketTicker';
 import RssNewsFeed from '@/components/news/RssNewsFeed';
 import SubmitBanner from '@/components/home/SubmitBanner';
 import { Metadata } from 'next';
@@ -125,8 +124,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Header />
-      <MarketTicker breakingItems={data.breaking.map(b => ({ id: b.id, title: b.title, link: b.link }))} />
+      <Header breakingItems={data.breaking.map(b => ({ id: b.id, title: b.title, link: b.link }))} />
       <main className="bg-gray-50 min-h-screen">
         <div className="site-container pt-4">
           <HeroSection main={data.heroMain} side1={data.heroSide1} side2={data.heroSide2} />

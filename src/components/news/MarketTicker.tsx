@@ -249,7 +249,7 @@ interface BreakingItem {
   link: string;
 }
 
-export default function MarketTicker({ breakingItems = [] }: { breakingItems?: BreakingItem[] }) {
+export default function MarketTicker({ breakingItems = [], onMenuToggle }: { breakingItems?: BreakingItem[]; onMenuToggle?: () => void }) {
   const [pulse, setPulse] = useState(true);
   const [allEvents, setAllEvents] = useState<Record<string, string[]>>({});
   const [nationalHolidays, setNationalHolidays] = useState<Set<string>>(new Set());
@@ -324,6 +324,11 @@ export default function MarketTicker({ breakingItems = [] }: { breakingItems?: B
     <div className="bg-gradient-to-l from-[#0a1628] via-[#0f1d35] to-[#0a1628] text-white py-2.5 border-b border-white/5 relative">
       <div className="max-w-[1400px] mx-auto px-4">
         <div className={`flex items-center gap-2 ${events.length === 0 ? 'justify-center' : ''}`}>
+          {onMenuToggle && (
+            <button onClick={onMenuToggle} className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors shrink-0">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+            </button>
+          )}
           <div className="relative shrink-0" ref={calRef}>
             <button onClick={() => setShowCalendar(!showCalendar)} className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
               <div className="w-6 h-6 rounded-md bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-md shadow-amber-400/20 cursor-pointer">

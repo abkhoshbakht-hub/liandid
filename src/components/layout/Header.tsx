@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
+import MarketTicker from '@/components/news/MarketTicker';
 
 const categories: Array<{name: string; slug: string; href?: string; subcategories?: Array<{name: string; slug: string; href?: string}>}> = [
   { name: 'صفحه اصلی', slug: 'home', href: '/' },
@@ -102,7 +103,7 @@ const breakingNews = [
   'هشدار هواشناسی نسبت به ورود سامانه بارشی جدید',
 ];
 
-export default function Header() {
+export default function Header({ breakingItems = [] }: { breakingItems?: Array<{id: string; title: string; link: string}> }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
@@ -127,9 +128,9 @@ export default function Header() {
     <header className="relative z-50">
       {/* هدر اصلی */}
       <div className="relative bg-white overflow-hidden h-[120px] lg:h-[200px]">
-        <Image src="/هدر لیان دید 3.png" alt="هدر لیان دید" fill className="object-cover" priority />
-        <div className="absolute z-20 hidden lg:block" style={{ right: '150px', top: '170px' }}>
-          <span className="text-[10px] font-bold text-[#1B365D] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]" style={{ whiteSpace: 'nowrap' }}>— پروانه انتشار: {settings.license || '۹۶۲۲'} —</span>
+        <Image src="/هدر لیان دید 3.png" alt="هدر لیان دید" fill className="object-cover object-right lg:object-center" priority />
+        <div className="absolute z-20 bottom-1 left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-auto lg:right-[150px] lg:bottom-[auto] lg:top-[170px]">
+          <span className="text-[9px] lg:text-[10px] font-bold text-[#1B365D] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]" style={{ whiteSpace: 'nowrap' }}>— پروانه انتشار: {settings.license || '۹۶۲۲'} —</span>
         </div>
         <div className="site-container h-full flex items-center justify-between relative z-10">
 
@@ -141,11 +142,6 @@ export default function Header() {
               </button>
             )}
           </div>
-
-          {/* سمت چپ: همبری */}
-          <button className="lg:hidden w-10 h-10 flex items-center justify-center text-white bg-[#1B365D]/80 backdrop-blur-sm rounded-lg transition-colors" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} /></svg>
-          </button>
 
           {/* سمت چپ: جستجو و لینک‌ها */}
           <div className="hidden lg:flex flex-col items-end gap-2">
@@ -186,6 +182,9 @@ export default function Header() {
 
         </div>
       </div>
+
+      {/* نوار تقویم و اخبار فوری */}
+      <MarketTicker breakingItems={breakingItems} onMenuToggle={() => setIsMenuOpen(!isMenuOpen)} />
 
       {/* نوار منو */}
       <nav className="hidden lg:block bg-gradient-to-l from-[#1B365D] via-[#1e3a64] to-[#1B365D] shadow-md">
