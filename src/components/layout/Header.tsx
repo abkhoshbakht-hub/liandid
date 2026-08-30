@@ -126,21 +126,24 @@ export default function Header() {
   return (
     <header className="relative z-50">
       {/* هدر اصلی */}
-      <div className="relative bg-white overflow-hidden" style={{ height: '200px' }}>
+      <div className="relative bg-white overflow-hidden h-[120px] lg:h-[200px]">
         <Image src="/هدر لیان دید 3.png" alt="هدر لیان دید" fill className="object-cover" priority />
-        <div className="absolute z-20" style={{ right: '150px', top: '170px' }}>
+        <div className="absolute z-20 hidden lg:block" style={{ right: '150px', top: '170px' }}>
           <span className="text-[10px] font-bold text-[#1B365D] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]" style={{ whiteSpace: 'nowrap' }}>— پروانه انتشار: {settings.license || '۹۶۲۲'} —</span>
         </div>
         <div className="site-container h-full flex items-center justify-between relative z-10">
 
-          {/* سمت راست: خروج و همبرگر */}
+          {/* سمت راست: لوگو موبایل + خروج و همبرگر */}
           <div className="flex items-center gap-3">
+            <Link href="/" className="lg:hidden">
+              <Image src="/logo.png" alt="لیان دید" width={50} height={50} className="object-contain" />
+            </Link>
             {isAuthenticated && isAdmin && (
               <button onClick={logout} className="px-4 py-2 text-sm text-gray-500 hover:text-red-500 hover:bg-red-50 border border-gray-200 rounded-lg transition-all">
                 خروج
               </button>
             )}
-            <button className="lg:hidden w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <button className="lg:hidden w-10 h-10 flex items-center justify-center text-white bg-[#1B365D]/80 backdrop-blur-sm rounded-lg transition-colors" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} /></svg>
             </button>
           </div>
