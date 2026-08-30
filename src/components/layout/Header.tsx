@@ -129,7 +129,7 @@ export default function Header({ breakingItems = [] }: { breakingItems?: Array<{
       {/* هدر اصلی */}
       <div className="relative bg-white overflow-hidden h-[120px] lg:h-[200px]">
         <Image src="/هدر لیان دید 3.png" alt="هدر لیان دید" fill className="object-cover object-right lg:object-center" priority />
-        <div className="absolute z-20 bottom-1 right-10 lg:bottom-auto lg:right-auto lg:left-1/2 lg:-translate-x-1/2 lg:top-[170px]">
+        <div className="absolute z-20 bottom-2 right-11 lg:bottom-auto lg:right-auto lg:left-1/2 lg:-translate-x-1/2 lg:top-[170px]">
           <span className="text-[9px] lg:text-[10px] font-bold text-[#1B365D] drop-shadow-[0_1px_2px_rgba(255,255,255,0.8)]" style={{ whiteSpace: 'nowrap' }}>— پروانه انتشار: {settings.license || '۹۶۲۲'} —</span>
         </div>
         <div className="site-container h-full flex items-center justify-between relative z-10">
