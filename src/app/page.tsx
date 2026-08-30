@@ -103,7 +103,7 @@ async function getHomepageData() {
     const breakingIds = breaking.map(b => b.id);
     const usedIds = new Set([...heroIds, ...breakingIds]);
 
-    const latest = allNewsItems.filter(n => !usedIds.has(n.id)).slice(0, 8);
+    const latest = allNewsItems.filter(n => !usedIds.has(n.id)).slice(0, 10);
     latest.forEach(n => usedIds.add(n.id));
 
     const analysisKeys = ['analysis-1', 'analysis-2', 'analysis-3'];
