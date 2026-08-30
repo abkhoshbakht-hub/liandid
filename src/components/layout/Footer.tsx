@@ -84,7 +84,7 @@ export default function Footer() {
           </div>
 
           {/* ستون سوم: دسته‌بندی‌ها */}
-          <div className="text-center">
+          <div className="text-center hidden md:block">
             <h3 className="text-[#C9A96E] font-black text-base mb-2">دسته‌بندی‌ها</h3>
             <div className="grid grid-cols-4 gap-2">
               {categories.filter((c: any) => c.slug !== 'exclusive-news' && c.slug !== 'special-news' && !c.name.includes('اختصاصی') && !c.name.includes('لیان دید')).map((cat) => (
@@ -116,7 +116,7 @@ export default function Footer() {
           </div>
 
           {/* ستون پنجم: خبرنامه */}
-          <div className="relative text-center">
+          <div className="relative text-center hidden md:block">
             <h3 className="text-[#C9A96E] font-black text-base mb-2">خبرنامه</h3>
             <p className="text-white/60 text-sm mb-2">
               آخرین اخبار را در ایمیل خود دریافت کنید
