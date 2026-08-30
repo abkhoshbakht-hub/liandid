@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { timeAgo, getCategoryStyle } from '@/lib/utils';
 
 interface NewsItem {
@@ -20,13 +20,21 @@ const MOBILE_INITIAL = 8;
 
 export default function LatestNews({ items }: { items: NewsItem[] }) {
   const [showAll, setShowAll] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   if (items.length === 0) {
     return <p className="text-gray-400 text-center py-12 text-sm">خبری موجود نیست</p>;
   }
 
-  const visibleItems = showAll ? items : items.slice(0, MOBILE_INITIAL);
-  const hasMore = items.length > MOBILE_INITIAL;
+  const visibleItems = (isMobile && !showAll) ? items.slice(0, MOBILE_INITIAL) : items;
+  const hasMore = isMobile && items.length > MOBILE_INITIAL;
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden h-full shadow-sm flex flex-col">
