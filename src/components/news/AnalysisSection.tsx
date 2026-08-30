@@ -55,7 +55,7 @@ export default function AnalysisSection({ items }: { items: AnalysisItem[] }) {
                 <img
                   src={item.image}
                   alt={item.title}
-                  className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity duration-500"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
