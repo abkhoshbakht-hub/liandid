@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
 
-const categories = [
+const categories: Array<{name: string; slug: string; href?: string; subcategories?: Array<{name: string; slug: string; href?: string}>}> = [
   { name: 'صفحه اصلی', slug: 'home', href: '/' },
   {
     name: 'سیاسی',
@@ -200,7 +200,7 @@ export default function Header() {
                 onMouseLeave={() => setOpenDropdown(null)}
               >
                 <Link
-                  href={cat.href || `/category/${cat.slug}`}
+                  href={'href' in cat && cat.href ? cat.href : `/category/${cat.slug}`}
                   className="px-5 py-2 text-[13px] font-medium text-white/80 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1.5 border-b-2 border-transparent hover:border-[#C9A96E]"
                 >
                   {cat.name}
@@ -223,7 +223,7 @@ export default function Header() {
                         </Link>
                       ))}
                     </div>
-                    {cat.href && (
+                    {'href' in cat && cat.href && (
                     <div className="px-7 py-3.5 bg-gradient-to-l from-gray-50 to-gray-100 border-t border-gray-100">
                       <Link href={cat.href} className="text-xs text-[#1B365D] hover:text-[#C9A96E] font-bold transition-colors flex items-center gap-1">
                         مشاهده همه
@@ -317,7 +317,7 @@ export default function Header() {
                       )}
                     </div>
                   ) : (
-<Link href={cat.href || `/category/${cat.slug}`} className="block px-5 py-4 text-sm text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-all" onClick={() => setIsMenuOpen(false)}><span className="whitespace-nowrap">{cat.name}</span></Link>
+<Link href={'href' in cat && cat.href ? cat.href : `/category/${cat.slug}`} className="block px-5 py-4 text-sm text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-all" onClick={() => setIsMenuOpen(false)}><span className="whitespace-nowrap">{cat.name}</span></Link>
                   )}
                 </li>
               ))}
