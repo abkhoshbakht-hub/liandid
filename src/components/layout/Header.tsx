@@ -259,7 +259,7 @@ export default function Header({ breakingItems = [] }: { breakingItems?: Array<{
 
       {/* منوی موبایل */}
       {isMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-0 bg-white z-50 overflow-y-auto">
+        <div className="lg:hidden fixed inset-0 top-0 bg-white z-50 overflow-y-auto" onClick={() => setIsMenuOpen(false)}>
           <div className="bg-gradient-to-l from-[#1B365D] via-[#1e3a64] to-[#1B365D] px-4 py-4 flex justify-between items-center">
             <div className="h-[50px] w-[140px] relative">
               <Image src="/logo.png" alt="لیان دید" fill className="object-contain" sizes="140px" />
@@ -278,6 +278,7 @@ export default function Header({ breakingItems = [] }: { breakingItems?: Array<{
                   router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
                 }
               }}
+              onClick={(e) => e.stopPropagation()}
               className="relative mb-4 flex"
             >
               <input
@@ -298,7 +299,7 @@ export default function Header({ breakingItems = [] }: { breakingItems?: Array<{
                   {cat.subcategories ? (
                     <div>
                       <button
-                        onClick={() => setOpenDropdown(openDropdown === cat.slug ? null : cat.slug)}
+                        onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === cat.slug ? null : cat.slug); }}
                         className="w-full flex items-center justify-between px-5 py-4 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-all font-medium"
                       >
                         <span className="whitespace-nowrap">{cat.name}</span>
@@ -321,7 +322,7 @@ export default function Header({ breakingItems = [] }: { breakingItems?: Array<{
               ))}
               <li>
                 <button
-                  onClick={() => setOpenDropdown(openDropdown === 'bushahr-mobile' ? null : 'bushahr-mobile')}
+                  onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === 'bushahr-mobile' ? null : 'bushahr-mobile'); }}
                   className="w-full flex items-center justify-between px-5 py-4 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-all font-medium"
                 >
                   <span>🗺️ اخبار شهرها و روستاهای استان</span>
