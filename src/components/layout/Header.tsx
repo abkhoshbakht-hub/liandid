@@ -134,13 +134,8 @@ export default function Header({ breakingItems = [] }: { breakingItems?: Array<{
         </div>
         <div className="site-container h-full flex items-center justify-between relative z-10">
 
-          {/* سمت راست: خروج */}
+          {/* سمت راست */}
           <div className="flex items-center gap-3">
-            {isAuthenticated && isAdmin && (
-              <button onClick={logout} className="px-4 py-2 text-sm text-gray-500 hover:text-red-500 hover:bg-red-50 border border-gray-200 rounded-lg transition-all">
-                خروج
-              </button>
-            )}
           </div>
 
           {/* سمت چپ: جستجو و لینک‌ها */}
