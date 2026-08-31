@@ -170,7 +170,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[#f8f9fb] flex" dir="rtl">
-      <aside className="fixed inset-y-0 right-0 z-50 w-72 bg-[#0a1220] flex flex-col shadow-2xl shadow-black/30">
+      <aside className="hidden lg:flex fixed inset-y-0 right-0 z-50 w-72 bg-[#0a1220] flex-col shadow-2xl shadow-black/30">
         <div className="h-16 flex items-center px-5 border-b border-white/[0.04]">
           <Link href="/dashboard" className="flex items-center gap-3">
             <div className="h-8 w-24 relative">
