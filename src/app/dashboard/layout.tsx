@@ -191,17 +191,17 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                       isOpen ? 'bg-white/[0.06]' : 'hover:bg-white/[0.03]'
                     }`}
                   >
-                    <span className={`transition-colors duration-200 ${isOpen ? 'text-[#C9A96E]' : 'text-white/20 group-hover:text-white/30'}`}>
+                    <span className={`transition-colors duration-200 ${isOpen ? 'text-[#C9A96E]' : 'text-white/50 group-hover:text-white/60'}`}>
                       {s.icon}
                     </span>
                     <span className={`text-[12px] font-bold transition-colors duration-200 ${
-                      isOpen ? 'text-white/80' : 'text-white/35 group-hover:text-white/50'
+                      isOpen ? 'text-white/90' : 'text-white/65 group-hover:text-white/80'
                     }`}>{s.title}</span>
                     {isSectionActive(s) && !isOpen && (
                       <span className="w-1.5 h-1.5 rounded-full bg-[#C9A96E] mr-auto" />
                     )}
                     <svg
-                      className={`w-3 h-3 transition-transform duration-300 ${isOpen ? 'text-white/30 rotate-0' : 'text-white/10 rotate-180'}`}
+                      className={`w-3 h-3 transition-transform duration-300 ${isOpen ? 'text-white/50 rotate-0' : 'text-white/30 rotate-180'}`}
                       fill="none" stroke="currentColor" viewBox="0 0 24 24"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -209,10 +209,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); setPreview(preview === s.title ? null : s.title); }}
-                    className="p-1.5 rounded-lg hover:bg-white/5 transition-colors ml-0.5"
+                    className="p-1.5 rounded-lg hover:bg-white/[0.06] transition-colors ml-0.5"
                     title="پیش\u200cنمایش"
                   >
-                    <svg className={`w-3.5 h-3.5 transition-colors ${preview === s.title ? 'text-[#C9A96E]' : 'text-white/10 hover:text-white/25'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-3.5 h-3.5 transition-colors ${preview === s.title ? 'text-[#C9A96E]' : 'text-white/30 hover:text-white/50'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -229,10 +229,10 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                           href={item.href}
                           onMouseEnter={() => setHoveredItem(item.label)}
                           onMouseLeave={() => setHoveredItem(null)}
-                          className={`relative flex items-center px-3 py-[7px] rounded-lg text-[11.5px] transition-all duration-150 my-0.5 ${
+                           className={`relative flex items-center px-3 py-[7px] rounded-lg text-[11.5px] transition-all duration-150 my-0.5 ${
                             activeItem
                               ? 'bg-[#C9A96E]/[0.12] text-[#C9A96E] font-bold'
-                              : 'text-white/30 hover:text-white/60 hover:bg-white/[0.03]'
+                              : 'text-white/55 hover:text-white/80 hover:bg-white/[0.06]'
                           }`}
                         >
                           {activeItem && (
@@ -256,15 +256,15 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-white text-[11px] font-bold truncate">{user?.name}</p>
-              <p className="text-white/25 text-[10px]">{user?.role === 'ADMIN' ? 'مدیر ارشد' : 'نویسنده'}</p>
+              <p className="text-white/50 text-[10px]">{user?.role === 'ADMIN' ? 'مدیر ارشد' : 'نویسنده'}</p>
             </div>
           </div>
           <div className="flex gap-1.5">
-            <a href="/" target="_blank" className="flex-1 flex items-center justify-center gap-1.5 text-[10px] text-white/25 hover:text-white/60 py-2 rounded-lg hover:bg-white/[0.03] transition-colors border border-white/[0.04]">
+            <a href="/" target="_blank" className="flex-1 flex items-center justify-center gap-1.5 text-[10px] text-white/55 hover:text-white/80 py-2 rounded-lg hover:bg-white/[0.06] transition-colors border border-white/[0.08]">
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
               مشاهده سایت
             </a>
-            <button onClick={logout} className="flex-1 flex items-center justify-center gap-1.5 text-[10px] text-white/25 hover:text-red-400 py-2 rounded-lg hover:bg-white/[0.03] transition-colors border border-white/[0.04]">
+            <button onClick={logout} className="flex-1 flex items-center justify-center gap-1.5 text-[10px] text-white/55 hover:text-red-400 py-2 rounded-lg hover:bg-white/[0.06] transition-colors border border-white/[0.08]">
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
               خروج
             </button>
@@ -310,9 +310,9 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                         isOpen ? 'bg-white/[0.06]' : 'hover:bg-white/[0.03]'
                       }`}
                     >
-                      <span className={isOpen ? 'text-[#C9A96E]' : 'text-white/20'}>{s.icon}</span>
-                      <span className={`text-[12px] font-bold ${isOpen ? 'text-white/80' : 'text-white/35'}`}>{s.title}</span>
-                      <svg className={`w-3 h-3 mr-auto transition-transform duration-300 ${isOpen ? 'text-white/30 rotate-0' : 'text-white/10 rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <span className={isOpen ? 'text-[#C9A96E]' : 'text-white/50'}>{s.icon}</span>
+                      <span className={`text-[12px] font-bold ${isOpen ? 'text-white/90' : 'text-white/65'}`}>{s.title}</span>
+                      <svg className={`w-3 h-3 mr-auto transition-transform duration-300 ${isOpen ? 'text-white/50 rotate-0' : 'text-white/30 rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </button>
@@ -323,7 +323,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
                           return (
                             <Link key={item.label + i} href={item.href} onClick={() => setMobileOpen(false)}
                               className={`relative block px-3 py-[7px] rounded-lg text-[11.5px] my-0.5 ${
-                                activeItem ? 'bg-[#C9A96E]/[0.12] text-[#C9A96E] font-bold' : 'text-white/30 hover:text-white/60 hover:bg-white/[0.03]'
+                                activeItem ? 'bg-[#C9A96E]/[0.12] text-[#C9A96E] font-bold' : 'text-white/55 hover:text-white/80 hover:bg-white/[0.06]'
                               }`}
                             >
                               {activeItem && <span className="absolute -right-[9px] top-1/2 -translate-y-1/2 w-[3px] h-4 bg-[#C9A96E] rounded-full" />}
