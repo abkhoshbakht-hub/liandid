@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       title, subtitle, content, excerpt, categoryId, featuredImage,
-      status, isFeatured, isBreaking, isPinned, source, sourceUrl,
+      status, isFeatured, isBreaking, isPinned, placement, source, sourceUrl,
       scheduledAt, metaTitle, metaDesc, metaKeywords, tagIds
     } = body;
 
@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
         isFeatured: isFeatured || false,
         isBreaking: isBreaking || false,
         isPinned: isPinned || false,
+        placement: placement || 'latest',
         source: source || null,
         sourceUrl: sourceUrl || null,
         scheduledAt: scheduledAt ? new Date(scheduledAt) : null,

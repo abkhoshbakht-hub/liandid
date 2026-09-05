@@ -48,7 +48,7 @@ async function getHomepageData() {
         orderBy: { publishedAt: 'desc' },
         select: {
           id: true, title: true, slug: true, excerpt: true, featuredImage: true,
-          publishedAt: true, isBreaking: true, isFeatured: true,
+          publishedAt: true, isBreaking: true, isFeatured: true, placement: true,
           author: { select: { name: true } },
           category: { select: { name: true, slug: true } },
         },
@@ -72,6 +72,27 @@ async function getHomepageData() {
 
     const allNewsItems = [...articles.map(toArticleItem), ...approvedNews.map(toExternalItem)];
 
+    const getPlacement = (id: string): string => {
+      const a = articles.find(x => x.id === id) as any;
+      return a?.placement || 'latest';
+    };
+
+    const articleItemsById = new Map(articles.map(a => [a.id, toArticleItem(a as any)]));
+    const heroPlacedItems = articles.filter(a => (a as any).placement === 'hero').map(a => articleItemsById.get(a.id)!);
+    const analysisPlacedItems = articles.filter(a => (a as any).placement === 'analysis').map(a => articleItemsById.get(a.id)!);
+    const pinnedPlacedItems = articles.filter(a => (a as any).placement === 'pinned').map(a => articleItemsById.get(a.id)!);
+
+    const dedupe = (items: Item[]): Item[] => {
+      const seen = new Set<string>();
+      return items.filter(n => {
+        if (seen.has(n.id)) return false;
+        seen.add(n.id);
+        return true;
+      });
+    };
+
+    const heroPool = dedupe([...heroPlacedItems, ...allNewsItems]);
+
     const resolve = (s: { id: string; type: string; customTitle?: string | null; customLink?: string | null; customContent?: string | null; customImage?: string | null; category?: string | null; externalNews?: typeof approvedNews[0] | null } | null, fallbackItem?: Item): Item | null => {
       if (s?.type === 'CUSTOM' && s.customTitle) {
         return {
@@ -89,9 +110,9 @@ async function getHomepageData() {
 
     const findSlot = (key: string) => slots.find(s => s.slotKey === key) || null;
 
-    const heroMain = resolve(findSlot('hero-main'), allNewsItems[0] || null);
-    const heroSide1 = resolve(findSlot('hero-side-1'), allNewsItems[1] || null);
-    const heroSide2 = resolve(findSlot('hero-side-2'), allNewsItems[2] || null);
+    const heroMain = resolve(findSlot('hero-main'), heroPool[0] || null);
+    const heroSide1 = resolve(findSlot('hero-side-1'), heroPool[1] || null);
+    const heroSide2 = resolve(findSlot('hero-side-2'), heroPool[2] || null);
 
     const heroIds = [heroMain?.id, heroSide1?.id, heroSide2?.id].filter(Boolean);
 
@@ -103,7 +124,11 @@ async function getHomepageData() {
     const breakingIds = breaking.map(b => b.id);
     const usedIds = new Set([...heroIds, ...breakingIds]);
 
-    const latest = allNewsItems.filter(n => !usedIds.has(n.id)).slice(0, 8);
+    const restPool = allNewsItems.filter(n => !usedIds.has(n.id));
+    const restPinned = pinnedPlacedItems.filter(n => !usedIds.has(n.id));
+    const restOthers = restPool.filter(n => getPlacement(n.id) !== 'analysis' && !restPinned.some(p => p.id === n.id));
+    const latestPool = dedupe([...restPinned, ...restOthers]);
+    const latest = latestPool.slice(0, 8);
     latest.forEach((n, i) => {
       usedIds.add(n.id);
       if (i < 8) n.image = `/latest-news/${i + 1}.jpg`;
@@ -112,7 +137,10 @@ async function getHomepageData() {
     const analysisKeys = ['analysis-1', 'analysis-2', 'analysis-3'];
     const analysis = analysisKeys.map((k, i) => {
       const slot = findSlot(k);
-      const fallbackItem = allNewsItems.filter(n => !usedIds.has(n.id))[i];
+      const unusedForAnalysis = allNewsItems.filter(n => !usedIds.has(n.id));
+      const analysisUnusedPlaced = analysisPlacedItems.filter(n => !usedIds.has(n.id));
+      const analysisPool = dedupe([...analysisUnusedPlaced, ...unusedForAnalysis]);
+      const fallbackItem = analysisPool[i];
       return resolve(slot, fallbackItem);
     }).filter((item): item is Item => item !== null);
 

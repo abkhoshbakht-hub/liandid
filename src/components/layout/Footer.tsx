@@ -8,6 +8,7 @@ import NewsletterForm from './NewsletterForm';
 const defaultLinks = [
   { name: 'درباره ما', href: '/about' },
   { name: 'تماس با ما', href: '/contact' },
+  { name: 'آرشیو اخبار', href: '/archive' },
   { name: 'حریم خصوصی', href: '/privacy' },
   { name: 'قوانین', href: '/terms' },
   { name: 'فید RSS', href: '/api/rss/feed', external: true },

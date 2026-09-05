@@ -21,6 +21,7 @@ interface Article {
   isFeatured: boolean;
   isBreaking: boolean;
   isPinned: boolean;
+  placement?: string;
   source?: string;
   sourceUrl?: string;
   publishedAt?: string;
@@ -83,6 +84,7 @@ function ArticlesContent() {
     isFeatured: false,
     isBreaking: false,
     isPinned: false,
+    placement: 'latest',
     source: '',
     sourceUrl: '',
     scheduledAt: '',
@@ -225,6 +227,7 @@ function ArticlesContent() {
       isFeatured: article.isFeatured,
       isBreaking: article.isBreaking,
       isPinned: article.isPinned,
+      placement: (article as any).placement || 'latest',
       source: article.source || '',
       sourceUrl: article.sourceUrl || '',
       scheduledAt: article.scheduledAt ? article.scheduledAt.slice(0, 16) : '',
@@ -323,7 +326,7 @@ function ArticlesContent() {
     setForm({
       title: '', subtitle: '', content: '', excerpt: '', featuredImage: '',
       categoryId: '', status: 'DRAFT', isFeatured: false, isBreaking: false,
-      isPinned: false, source: '', sourceUrl: '', scheduledAt: '',
+      isPinned: false, placement: 'latest', source: '', sourceUrl: '', scheduledAt: '',
       metaTitle: '', metaDesc: '', metaKeywords: '', tagIds: [],
     });
     setEditingArticle(null);
@@ -495,6 +498,15 @@ function ArticlesContent() {
                     <input type="checkbox" checked={form.isPinned} onChange={e => setForm({ ...form, isPinned: e.target.checked })} className="w-4 h-4 text-[#C9A96E] rounded" />
                     <span className="text-sm">سنجاق شده</span>
                   </label>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">جایگاه نمایش در سایت</label>
+                    <select value={(form as any).placement || 'latest'} onChange={e => setForm({ ...form, placement: e.target.value } as any)} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#C9A96E] text-sm bg-white">
+                      <option value="latest">آخرین اخبار</option>
+                      <option value="hero">هیرو (اسلایدر بالای سایت)</option>
+                      <option value="analysis">تحلیل خبر</option>
+                      <option value="pinned">سنجاق شده (بالای لیست)</option>
+                    </select>
+                  </div>
                 </div>
 
                 {/* زمان‌بندی */}
@@ -584,6 +596,11 @@ function ArticlesContent() {
                             <div className="font-bold text-sm text-[#1B365D]">{article.title}</div>
                             {article.isBreaking && <span className="text-xs text-red-500 font-bold">فوری</span>}
                             {article.isFeatured && <span className="text-xs text-[#C9A96E] font-bold mr-1">ویژه</span>}
+                            {(article as any).placement && (article as any).placement !== 'latest' && (
+                              <span className="text-xs text-blue-600 font-bold mr-1">
+                                {(article as any).placement === 'hero' ? 'هیرو' : (article as any).placement === 'analysis' ? 'تحلیل' : (article as any).placement === 'pinned' ? 'سنجاق' : (article as any).placement}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </td>

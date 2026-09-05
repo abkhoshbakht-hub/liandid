@@ -69,7 +69,7 @@ export async function PUT(
     const body = await req.json();
     const {
       title, subtitle, content, excerpt, categoryId, featuredImage,
-      status, isFeatured, isBreaking, isPinned, source, sourceUrl,
+      status, isFeatured, isBreaking, isPinned, placement, source, sourceUrl,
       scheduledAt, metaTitle, metaDesc, metaKeywords, tagIds, region
     } = body;
 
@@ -131,6 +131,7 @@ export async function PUT(
     if (isFeatured !== undefined) updateData.isFeatured = isFeatured;
     if (isBreaking !== undefined) updateData.isBreaking = isBreaking;
     if (isPinned !== undefined) updateData.isPinned = isPinned;
+    if (placement !== undefined) updateData.placement = placement;
     if (source !== undefined) updateData.source = source;
     if (sourceUrl !== undefined) updateData.sourceUrl = sourceUrl;
     if (scheduledAt !== undefined) updateData.scheduledAt = scheduledAt ? new Date(scheduledAt) : null;

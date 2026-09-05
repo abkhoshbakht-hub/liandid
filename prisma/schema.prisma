@@ -39,6 +39,7 @@ model Article {
   isFeatured    Boolean   @default(false)
   isBreaking    Boolean   @default(false)
   isPinned      Boolean   @default(false)
+  placement     String    @default("latest") // latest, hero, analysis, pinned
   source        String?
   sourceUrl     String?
   publishedAt   DateTime?
