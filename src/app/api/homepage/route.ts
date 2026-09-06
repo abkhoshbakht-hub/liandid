@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { isBushehrNews } from '@/lib/bushehr';
 
 export async function GET() {
   try {
@@ -30,7 +31,14 @@ export async function GET() {
       ...n, isCustom: false,
     });
 
-    const resolve = (s: typeof slots[0], fallbackIndex: number = 0) => {
+    const resolve = (s: typeof slots[0] | null | undefined, fallbackIndex: number = -1) => {
+      if (!s) {
+        // باکس غیرفعال یا خالی: فقط در صورت درخواست صریح، خودکار پر شود
+        if (fallbackIndex >= 0 && approvedNews[fallbackIndex]) {
+          return toItem(approvedNews[fallbackIndex]);
+        }
+        return null;
+      }
       if (s.type === 'CUSTOM' && s.customTitle) {
         return {
           id: s.id, title: s.customTitle, link: s.customLink || '#',
@@ -44,7 +52,7 @@ export async function GET() {
         return toItem(s.externalNews);
       }
       // خودکار: از آخرین اخبار تایید شده
-      if (approvedNews[fallbackIndex]) {
+      if (fallbackIndex >= 0 && approvedNews[fallbackIndex]) {
         return toItem(approvedNews[fallbackIndex]);
       }
       return null;
@@ -59,10 +67,18 @@ export async function GET() {
       resolve(slots.find(s => s.slotKey === k)!, 3 + i)
     ).filter(Boolean);
 
+    // آخرین اخبار: فقط باکس‌های تاییدشده مدیر — بدون پر کردن خودکار، فقط اخبار بوشهر
     const latestKeys = ['latest-1', 'latest-2', 'latest-3', 'latest-4', 'latest-5', 'latest-6', 'latest-7', 'latest-8', 'latest-9', 'latest-10'];
-    const latest = latestKeys.map((k, i) =>
-      resolve(slots.find(s => s.slotKey === k)!, 8 + i)
-    ).filter(Boolean);
+    const latestSeen = new Set<string>();
+    const latest = latestKeys
+      .map((k) => resolve(slots.find(s => s.slotKey === k) ?? null))
+      .filter((n): n is NonNullable<typeof n> => {
+        if (!n || latestSeen.has(n.id)) return false;
+        // خبر اختصاصی مدیر همیشه مجاز است؛ خبر خبرگزاری فقط اگر بوشهری باشد
+        if (!n.isCustom && !isBushehrNews({ category: n.category, sourceName: n.sourceName, title: n.title, description: n.description })) return false;
+        latestSeen.add(n.id);
+        return true;
+      });
 
     const analysisKeys = ['analysis-1', 'analysis-2', 'analysis-3'];
     const analysis = analysisKeys.map((k, i) =>

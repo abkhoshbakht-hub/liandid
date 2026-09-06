@@ -4,8 +4,8 @@ import http from 'http';
 import { prisma } from './prisma';
 import { rssSources, rssFallbackSources, type RssSource } from './rss-sources';
 import { classifyNews } from './topics';
-
-const BUSHEHR_KEYWORDS = /بوشهر(ی|ستان)?|عسلویه|کنگان(ی)?|گناوه(ای)?|(?<![مد])دیر(?!کل|یت|عامل|ان|انه)|تنگستان(ی)?|دیلم(ی)?|خارگ(ی)?|برازجان(ی)?|دشتی|دشتستان(ی)?|جم‌پیلن|کیمیای پارس|پارس جنوبی|نخل تقی|سیراف(ی)?|اهرم(ی)?|چاه‌مبارک|پارسیان(ی)?/i;
+import { cleanTitle } from './clean-text';
+import { BUSHEHR_KEYWORDS } from './bushehr';
 
 const parser = new Parser({
   timeout: 15000,
@@ -14,10 +14,6 @@ const parser = new Parser({
     'Accept': 'application/rss+xml, application/xml, text/xml, */*',
   },
 });
-
-function cleanTitle(title: string): string {
-  return title.replace(/\b[a-zA-Z]{2,}\b/g, '').replace(/\s{2,}/g, ' ').trim();
-}
 
 function fetchUrlFollowingRedirects(url: string, maxRedirects = 5): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -147,5 +143,35 @@ export async function fetchAllRssFeeds(): Promise<number> {
     }
   }
 
+  // پاکسازی عناوین انگلیسی خبرهای ذخیره‌شده قبلی (فقط عنوان تغییر می‌کند)
+  try {
+    await cleanupOldEnglishTitles();
+  } catch {
+    // خطای پاکسازی نباید ذخیره اخبار را خراب کند
+  }
+
   return saved;
+}
+
+// تمیزسازی عناوین دارای حروف لاتین در خبرهای قبلی
+async function cleanupOldEnglishTitles(): Promise<number> {
+  const rows = await prisma.externalNews.findMany({
+    select: { id: true, title: true },
+    orderBy: { fetchedAt: 'desc' },
+    take: 5000,
+  });
+
+  let fixed = 0;
+  for (const row of rows) {
+    if (!/[A-Za-z]/.test(row.title)) continue;
+    const cleaned = cleanTitle(row.title);
+    if (cleaned && cleaned !== row.title) {
+      await prisma.externalNews.update({
+        where: { id: row.id },
+        data: { title: cleaned },
+      });
+      fixed++;
+    }
+  }
+  return fixed;
 }

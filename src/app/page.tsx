@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { isBushehrNews } from '@/lib/bushehr';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/news/HeroSection';
@@ -72,15 +73,9 @@ async function getHomepageData() {
 
     const allNewsItems = [...articles.map(toArticleItem), ...approvedNews.map(toExternalItem)];
 
-    const getPlacement = (id: string): string => {
-      const a = articles.find(x => x.id === id) as any;
-      return a?.placement || 'latest';
-    };
-
     const articleItemsById = new Map(articles.map(a => [a.id, toArticleItem(a as any)]));
     const heroPlacedItems = articles.filter(a => (a as any).placement === 'hero').map(a => articleItemsById.get(a.id)!);
     const analysisPlacedItems = articles.filter(a => (a as any).placement === 'analysis').map(a => articleItemsById.get(a.id)!);
-    const pinnedPlacedItems = articles.filter(a => (a as any).placement === 'pinned').map(a => articleItemsById.get(a.id)!);
 
     const dedupe = (items: Item[]): Item[] => {
       const seen = new Set<string>();
@@ -124,11 +119,18 @@ async function getHomepageData() {
     const breakingIds = breaking.map(b => b.id);
     const usedIds = new Set([...heroIds, ...breakingIds]);
 
-    const restPool = allNewsItems.filter(n => !usedIds.has(n.id));
-    const restPinned = pinnedPlacedItems.filter(n => !usedIds.has(n.id));
-    const restOthers = restPool.filter(n => getPlacement(n.id) !== 'analysis' && !restPinned.some(p => p.id === n.id));
-    const latestPool = dedupe([...restPinned, ...restOthers]);
-    const latest = latestPool.slice(0, 8);
+    // آخرین اخبار: فقط باکس‌های تاییدشده مدیر (latest-1 تا latest-10) — بدون پر کردن خودکار، فقط اخبار بوشهر
+    const latestKeys = ['latest-1', 'latest-2', 'latest-3', 'latest-4', 'latest-5', 'latest-6', 'latest-7', 'latest-8', 'latest-9', 'latest-10'];
+    const latest: Item[] = [];
+    const latestSeen = new Set<string>([...usedIds].filter((id): id is string => !!id));
+    for (const k of latestKeys) {
+      const item = resolve(findSlot(k));
+      if (!item || latestSeen.has(item.id)) continue;
+      // خبر اختصاصی مدیر همیشه مجاز است؛ خبر خبرگزاری فقط اگر بوشهری باشد
+      if (!item.isCustom && !isBushehrNews({ category: item.category, sourceName: item.sourceName, title: item.title, description: item.description })) continue;
+      latestSeen.add(item.id);
+      latest.push(item);
+    }
     latest.forEach((n, i) => {
       usedIds.add(n.id);
       if (i < 8) n.image = `/latest-news/${i + 1}.jpg`;

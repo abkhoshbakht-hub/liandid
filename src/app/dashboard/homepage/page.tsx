@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { isBushehrNews } from '@/lib/bushehr';
 
 interface Slot {
   id: string;
@@ -118,6 +119,20 @@ function HomepageContent() {
     finally { setSaving(false); }
   };
 
+  const handleToggleApprove = async (slotId: string, current: boolean) => {
+    setSaving(true);
+    try {
+      const res = await fetch('/api/admin/homepage', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: slotId, isActive: !current }),
+      });
+      const data = await res.json();
+      if (data.success) fetchSlots();
+    } catch (e) { console.error(e); }
+    finally { setSaving(false); }
+  };
+
   const handleClear = async (slotId: string) => {
     setSaving(true);
     try {
@@ -182,9 +197,19 @@ function HomepageContent() {
                     <div key={slot.id} className="bg-white rounded-xl border border-gray-100 p-4 hover:shadow-md transition-shadow">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-xs font-bold text-gray-400 bg-gray-50 px-2 py-1 rounded">{slot.slotKey}</span>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${slot.type === 'CUSTOM' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
-                          {slot.type === 'CUSTOM' ? 'ویرایش' : 'خبرگزاری'}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${slot.type === 'CUSTOM' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                            {slot.type === 'CUSTOM' ? 'ویرایش' : 'خبرگزاری'}
+                          </span>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${slot.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                            {slot.isActive ? 'تایید شده' : 'در انتظار تایید'}
+                          </span>
+                          {section === 'latest' && slot.externalNews && !isBushehrNews({ category: slot.externalNews.category, sourceName: slot.externalNews.sourceName, title: slot.externalNews.title }) && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-red-100 text-red-600">
+                              غیربوشهر ـ نمایش داده نمی‌شود
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {slot.type === 'CUSTOM' && slot.customTitle ? (
@@ -214,6 +239,15 @@ function HomepageContent() {
                         >
                           ویرایش
                         </button>
+                        {(slot.externalNewsId || slot.customTitle) && (
+                          <button
+                            onClick={() => handleToggleApprove(slot.id, slot.isActive)}
+                            disabled={saving}
+                            className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 ${slot.isActive ? 'bg-amber-50 text-amber-600 hover:bg-amber-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
+                          >
+                            {slot.isActive ? 'لغو تایید' : 'تایید'}
+                          </button>
+                        )}
                         {(slot.externalNewsId || slot.customTitle) && (
                           <button
                             onClick={() => handleClear(slot.id)}
