@@ -68,11 +68,13 @@ export default function HeroSection({ main, side1, side2 }: { main: NewsItem | n
                   <div className={`absolute inset-0 bg-gradient-to-br ${getCategoryStyle(news.category).gradient}`} />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-[#0a1628]/30 to-transparent" />
-                <div className="absolute top-4 right-4 z-20">
-                  <span className={`inline-block text-[11px] px-3 py-1.5 rounded-full font-bold text-white ${getCategoryStyle(news.category).bg} shadow-lg`}>
-                    {news.category}
-                  </span>
-                </div>
+                {news.category && news.category !== 'بوشهر' && (
+                  <div className="absolute top-4 right-4 z-20">
+                    <span className={`inline-block text-[11px] px-3 py-1.5 rounded-full font-bold text-white ${getCategoryStyle(news.category).bg} shadow-lg`}>
+                      {news.category}
+                    </span>
+                  </div>
+                )}
                 <div className="absolute bottom-0 right-0 left-0 p-5 z-20">
                   <h3 className="text-base font-black text-white group-hover:text-[#C9A96E] transition-colors duration-300 line-clamp-2 leading-[1.8] drop-shadow-lg">
                     {news.title}
