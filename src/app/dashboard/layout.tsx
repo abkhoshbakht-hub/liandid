@@ -20,6 +20,11 @@ interface SidebarSection {
 }
 
 const sections: SidebarSection[] = [
+  { title: 'اضافه کردن خبر جدید', preview: 'articles', icon: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" /></svg>
+  ), items: [
+    { href: '/dashboard/articles?new=1', label: 'خبر جدید' },
+  ]},
   { title: 'تنظیمات هدر', preview: 'header', icon: (
     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h7" /></svg>
   ), items: [
@@ -105,6 +110,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const catSlug = searchParams.get('cat');
   const sectionParam = searchParams.get('section');
   const statusParam = searchParams.get('status');
+  const newParam = searchParams.get('new');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -124,8 +130,12 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
       const statusPart = item.href.split('status=')[1];
       return pathname === item.href.split('?')[0] && statusParam === statusPart;
     }
+    if (item.href.includes('?new=')) {
+      const newPart = item.href.split('new=')[1];
+      return pathname === item.href.split('?')[0] && newParam === newPart;
+    }
     if (item.href === '/dashboard/articles') {
-      return pathname === '/dashboard/articles' && !statusParam && !catSlug;
+      return pathname === '/dashboard/articles' && !statusParam && !catSlug && !newParam;
     }
     return pathname === item.href;
   };

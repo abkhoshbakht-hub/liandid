@@ -60,6 +60,7 @@ function ArticlesContent() {
   const searchParams = useSearchParams();
   const catSlug = searchParams.get('cat');
   const statusParam = searchParams.get('status');
+  const newParam = searchParams.get('new');
   const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -125,6 +126,16 @@ function ArticlesContent() {
       setFilterStatus('');
     }
   }, [statusParam]);
+
+  useEffect(() => {
+    if (newParam === '1') {
+      resetForm();
+      setShowForm(true);
+      setTimeout(() => {
+        document.getElementById('article-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+    }
+  }, [newParam]);
 
   const SEVEN_DAYS_AGO = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
 
@@ -464,7 +475,7 @@ function ArticlesContent() {
         })()}
         {/* فرم ایجاد/ویرایش خبر */}
         {showForm && (
-          <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-gray-200">
+          <div id="article-form" className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-gray-200 scroll-mt-24">
             <h2 className="text-xl font-bold text-[#1B365D] mb-6">{editingArticle ? 'ویرایش خبر' : 'خبر جدید'}</h2>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
