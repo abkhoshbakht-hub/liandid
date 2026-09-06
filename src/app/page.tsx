@@ -128,6 +128,12 @@ async function getHomepageData() {
     const restPinned = pinnedPlacedItems.filter(n => !usedIds.has(n.id));
     const restOthers = restPool.filter(n => getPlacement(n.id) !== 'analysis' && !restPinned.some(p => p.id === n.id));
     const latestPool = dedupe([...restPinned, ...restOthers]);
+    // مرتب‌سازی همه خبرها با هم بر اساس جدیدترین تاریخ انتشار
+    latestPool.sort((x, y) => {
+      const tx = x.publishedAt ? new Date(x.publishedAt).getTime() : 0;
+      const ty = y.publishedAt ? new Date(y.publishedAt).getTime() : 0;
+      return ty - tx;
+    });
     const latest = latestPool.slice(0, 8);
     latest.forEach((n, i) => {
       usedIds.add(n.id);

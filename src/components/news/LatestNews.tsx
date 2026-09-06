@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { timeAgo, getCategoryStyle, toPersianDigits } from '@/lib/utils';
 
 interface NewsItem {
@@ -80,6 +81,9 @@ export default function LatestNews({ items }: { items: NewsItem[] }) {
         </a>
       ))}
     </div>
+      <Link href="/archive" className="block text-center py-4 text-sm font-extrabold text-[#1B365D] hover:text-[#C9A96E] hover:bg-gray-50 border-t border-gray-100 transition-colors">
+        مشاهده همه اخبار
+      </Link>
     </div>
   );
 }
