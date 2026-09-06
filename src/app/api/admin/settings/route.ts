@@ -15,7 +15,10 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    // کلیدهای محافظت‌شده: فقط برنامه‌نویس (کد) می‌تواند تغییر دهد، نه ادمین
+    const PROTECTED_KEYS = ['footerCreditText', 'footerCreditLink'];
     for (const [key, value] of Object.entries(body)) {
+      if (PROTECTED_KEYS.includes(key)) continue;
       if (typeof value === 'string') {
         await prisma.siteSetting.upsert({
           where: { key },

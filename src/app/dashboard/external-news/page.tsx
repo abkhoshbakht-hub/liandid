@@ -29,6 +29,10 @@ export default function ExternalNewsPage() {
   const [selected, setSelected] = useState<string[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [actionLoading, setActionLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const PAGE_SIZE = 20;
 
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || !isAdmin)) {
@@ -40,10 +44,12 @@ export default function ExternalNewsPage() {
     if (isAuthenticated && isAdmin) fetchNews();
   }, [isAuthenticated, isAdmin]);
 
-  const fetchNews = async () => {
+  const fetchNews = async (pageNum: number = page) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
+      params.set('page', String(pageNum));
+      params.set('limit', String(PAGE_SIZE));
       if (filter === 'BREAKING') {
         params.set('breaking', 'true');
       } else if (filter !== 'all') {
@@ -54,6 +60,9 @@ export default function ExternalNewsPage() {
       if (data.success) {
         setNews(data.data);
         setPendingCount(data.pendingCount);
+        setTotalPages(data.pagination?.totalPages || 1);
+        setTotal(data.pagination?.total || 0);
+        setSelected([]);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -62,8 +71,18 @@ export default function ExternalNewsPage() {
     }
   };
 
+  const changePage = (p: number) => {
+    if (p < 1 || p > totalPages || p === page) return;
+    setPage(p);
+    fetchNews(p);
+  };
+
   useEffect(() => {
-    if (isAuthenticated && isAdmin) fetchNews();
+    if (isAuthenticated && isAdmin) {
+      setPage(1);
+      setSelected([]);
+      fetchNews(1);
+    }
   }, [filter]);
 
   const handleStatus = async (ids: string[], status: string) => {
@@ -261,7 +280,7 @@ export default function ExternalNewsPage() {
                     onChange={() => toggleSelect(item.id)}
                     className="w-4 h-4 rounded"
                   />
-                  <span className="text-xs text-gray-400 w-8">{index + 1}</span>
+                  <span className="text-xs text-gray-400 w-8">{(page - 1) * PAGE_SIZE + index + 1}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       {statusBadge(item.status)}
@@ -326,6 +345,52 @@ export default function ExternalNewsPage() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* صفحه‌بندی */}
+        {!loading && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-6 flex-wrap" dir="rtl">
+            <span className="text-xs text-gray-400 ml-2">مجموع: {total} خبر</span>
+            <button
+              onClick={() => changePage(page - 1)}
+              disabled={page <= 1}
+              className="px-3 py-2 rounded-lg text-[13px] font-bold bg-white text-gray-600 border border-gray-200 hover:border-[#1B365D] hover:text-[#1B365D] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              قبلی
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter(p => p === 1 || p === totalPages || Math.abs(p - page) <= 2)
+              .reduce<number[]>((acc, p) => {
+                const prev = acc[acc.length - 1];
+                if (prev !== undefined && p - prev > 1) acc.push(-1);
+                acc.push(p);
+                return acc;
+              }, [])
+              .map((p, i) =>
+                p === -1 ? (
+                  <span key={`gap-${i}`} className="text-gray-300 px-1">...</span>
+                ) : (
+                  <button
+                    key={p}
+                    onClick={() => changePage(p)}
+                    className={`w-9 h-9 flex items-center justify-center rounded-lg text-[13px] font-black transition-all ${
+                      p === page
+                        ? 'bg-[#1B365D] text-white shadow'
+                        : 'bg-white text-gray-600 border border-gray-200 hover:border-[#1B365D] hover:text-[#1B365D]'
+                    }`}
+                  >
+                    {p.toLocaleString('fa-IR')}
+                  </button>
+                )
+              )}
+            <button
+              onClick={() => changePage(page + 1)}
+              disabled={page >= totalPages}
+              className="px-3 py-2 rounded-lg text-[13px] font-bold bg-white text-gray-600 border border-gray-200 hover:border-[#1B365D] hover:text-[#1B365D] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              بعدی
+            </button>
           </div>
         )}
       </div>

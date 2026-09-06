@@ -27,8 +27,6 @@ export default function FooterSettingsPage() {
   const [address, setAddress] = useState('بوشهر، امامزاده مهر ۱۸');
   const [phone, setPhone] = useState('۰۹۳۶-۰۲۸-۰۵۶۲');
   const [copyright, setCopyright] = useState('لیان دید. تمامی حقوق محفوظ است.');
-  const [creditText, setCreditText] = useState('طراحی و تولید: لیان دیزاین');
-  const [creditLink, setCreditLink] = useState('https://liandesign.ir');
   const [links, setLinks] = useState<FooterLink[]>(defaultLinks);
   const [newLinkName, setNewLinkName] = useState('');
   const [newLinkHref, setNewLinkHref] = useState('');
@@ -46,8 +44,6 @@ export default function FooterSettingsPage() {
         if (data.footerAddress) setAddress(data.footerAddress);
         if (data.footerPhone) setPhone(data.footerPhone);
         if (data.footerCopyright) setCopyright(data.footerCopyright);
-        if (data.footerCreditText) setCreditText(data.footerCreditText);
-        if (data.footerCreditLink) setCreditLink(data.footerCreditLink);
         if (data.footerLinks) {
           try { setLinks(JSON.parse(data.footerLinks)); } catch {}
         }
@@ -70,8 +66,6 @@ export default function FooterSettingsPage() {
           footerAddress: address,
           footerPhone: phone,
           footerCopyright: copyright,
-          footerCreditText: creditText,
-          footerCreditLink: creditLink,
           footerLinks: JSON.stringify(links),
         }),
       });
@@ -169,19 +163,11 @@ export default function FooterSettingsPage() {
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-4">
-        <h2 className="text-sm font-black text-[#1B365D] mb-4">کپی\u200cرایت و طراحی</h2>
+        <h2 className="text-sm font-black text-[#1B365D] mb-4">کپی‌رایت</h2>
         <div className="space-y-3">
           <div>
             <label className="block text-xs text-gray-400 mb-1">متن کپی\u200cرایت</label>
             <input type="text" value={copyright} onChange={e => setCopyright(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#C9A96E]" />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">متن طراحی</label>
-            <input type="text" value={creditText} onChange={e => setCreditText(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#C9A96E]" />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">لینک طراح</label>
-            <input type="url" value={creditLink} onChange={e => setCreditLink(e.target.value)} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#C9A96E]" dir="ltr" />
           </div>
         </div>
       </div>
