@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/rss?refresh=true",
+      "schedule": "*/10 * * * *"
+    }
+  ]
+}

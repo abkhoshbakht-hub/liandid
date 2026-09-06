@@ -153,16 +153,19 @@ export async function fetchAllRssFeeds(): Promise<number> {
   return saved;
 }
 
-// تمیزسازی عناوین دارای حروف لاتین در خبرهای قبلی
+// تمیزسازی عناوین دارای حروف لاتین در خبرهای قبلی (محدود در هر اجرا تا دریافت خبر کند نشود)
+const MAX_CLEAN_PER_RUN = 100;
+
 async function cleanupOldEnglishTitles(): Promise<number> {
   const rows = await prisma.externalNews.findMany({
     select: { id: true, title: true },
-    orderBy: { fetchedAt: 'desc' },
-    take: 5000,
+    orderBy: { fetchedAt: 'asc' },
+    take: 1000,
   });
 
   let fixed = 0;
   for (const row of rows) {
+    if (fixed >= MAX_CLEAN_PER_RUN) break;
     if (!/[A-Za-z]/.test(row.title)) continue;
     const cleaned = cleanTitle(row.title);
     if (cleaned && cleaned !== row.title) {
