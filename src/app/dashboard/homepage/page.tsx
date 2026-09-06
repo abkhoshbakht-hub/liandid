@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { isBushehrNews } from '@/lib/bushehr';
 
 interface Slot {
   id: string;
@@ -204,11 +203,6 @@ function HomepageContent() {
                           <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${slot.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
                             {slot.isActive ? 'تایید شده' : 'در انتظار تایید'}
                           </span>
-                          {section === 'latest' && slot.externalNews && !isBushehrNews({ category: slot.externalNews.category, sourceName: slot.externalNews.sourceName, title: slot.externalNews.title }) && (
-                            <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-red-100 text-red-600">
-                              غیربوشهر ـ نمایش داده نمی‌شود
-                            </span>
-                          )}
                         </div>
                       </div>
 
