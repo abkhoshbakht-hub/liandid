@@ -63,7 +63,7 @@ const sections: SidebarSection[] = [
     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>
   ), items: [
     { href: '/dashboard/articles', label: 'اخبار سایت' },
-    { href: '/archive', label: 'آرشیو اخبار' },
+    { href: '/dashboard/articles?status=ARCHIVED', label: 'آرشیو اخبار' },
     { href: '/dashboard/submissions', label: 'ارسالی مخاطبین' },
   ]},
   { title: 'مدیریت', preview: 'categories', icon: (
@@ -104,6 +104,7 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
   const catSlug = searchParams.get('cat');
   const sectionParam = searchParams.get('section');
+  const statusParam = searchParams.get('status');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -118,6 +119,13 @@ function DashboardLayoutInner({ children }: { children: React.ReactNode }) {
     if (item.href.includes('?section=')) {
       const secPart = item.href.split('section=')[1];
       return pathname === item.href.split('?')[0] && sectionParam === secPart;
+    }
+    if (item.href.includes('?status=')) {
+      const statusPart = item.href.split('status=')[1];
+      return pathname === item.href.split('?')[0] && statusParam === statusPart;
+    }
+    if (item.href === '/dashboard/articles') {
+      return pathname === '/dashboard/articles' && !statusParam && !catSlug;
     }
     return pathname === item.href;
   };

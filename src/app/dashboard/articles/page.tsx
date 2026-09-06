@@ -59,6 +59,7 @@ function ArticlesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const catSlug = searchParams.get('cat');
+  const statusParam = searchParams.get('status');
   const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -114,6 +115,14 @@ function ArticlesContent() {
       if (found) setFilterCategory(found.id);
     }
   }, [catSlug, categories]);
+
+  useEffect(() => {
+    if (statusParam && ['DRAFT', 'PENDING', 'PUBLISHED', 'ARCHIVED'].includes(statusParam)) {
+      setFilterStatus(statusParam);
+    } else if (statusParam === null) {
+      setFilterStatus('');
+    }
+  }, [statusParam]);
 
   const fetchArticles = async () => {
     setLoading(true);
