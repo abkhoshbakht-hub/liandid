@@ -231,7 +231,7 @@ function HomepageContent() {
                           onClick={() => { setEditingSlot(slot); setModalTab('archive'); fetchNews(''); }}
                           className="flex-1 px-3 py-2 bg-[#1B365D] text-white text-xs font-medium rounded-lg hover:bg-[#2a4a7a] transition-colors"
                         >
-                          ویرایش
+                          انتخاب خبر
                         </button>
                         {(slot.externalNewsId || slot.customTitle) && (
                           <button
