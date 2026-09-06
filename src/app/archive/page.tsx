@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { timeAgo } from '@/lib/utils';
+import { toPersianDate, toGregorian, toPersianNumber } from '@/lib/date';
 import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -26,20 +27,38 @@ const PAGE_SIZE = 12;
 export default async function ArchivePage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; cat?: string; q?: string }>;
+  searchParams: Promise<{ page?: string; cat?: string; q?: string; year?: string }>;
 }) {
   const params = await searchParams;
   const page = Math.max(1, parseInt(params.page || '1', 10) || 1);
   const catSlug = params.cat || '';
   const query = (params.q || '').trim();
+  const yearNum = parseInt(params.year || '', 10);
+  const yearValid = !isNaN(yearNum) && yearNum >= 1300 && yearNum <= 1500;
 
   const categories = await prisma.category.findMany({
     orderBy: { name: 'asc' },
     select: { id: true, name: true, slug: true },
   });
 
+  const allDates = await prisma.article.findMany({
+    where: { status: 'PUBLISHED', publishedAt: { not: null } },
+    select: { publishedAt: true },
+  });
+  const yearSet = new Set<number>();
+  for (const d of allDates) {
+    if (d.publishedAt) {
+      const jy = parseInt(toPersianDate(d.publishedAt).split('/')[0], 10);
+      if (!isNaN(jy)) yearSet.add(jy);
+    }
+  }
+  const years = Array.from(yearSet).sort((a, b) => b - a);
+
   const where: any = { status: 'PUBLISHED' };
   if (catSlug) where.category = { slug: catSlug };
+  if (yearValid) {
+    where.publishedAt = { gte: toGregorian(yearNum, 1, 1), lt: toGregorian(yearNum + 1, 1, 1) };
+  }
   if (query) {
     where.OR = [
       { title: { contains: query } },
@@ -70,6 +89,7 @@ export default async function ArchivePage({
     const sp = new URLSearchParams();
     if (catSlug) sp.set('cat', catSlug);
     if (query) sp.set('q', query);
+    if (yearValid) sp.set('year', String(yearNum));
     if (p > 1) sp.set('page', String(p));
     const qs = sp.toString();
     return `/archive${qs ? `?${qs}` : ''}`;
@@ -119,10 +139,20 @@ export default async function ArchivePage({
                 <option key={c.id} value={c.slug}>{c.name}</option>
               ))}
             </select>
+            <select
+              name="year"
+              defaultValue={yearValid ? String(yearNum) : ''}
+              className="sm:w-40 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#C9A96E] text-gray-700"
+            >
+              <option value="">همه سال‌ها</option>
+              {years.map(y => (
+                <option key={y} value={String(y)}>{toPersianNumber(y)}</option>
+              ))}
+            </select>
             <button type="submit" className="px-8 py-3 bg-[#1B365D] text-white rounded-xl text-sm font-bold hover:bg-[#0f1d35] transition-colors">
               جستجو
             </button>
-            {(query || catSlug) && (
+            {(query || catSlug || yearValid) && (
               <Link href="/archive" className="px-6 py-3 bg-gray-100 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-200 transition-colors text-center">
                 حذف فیلتر
               </Link>

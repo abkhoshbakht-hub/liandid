@@ -70,6 +70,8 @@ function ArticlesContent() {
   const [filterStatus, setFilterStatus] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [onlyOld, setOnlyOld] = useState(false);
+  const [oldCount, setOldCount] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [socialDialog, setSocialDialog] = useState<{ articleId: string; articleTitle: string } | null>(null);
   const [sharing, setSharing] = useState(false);
@@ -124,11 +126,18 @@ function ArticlesContent() {
     }
   }, [statusParam]);
 
+  const SEVEN_DAYS_AGO = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
+
   const fetchArticles = async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (filterStatus) params.set('status', filterStatus);
+      if (onlyOld) {
+        params.set('status', 'PUBLISHED');
+        params.set('publishedBefore', SEVEN_DAYS_AGO);
+      } else {
+        if (filterStatus) params.set('status', filterStatus);
+      }
       if (filterCategory) params.set('categoryId', filterCategory);
       if (searchQuery) params.set('search', searchQuery);
       
@@ -139,6 +148,20 @@ function ArticlesContent() {
       console.error('Error fetching articles:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchOldCount = async () => {
+    try {
+      const params = new URLSearchParams();
+      params.set('status', 'PUBLISHED');
+      params.set('publishedBefore', SEVEN_DAYS_AGO);
+      params.set('limit', '1');
+      const res = await fetch(`/api/admin/articles?${params}`);
+      const data = await res.json();
+      if (data.success) setOldCount(data.pagination?.total || 0);
+    } catch (error) {
+      console.error('Error fetching archive candidates:', error);
     }
   };
 
@@ -166,7 +189,13 @@ function ArticlesContent() {
     if (isAuthenticated && isAdmin) {
       fetchArticles();
     }
-  }, [filterStatus, filterCategory, searchQuery]);
+  }, [filterStatus, filterCategory, searchQuery, onlyOld]);
+
+  useEffect(() => {
+    if (isAuthenticated && isAdmin) {
+      fetchOldCount();
+    }
+  }, [isAuthenticated, isAdmin]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -263,6 +292,28 @@ function ArticlesContent() {
       }
     } catch (error) {
       console.error('Error deleting:', error);
+    }
+  };
+
+  const handleQuickArchive = async (id: string, title: string) => {
+    if (!confirm(`«${title}» به آرشیو منتقل شود؟\nاین خبر از سایت مخفی می‌شود.`)) return;
+    try {
+      const res = await fetch(`/api/admin/articles/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'ARCHIVED' }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('خبر به آرشیو منتقل شد');
+        fetchArticles();
+        fetchOldCount();
+      } else {
+        alert(data.message || 'خطا در آرشیو کردن');
+      }
+    } catch (error) {
+      console.error('Error archiving:', error);
+      alert('خطا در آرشیو کردن');
     }
   };
 
@@ -554,6 +605,22 @@ function ArticlesContent() {
           </div>
         )}
 
+        {/* بنر آماده آرشیو */}
+        {oldCount > 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex flex-wrap items-center gap-3">
+            <span className="text-2xl">🗂️</span>
+            <p className="text-sm text-amber-800 flex-1 min-w-[220px]">
+              <strong>{oldCount} خبر</strong> قدیمی‌تر از یک هفته آماده آرشیو است. هر خبر فقط با تایید شما آرشیو می‌شود.
+            </p>
+            <button
+              onClick={() => setOnlyOld(!onlyOld)}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${onlyOld ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-white text-amber-700 border border-amber-300 hover:bg-amber-100'}`}
+            >
+              {onlyOld ? 'نمایش همه اخبار' : 'نمایش خبرهای آماده آرشیو'}
+            </button>
+          </div>
+        )}
+
         {/* فیلترها */}
         <div className="bg-white rounded-xl p-6 mb-6 shadow-sm border border-gray-100">
           <div className="flex flex-wrap gap-4 items-center">
@@ -629,6 +696,9 @@ function ArticlesContent() {
                             <button onClick={() => handleQuickPublish(article.id)} className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold hover:bg-blue-200 transition-colors">انتشار</button>
                           )}
                           <button onClick={() => handleEdit(article)} className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold hover:bg-blue-200 transition-colors">ویرایش</button>
+                          {article.status === 'PUBLISHED' && (
+                            <button onClick={() => handleQuickArchive(article.id, article.title)} className="px-3 py-1 bg-amber-100 text-amber-700 rounded text-xs font-bold hover:bg-amber-200 transition-colors">آرشیو</button>
+                          )}
                           <button onClick={() => setPreviewArticle(article)} className="px-3 py-1 bg-gray-100 text-gray-700 rounded text-xs font-bold hover:bg-gray-200 transition-colors">مشاهده</button>
                           <button onClick={() => handleDelete(article.id)} className="px-3 py-1 bg-red-100 text-red-700 rounded text-xs font-bold hover:bg-red-200 transition-colors">حذف</button>
                         </div>

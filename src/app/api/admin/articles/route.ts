@@ -113,6 +113,7 @@ export async function GET(req: NextRequest) {
     const categoryId = searchParams.get('categoryId');
     const search = searchParams.get('search');
     const region = searchParams.get('region');
+    const publishedBefore = searchParams.get('publishedBefore');
 
     const where: any = {};
     
@@ -122,6 +123,10 @@ export async function GET(req: NextRequest) {
     
     if (status) where.status = status;
     if (categoryId) where.categoryId = categoryId;
+    if (publishedBefore) {
+      const d = new Date(publishedBefore);
+      if (!isNaN(d.getTime())) where.publishedAt = { lt: d };
+    }
     if (region !== null && region !== undefined) {
       where.region = region;
     }
