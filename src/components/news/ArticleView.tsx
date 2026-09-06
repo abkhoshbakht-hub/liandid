@@ -24,7 +24,7 @@ export default function ArticleView({ slug }: { slug: string }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/articles/${slug}`)
+    fetch(`/api/articles/${slug}`)
       .then(r => r.json())
       .then(data => { if (data.success) setArticle(data.data); })
       .catch(() => {})
