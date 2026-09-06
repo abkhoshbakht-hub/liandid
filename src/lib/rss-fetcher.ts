@@ -132,7 +132,7 @@ export async function fetchAllRssFeeds(): Promise<number> {
         await prisma.externalNews.create({
           data: {
             title: news.title, link: news.link, description: news.description, image: news.image,
-            source: news.source, sourceName: news.sourceName, category, status: 'APPROVED', publishedAt: news.publishedAt,
+            source: news.source, sourceName: news.sourceName, category, status: 'PENDING', publishedAt: news.publishedAt,
             topic: classifyNews(news.title, news.description),
           },
         });
