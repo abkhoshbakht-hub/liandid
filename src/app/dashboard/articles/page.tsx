@@ -530,7 +530,11 @@ function ArticlesContent() {
                   <label className="block text-sm font-bold text-gray-700 mb-3">عکس شاخص</label>
                   {form.featuredImage ? (
                     <div className="relative">
-                      <Image src={form.featuredImage} alt="پیش‌نمایش" width={400} height={200} className="w-full h-40 object-cover rounded-lg" />
+                      {form.featuredImage.startsWith('data:') ? (
+                        <img src={form.featuredImage} alt="پیش‌نمایش" className="w-full h-40 object-cover rounded-lg" />
+                      ) : (
+                        <Image src={form.featuredImage} alt="پیش‌نمایش" width={400} height={200} className="w-full h-40 object-cover rounded-lg" unoptimized={form.featuredImage.startsWith('data:')} />
+                      )}
                       <button onClick={() => setForm({ ...form, featuredImage: '' })} className="absolute top-2 left-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button>
                     </div>
                   ) : (
@@ -687,7 +691,11 @@ function ArticlesContent() {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           {article.featuredImage && (
-                            <Image src={article.featuredImage} alt="" width={48} height={36} className="w-12 h-9 object-cover rounded" />
+                            article.featuredImage.startsWith('data:') ? (
+                              <img src={article.featuredImage} alt="" className="w-12 h-9 object-cover rounded" />
+                            ) : (
+                              <Image src={article.featuredImage} alt="" width={48} height={36} className="w-12 h-9 object-cover rounded" unoptimized={article.featuredImage.startsWith('data:')} />
+                            )
                           )}
                           <div>
                             <div className="font-bold text-sm text-[#1B365D]">{article.title}</div>
@@ -743,7 +751,11 @@ function ArticlesContent() {
             </div>
             <div className="p-6">
               {previewArticle.featuredImage && (
-                <Image src={previewArticle.featuredImage} alt="" width={800} height={400} className="w-full h-64 object-cover rounded-xl mb-6" />
+                previewArticle.featuredImage.startsWith('data:') ? (
+                  <img src={previewArticle.featuredImage} alt="" className="w-full h-64 object-cover rounded-xl mb-6" />
+                ) : (
+                  <Image src={previewArticle.featuredImage} alt="" width={800} height={400} className="w-full h-64 object-cover rounded-xl mb-6" unoptimized={previewArticle.featuredImage.startsWith('data:')} />
+                )
               )}
               {previewArticle.category && (
                 <span className="inline-block px-3 py-1 bg-[#1B365D] text-white text-xs font-bold rounded-full mb-3">{previewArticle.category.name}</span>

@@ -26,22 +26,41 @@ export async function POST(request: NextRequest) {
     let fileName = null;
 
     if (file && file.size > 0) {
-      const ext = file.name.split('.').pop();
+      if (file.size > 4 * 1024 * 1024) {
+        return NextResponse.json({ error: 'حجم فایل نباید بیشتر از ۴ مگابایت باشد' }, { status: 400 });
+      }
+      const ext = file.name.split('.').pop() || 'jpg';
       fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
 
       if (process.env.BLOB_READ_WRITE_TOKEN) {
-        const { put } = await import('@vercel/blob');
-        const blob = await put(`uploads/${fileName}`, file, { access: 'public' });
-        mediaUrl = blob.url;
-      } else {
+        try {
+          const { put } = await import('@vercel/blob');
+          const blob = await put(`uploads/${fileName}`, file, { access: 'public' });
+          mediaUrl = blob.url;
+        } catch (e) {
+          console.error('Blob submit upload failed, fallback to base64:', e);
+        }
+      }
+      if (!mediaUrl) {
         const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const { writeFile } = require('fs/promises');
-        const { join } = require('path');
-        const uploadDir = join(process.cwd(), 'public', 'uploads');
-        await require('fs').promises.mkdir(uploadDir, { recursive: true });
-        await writeFile(join(uploadDir, fileName), buffer);
-        mediaUrl = `/uploads/${fileName}`;
+        let buffer = Buffer.from(bytes);
+        let mimeType = file.type || 'image/jpeg';
+        try {
+          const sharp = (await import('sharp')).default;
+          const compressed = await sharp(buffer)
+            .resize({ width: 1280, height: 1280, fit: 'inside', withoutEnlargement: true })
+            .jpeg({ quality: 80 })
+            .toBuffer();
+          if (compressed.length < buffer.length) {
+            buffer = compressed;
+            mimeType = 'image/jpeg';
+          }
+        } catch {}
+        if (buffer.length > 1.5 * 1024 * 1024) {
+          return NextResponse.json({ error: 'عکس حتی بعد از فشرده‌سازی بزرگ است' }, { status: 400 });
+        }
+        const base64 = buffer.toString('base64');
+        mediaUrl = `data:${mimeType};base64,${base64}`;
       }
     }
 
