@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { readdir, stat } from 'fs/promises';
-import { join } from 'path';
 
 export async function GET() {
   try {
@@ -15,6 +13,21 @@ export async function GET() {
       );
     }
 
+    // اگر Blob فعال است از لیست Blob بخوان، وگرنه از فایل‌سیستم لوکال
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      const { list } = await import('@vercel/blob');
+      const { blobs } = await list({ prefix: 'uploads/' });
+      const mediaFiles = blobs
+        .filter(b => /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(b.pathname))
+        .map(b => ({ name: b.pathname.split('/').pop() || b.pathname, url: b.url, size: b.size }));
+      return NextResponse.json({
+        success: true,
+        data: mediaFiles.sort((a, b) => (b.size || 0) - (a.size || 0)),
+      });
+    }
+
+    const { readdir, stat } = await import('fs/promises');
+    const { join } = await import('path');
     const uploadsDir = join(process.cwd(), 'public', 'uploads');
     
     try {

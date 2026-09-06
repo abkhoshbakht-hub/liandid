@@ -26,17 +26,23 @@ export async function POST(request: NextRequest) {
     let fileName = null;
 
     if (file && file.size > 0) {
-      const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
       const ext = file.name.split('.').pop();
       fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
-      mediaUrl = `/uploads/${fileName}`;
 
-      const { writeFile } = require('fs/promises');
-      const { join } = require('path');
-      const uploadDir = join(process.cwd(), 'public', 'uploads');
-      await require('fs').promises.mkdir(uploadDir, { recursive: true });
-      await writeFile(join(uploadDir, fileName), buffer);
+      if (process.env.BLOB_READ_WRITE_TOKEN) {
+        const { put } = await import('@vercel/blob');
+        const blob = await put(`uploads/${fileName}`, file, { access: 'public' });
+        mediaUrl = blob.url;
+      } else {
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        const { writeFile } = require('fs/promises');
+        const { join } = require('path');
+        const uploadDir = join(process.cwd(), 'public', 'uploads');
+        await require('fs').promises.mkdir(uploadDir, { recursive: true });
+        await writeFile(join(uploadDir, fileName), buffer);
+        mediaUrl = `/uploads/${fileName}`;
+      }
     }
 
     const submission = await prisma.userSubmission.create({

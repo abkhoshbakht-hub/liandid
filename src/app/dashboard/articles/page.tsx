@@ -212,6 +212,12 @@ function ArticlesContent() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (file.size > 4 * 1024 * 1024) {
+      alert('حجم عکس نباید بیشتر از ۴ مگابایت باشد');
+      e.target.value = '';
+      return;
+    }
+
     setUploading(true);
     try {
       const formData = new FormData();
@@ -224,11 +230,15 @@ function ArticlesContent() {
       const data = await res.json();
       if (data.success) {
         setForm({ ...form, featuredImage: data.data.url });
+      } else {
+        alert(data.message || 'خطا در آپلود عکس');
       }
     } catch (error) {
       console.error('Error uploading:', error);
+      alert('خطا در آپلود عکس - اتصال را بررسی کنید');
     } finally {
       setUploading(false);
+      e.target.value = '';
     }
   };
 

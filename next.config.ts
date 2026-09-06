@@ -20,6 +20,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'www.boresseir.com' },
       { protocol: 'https', hostname: 'booshahr24.ir' },
       { protocol: 'https', hostname: 'youngpress.ir' },
+      { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },
     ],
   },
 };
