@@ -4,7 +4,10 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { randomUUID } from 'crypto';
 
-const FALLBACKS = { maxMb: 1, quality: 80, maxDim: 1280, format: 'jpeg' };
+const FALLBACKS = { maxMb: 1, quality: 75, maxDim: 1280, format: 'webp' };
+
+// سقف استاندارد عکس خبری: ۲۰۰ کیلوبایت (استاندارد سایت‌های خبری برای سرعت)
+const TARGET_BYTES = 200 * 1024;
 
 async function getImageSettings() {
   try {
@@ -83,23 +86,25 @@ export async function POST(req: NextRequest) {
 
     try {
       const sharp = (await import('sharp')).default;
-      let pipeline = sharp(buffer).resize({ width: settings.maxDim, height: settings.maxDim, fit: 'inside', withoutEnlargement: true });
-      if (settings.format === 'webp') {
-        pipeline = pipeline.webp({ quality: settings.quality });
-        mimeType = 'image/webp';
-      } else if (settings.format === 'png') {
-        pipeline = pipeline.png();
+      const resized = sharp(buffer).resize({ width: settings.maxDim, height: settings.maxDim, fit: 'inside', withoutEnlargement: true });
+      const canAdapt = settings.format === 'webp' || settings.format === 'jpeg';
+      if (settings.format === 'png') {
+        out = await resized.png().toBuffer();
         mimeType = 'image/png';
       } else if (settings.format === 'original') {
-        // بدون تبدیل فرمت، فقط تغییر اندازه
+        out = await resized.toBuffer();
+        mimeType = file.type || 'image/jpeg';
       } else {
-        pipeline = pipeline.jpeg({ quality: settings.quality });
-        mimeType = 'image/jpeg';
-      }
-      const converted = await pipeline.toBuffer();
-      if (converted.length < buffer.length || settings.format !== 'original') {
-        out = converted;
-        if (settings.format === 'original') mimeType = file.type || 'image/jpeg';
+        // فشرده‌سازی تطبیقی: کیفیت را کم می‌کند تا حجم زیر ۲۰۰ کیلوبایت برود (حداقل کیفیت ۵۰)
+        let q = settings.quality;
+        const isWebp = settings.format === 'webp';
+        mimeType = isWebp ? 'image/webp' : 'image/jpeg';
+        for (;;) {
+          const trial = await (isWebp ? resized.clone().webp({ quality: q }) : resized.clone().jpeg({ quality: q })).toBuffer();
+          out = trial;
+          if (trial.length <= TARGET_BYTES || q <= 50) break;
+          q -= 10;
+        }
       }
     } catch {}
 

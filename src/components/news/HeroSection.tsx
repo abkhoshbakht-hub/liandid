@@ -1,4 +1,5 @@
 import { timeAgo, getCategoryStyle } from '@/lib/utils';
+import HeroImage from '@/components/news/HeroImage';
 
 interface NewsItem {
   id: string;
@@ -22,7 +23,7 @@ export default function HeroSection({ main, side1, side2 }: { main: NewsItem | n
           {main ? (
             <a href={main.link} target="_blank" rel="noopener noreferrer" className="group block relative rounded-2xl overflow-hidden h-[280px] sm:h-[360px] lg:h-[420px] bg-[#0a1628]">
               {main.image ? (
-                <img src={main.image} alt={main.title} className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105" />
+                <HeroImage src={main.image} alt={main.title} hoverZoom />
               ) : (
                 <div className={`absolute inset-0 bg-gradient-to-br ${getCategoryStyle(main.category).gradient}`} />
               )}
@@ -63,7 +64,7 @@ export default function HeroSection({ main, side1, side2 }: { main: NewsItem | n
             news ? (
               <a key={news.id} href={news.link} target="_blank" rel="noopener noreferrer" className="group flex-1 block relative rounded-2xl overflow-hidden bg-[#0a1628] min-h-[200px]">
                 {news.image ? (
-                  <img src={news.image} alt={news.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <HeroImage src={news.image} alt={news.title} hoverZoom />
                 ) : (
                   <div className={`absolute inset-0 bg-gradient-to-br ${getCategoryStyle(news.category).gradient}`} />
                 )}

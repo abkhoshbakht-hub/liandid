@@ -7,10 +7,10 @@ import Link from 'next/link';
 
 const DEFAULTS = {
   image_max_mb: '1',
-  image_quality: '80',
+  image_quality: '75',
   image_max_dim: '1280',
   image_aspect: '16:9',
-  image_format: 'jpeg',
+  image_format: 'webp',
 };
 
 const ASPECTS = [
@@ -21,8 +21,8 @@ const ASPECTS = [
 ];
 
 const FORMATS = [
-  { value: 'jpeg', label: 'JPEG (سازگار با همه — پیشنهادی)' },
-  { value: 'webp', label: 'WebP (کم‌حجم‌تر و مدرن)' },
+  { value: 'webp', label: 'WebP (کم‌حجم و سریع — استاندارد سایت‌های خبری)' },
+  { value: 'jpeg', label: 'JPEG (سازگار با همه)' },
   { value: 'png', label: 'PNG (کیفیت کامل، حجم بیشتر)' },
   { value: 'original', label: 'فرمت اصلی عکس (بدون تبدیل)' },
 ];

@@ -79,7 +79,7 @@ function ArticlesContent() {
   const [socialDialog, setSocialDialog] = useState<{ articleId: string; articleTitle: string } | null>(null);
   const [sharing, setSharing] = useState(false);
   const [cropSrc, setCropSrc] = useState<{ url: string; name: string } | null>(null);
-  const [imgSettings, setImgSettings] = useState({ maxMb: 1, quality: 80, maxDim: 1280, aspect: '16:9', format: 'jpeg' });
+  const [imgSettings, setImgSettings] = useState({ maxMb: 1, quality: 75, maxDim: 1280, aspect: '16:9', format: 'webp' });
 
   const [form, setForm] = useState({
     title: '',
@@ -117,11 +117,11 @@ function ArticlesContent() {
         .then(r => r.json())
         .then(data => {
           setImgSettings({
-            maxMb: parseFloat(data.image_max_mb) || 4,
-            quality: parseInt(data.image_quality, 10) || 80,
+            maxMb: parseFloat(data.image_max_mb) || 1,
+            quality: parseInt(data.image_quality, 10) || 75,
             maxDim: parseInt(data.image_max_dim, 10) || 1280,
             aspect: data.image_aspect || '16:9',
-            format: data.image_format || 'jpeg',
+            format: data.image_format || 'webp',
           });
         })
         .catch(() => {});
