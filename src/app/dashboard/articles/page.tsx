@@ -48,6 +48,12 @@ interface Tag {
   name: string;
 }
 
+// زمان فعلی به فرمت ورودی datetime-local (ساعت مرورگر ادمین)
+const nowLocalInput = () => {
+  const d = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
+  return d.toISOString().slice(0, 16);
+};
+
 export default function ArticlesPage() {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-4 border-[#C9A96E] border-t-transparent rounded-full" /></div>}>
@@ -95,7 +101,7 @@ function ArticlesContent() {
     placement: 'latest',
     source: '',
     sourceUrl: '',
-    scheduledAt: '',
+    scheduledAt: nowLocalInput(),
     metaTitle: '',
     metaDesc: '',
     metaKeywords: '',
@@ -434,7 +440,7 @@ function ArticlesContent() {
     setForm({
       title: '', subtitle: '', content: '', excerpt: '', featuredImage: '',
       categoryId: '', status: 'DRAFT', isFeatured: false, isBreaking: false,
-      isPinned: false, placement: 'latest', source: '', sourceUrl: '', scheduledAt: '',
+      isPinned: false, placement: 'latest', source: '', sourceUrl: '', scheduledAt: nowLocalInput(),
       metaTitle: '', metaDesc: '', metaKeywords: '', tagIds: [],
     });
     setEditingArticle(null);

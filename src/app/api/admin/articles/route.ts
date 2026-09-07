@@ -52,11 +52,15 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // زمان انتشار = همان لحظه انتشار
+    const publishingNow = finalStatus === 'PUBLISHED';
+
     const article = await prisma.article.create({
       data: {
         title,
         slug,
         subtitle: subtitle || null,
+        publishedAt: publishingNow ? new Date() : null,
         content,
         excerpt: excerpt || null,
         featuredImage: featuredImage || null,

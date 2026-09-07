@@ -124,7 +124,8 @@ export async function PUT(
     if (featuredImage !== undefined) updateData.featuredImage = featuredImage;
     if (status !== undefined) {
       updateData.status = status;
-      if (status === 'PUBLISHED' && !existingArticle.publishedAt) {
+      // هر بار که خبر منتشر می‌شود (تازه یا مجدد)، زمان همان لحظه ثبت می‌شود
+      if (status === 'PUBLISHED' && existingArticle.status !== 'PUBLISHED') {
         updateData.publishedAt = new Date();
       }
     }

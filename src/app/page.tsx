@@ -48,7 +48,7 @@ async function getHomepageData() {
       }),
       prisma.article.findMany({
         where: { status: 'PUBLISHED' },
-        orderBy: { publishedAt: 'desc' },
+        orderBy: { publishedAt: { sort: 'desc', nulls: 'last' } },
         select: {
           id: true, title: true, slug: true, excerpt: true, featuredImage: true,
           publishedAt: true, isBreaking: true, isFeatured: true, placement: true,
