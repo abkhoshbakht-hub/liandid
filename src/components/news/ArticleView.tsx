@@ -6,6 +6,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import CommentForm from '@/components/news/CommentForm';
 import CommentList from '@/components/news/CommentList';
+import { aspectToRatio } from '@/lib/image-settings';
 
 interface Article {
   id: string;
@@ -22,6 +23,7 @@ interface Article {
 export default function ArticleView({ slug }: { slug: string }) {
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
+  const [imgAspect, setImgAspect] = useState('16:9');
 
   useEffect(() => {
     fetch(`/api/articles/${slug}`)
@@ -29,6 +31,10 @@ export default function ArticleView({ slug }: { slug: string }) {
       .then(data => { if (data.success) setArticle(data.data); })
       .catch(() => {})
       .finally(() => setLoading(false));
+    fetch('/api/admin/settings')
+      .then(r => r.json())
+      .then(data => { if (data.image_aspect) setImgAspect(data.image_aspect); })
+      .catch(() => {});
   }, [slug]);
 
   const formatDate = (d: string) => {
@@ -95,11 +101,18 @@ export default function ArticleView({ slug }: { slug: string }) {
               }}
             />
             <div className="bg-white rounded-2xl overflow-hidden border border-gray-100">
-              {article.featuredImage && (
-                <div className="relative h-64 md:h-96">
-                  <img src={article.featuredImage} alt={article.title} className="w-full h-full object-cover" />
-                </div>
-              )}
+              {article.featuredImage && (() => {
+                const ratio = aspectToRatio(imgAspect);
+                return ratio ? (
+                  <div className="relative w-full overflow-hidden" style={{ aspectRatio: ratio }}>
+                    <img src={article.featuredImage} alt={article.title} className="absolute inset-0 w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="relative w-full overflow-hidden">
+                    <img src={article.featuredImage} alt={article.title} className="w-full h-auto" />
+                  </div>
+                );
+              })()}
               <div className="p-6 md:p-8">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-xs px-3 py-1.5 rounded-full font-bold bg-[#1B365D] text-white">{article.category?.name}</span>

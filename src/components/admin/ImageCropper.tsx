@@ -48,12 +48,10 @@ export default function ImageCropper({ imageSrc, fileName, defaultAspect, output
   const dh = nat.h * scale;
 
   const clamp = useCallback((ox: number, oy: number) => {
-    const minX = Math.min(frameW - dw, 0);
-    const minY = Math.min(frameH - dh, 0);
-    return {
-      x: Math.max(minX, Math.min(0, ox)),
-      y: Math.max(minY, Math.min(0, oy)),
-    };
+    // اگر عکس از قاب کوچک‌تر شد، وسط‌چین ثابت می‌ماند
+    const x = dw >= frameW ? Math.max(frameW - dw, Math.min(0, ox)) : (frameW - dw) / 2;
+    const y = dh >= frameH ? Math.max(frameH - dh, Math.min(0, oy)) : (frameH - dh) / 2;
+    return { x, y };
   }, [frameW, frameH, dw, dh]);
 
   useEffect(() => {
@@ -73,7 +71,7 @@ export default function ImageCropper({ imageSrc, fileName, defaultAspect, output
   }, [nat.w, nat.h, frameW, aspectKey]);
 
   const handleZoom = (z: number) => {
-    const nz = Math.max(1, Math.min(3, z));
+    const nz = Math.max(0.3, Math.min(3, z));
     const cx = (frameW / 2 - offset.x) / scale;
     const cy = (frameH / 2 - offset.y) / scale;
     const ns = baseScale * nz;
@@ -109,11 +107,21 @@ export default function ImageCropper({ imageSrc, fileName, defaultAspect, output
       canvas.height = outH;
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('canvas');
-      const sx = -offset.x / scale;
-      const sy = -offset.y / scale;
-      const sw = frameW / scale;
-      const sh = frameH / scale;
-      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, outW, outH);
+      const k = outW / frameW;
+      if (dw < frameW || dh < frameH) {
+        // پس‌زمینه محو + عکس کوچک وسط — دقیقاً مثل قاب
+        try { (ctx as any).filter = 'blur(30px)'; } catch {}
+        const cs = Math.max(outW / nat.w, outH / nat.h);
+        const bw = nat.w * cs;
+        const bh = nat.h * cs;
+        ctx.drawImage(img, 0, 0, nat.w, nat.h, (outW - bw) / 2, (outH - bh) / 2, bw, bh);
+        try { (ctx as any).filter = 'none'; } catch {}
+        try { ctx.filter = 'brightness(0.55)'; } catch {}
+        ctx.fillStyle = 'rgba(0,0,0,0.45)';
+        ctx.fillRect(0, 0, outW, outH);
+        try { (ctx as any).filter = 'none'; } catch {}
+      }
+      ctx.drawImage(img, 0, 0, nat.w, nat.h, offset.x * k, offset.y * k, dw * k, dh * k);
       const mime = format === 'webp' ? 'image/webp' : format === 'png' ? 'image/png' : 'image/jpeg';
       const q = Math.max(0.1, Math.min(1, (quality || 80) / 100));
       const blob = await new Promise<Blob | null>(res => canvas.toBlob(res, mime, q));
@@ -134,7 +142,7 @@ export default function ImageCropper({ imageSrc, fileName, defaultAspect, output
           <button onClick={onCancel} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">✕</button>
         </div>
 
-        <p className="text-xs text-gray-500 mb-3 leading-6">عکس را با موس یا انگشت بکشید تا کادر شود. با دکمه‌های کم و زیاد، اندازه را تنظیم کنید.</p>
+        <p className="text-xs text-gray-500 mb-3 leading-6">عکس را با موس یا انگشت بکشید تا کادر شود. با − عکس را کوچک و با + بزرگ کنید.</p>
 
         {/* قاب برش */}
         <div
@@ -146,6 +154,16 @@ export default function ImageCropper({ imageSrc, fileName, defaultAspect, output
           onPointerUp={onPointerUp}
           onPointerLeave={onPointerUp}
         >
+          {/* پس‌زمینه محو برای وقتی که عکس از قاب کوچک‌تر می‌شود */}
+          {imageSrc && (dw < frameW || dh < frameH) && (
+            <img
+              src={imageSrc}
+              alt=""
+              draggable={false}
+              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+              style={{ filter: 'blur(24px) brightness(0.55)', transform: 'scale(1.15)' }}
+            />
+          )}
           {imageSrc && (
             <img
               ref={imgRef}
@@ -171,7 +189,7 @@ export default function ImageCropper({ imageSrc, fileName, defaultAspect, output
         <div className="flex items-center gap-3 mt-4">
           <button onClick={() => handleZoom(zoom - 0.2)} className="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 font-black text-lg shrink-0">−</button>
           <input
-            type="range" min={1} max={3} step={0.05}
+            type="range" min={0.3} max={3} step={0.05}
             value={zoom}
             onChange={e => handleZoom(parseFloat(e.target.value))}
             className="flex-1 accent-[#C9A96E]"

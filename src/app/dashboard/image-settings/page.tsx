@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const DEFAULTS = {
-  image_max_mb: '4',
+  image_max_mb: '1',
   image_quality: '80',
   image_max_dim: '1280',
   image_aspect: '16:9',

@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { toPersianDateTime, toPersianNumber } from '@/lib/date';
 import ShamsiDateTimePicker from '@/components/admin/ShamsiDateTimePicker';
 import ImageCropper from '@/components/admin/ImageCropper';
+import { aspectToRatio } from '@/lib/image-settings';
 
 interface Article {
   id: string;
@@ -78,7 +79,7 @@ function ArticlesContent() {
   const [socialDialog, setSocialDialog] = useState<{ articleId: string; articleTitle: string } | null>(null);
   const [sharing, setSharing] = useState(false);
   const [cropSrc, setCropSrc] = useState<{ url: string; name: string } | null>(null);
-  const [imgSettings, setImgSettings] = useState({ maxMb: 4, quality: 80, maxDim: 1280, aspect: '16:9', format: 'jpeg' });
+  const [imgSettings, setImgSettings] = useState({ maxMb: 1, quality: 80, maxDim: 1280, aspect: '16:9', format: 'jpeg' });
 
   const [form, setForm] = useState({
     title: '',
@@ -557,16 +558,22 @@ function ArticlesContent() {
                     <label className="block text-sm font-bold text-gray-700">عکس شاخص</label>
                     <Link href="/dashboard/image-settings" className="text-xs text-[#C9A96E] hover:underline font-bold">تنظیم عکس</Link>
                   </div>
-                  {form.featuredImage ? (
-                    <div className="relative">
-                      {form.featuredImage.startsWith('data:') ? (
-                        <img src={form.featuredImage} alt="پیش‌نمایش" className="w-full h-40 object-cover rounded-lg" />
-                      ) : (
-                        <Image src={form.featuredImage} alt="پیش‌نمایش" width={400} height={200} className="w-full h-40 object-cover rounded-lg" unoptimized={form.featuredImage.startsWith('data:')} />
-                      )}
-                      <button onClick={() => setForm({ ...form, featuredImage: '' })} className="absolute top-2 left-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button>
-                    </div>
-                  ) : (
+                  {form.featuredImage ? (() => {
+                    const ratio = aspectToRatio(imgSettings.aspect);
+                    const wrapCls = 'relative w-full overflow-hidden rounded-lg';
+                    const imgCls = ratio ? 'absolute inset-0 w-full h-full object-cover rounded-lg' : 'w-full h-40 object-cover rounded-lg';
+                    const src = form.featuredImage as string;
+                    return (
+                      <div className={wrapCls} style={ratio ? { aspectRatio: ratio } : undefined}>
+                        {src.startsWith('data:') ? (
+                          <img src={src} alt="پیش‌نمایش" className={imgCls} />
+                        ) : (
+                          <Image src={src} alt="پیش‌نمایش" width={400} height={200} className={imgCls} unoptimized={src.startsWith('data:')} />
+                        )}
+                        <button onClick={() => setForm({ ...form, featuredImage: '' })} className="absolute top-2 left-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center z-10">✕</button>
+                      </div>
+                    );
+                  })() : (
                     <label className="block w-full h-40 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-[#C9A96E] transition-colors">
                       <svg className="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                       <span className="text-sm text-gray-500">{uploading ? 'در حال آپلود...' : 'انتخاب عکس'}</span>
@@ -793,13 +800,17 @@ function ArticlesContent() {
               <button onClick={() => setPreviewArticle(null)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">✕</button>
             </div>
             <div className="p-6">
-              {previewArticle.featuredImage && (
-                previewArticle.featuredImage.startsWith('data:') ? (
-                  <img src={previewArticle.featuredImage} alt="" className="w-full h-64 object-cover rounded-xl mb-6" />
-                ) : (
-                  <Image src={previewArticle.featuredImage} alt="" width={800} height={400} className="w-full h-64 object-cover rounded-xl mb-6" unoptimized={previewArticle.featuredImage.startsWith('data:')} />
-                )
-              )}
+              {previewArticle.featuredImage && (() => {
+                const ratio = aspectToRatio(imgSettings.aspect);
+                const cls = ratio ? 'absolute inset-0 w-full h-full object-cover rounded-xl' : 'w-full h-auto rounded-xl';
+                const wrap = ratio ? 'relative w-full overflow-hidden rounded-xl mb-6' : 'w-full overflow-hidden rounded-xl mb-6';
+                const style = ratio ? { aspectRatio: ratio } : undefined;
+                const src = previewArticle.featuredImage as string;
+                const img = src.startsWith('data:')
+                  ? <img src={src} alt="" className={cls} />
+                  : <Image src={src} alt="" width={800} height={400} className={cls} unoptimized={src.startsWith('data:')} />;
+                return <div className={wrap} style={style}>{img}</div>;
+              })()}
               {previewArticle.category && (
                 <span className="inline-block px-3 py-1 bg-[#1B365D] text-white text-xs font-bold rounded-full mb-3">{previewArticle.category.name}</span>
               )}

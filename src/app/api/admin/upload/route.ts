@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { randomUUID } from 'crypto';
 
-const FALLBACKS = { maxMb: 4, quality: 80, maxDim: 1280, format: 'jpeg' };
+const FALLBACKS = { maxMb: 1, quality: 80, maxDim: 1280, format: 'jpeg' };
 
 async function getImageSettings() {
   try {
