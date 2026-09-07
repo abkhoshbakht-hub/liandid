@@ -6,10 +6,11 @@ interface HeroImageProps {
   src: string;
   alt: string;
   hoverZoom?: boolean;
+  position?: string;
 }
 
 // عکس افقی: تمام قاب را پر می‌کند. عکس عمودی (موبایلی): کامل با پس‌زمینه محو نمایش داده می‌شود تا سر جایش بنشیند
-export default function HeroImage({ src, alt, hoverZoom }: HeroImageProps) {
+export default function HeroImage({ src, alt, hoverZoom, position }: HeroImageProps) {
   const [portrait, setPortrait] = useState(false);
 
   return (
@@ -33,7 +34,7 @@ export default function HeroImage({ src, alt, hoverZoom }: HeroImageProps) {
         className={
           portrait
             ? 'absolute inset-0 w-full h-full object-contain'
-            : `absolute inset-0 w-full h-full object-cover object-center${hoverZoom ? ' transition-transform duration-700 group-hover:scale-105' : ''}`
+            : `absolute inset-0 w-full h-full object-cover ${position || 'object-center'}${hoverZoom ? ' transition-transform duration-700 group-hover:scale-105' : ''}`
         }
       />
     </div>

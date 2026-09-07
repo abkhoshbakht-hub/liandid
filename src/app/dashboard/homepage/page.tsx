@@ -375,7 +375,7 @@ function CustomNewsForm({ slot, onSave, saving }: { slot: Slot; onSave: (t: stri
         <label className="block text-sm font-bold text-gray-700 mb-1">تصویر باکس (نمایش دقیق سایت)</label>
         {image ? (
           <div className="relative mb-2 rounded-xl overflow-hidden border border-gray-200" style={{ aspectRatio: slot.slotKey.startsWith('hero') ? '2 / 1' : '16 / 9' }}>
-            <HeroImage src={image} alt="پیش‌نمایش" />
+            <HeroImage src={image} alt="پیش‌نمایش" position={slot.slotKey === 'hero-main' ? 'object-top' : undefined} />
             <button onClick={() => setImage('')} className="absolute top-2 left-2 z-10 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button>
           </div>
         ) : null}

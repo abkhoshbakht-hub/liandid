@@ -23,7 +23,7 @@ export default function HeroSection({ main, side1, side2 }: { main: NewsItem | n
           {main ? (
             <a href={main.link} target="_blank" rel="noopener noreferrer" className="group block relative rounded-2xl overflow-hidden h-[280px] sm:h-[360px] lg:h-[420px] bg-[#0a1628]">
               {main.image ? (
-                <HeroImage src={main.image} alt={main.title} hoverZoom />
+                <HeroImage src={main.image} alt={main.title} hoverZoom position="object-top" />
               ) : (
                 <div className={`absolute inset-0 bg-gradient-to-br ${getCategoryStyle(main.category).gradient}`} />
               )}
