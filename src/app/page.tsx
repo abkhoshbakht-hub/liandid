@@ -163,7 +163,8 @@ async function getHomepageData() {
     const latest = latestPool.slice(0, 8);
     latest.forEach((n, i) => {
       usedIds.add(n.id);
-      if (i < 8) n.image = `/latest-news/${i + 1}.jpg`;
+      // فقط خبری که عکس ندارد، عکس پیش‌فرض می‌گیرد؛ عکس واقعی خبر دست نمی‌خورد
+      if (!n.image) n.image = `/latest-news/${i + 1}.jpg`;
     });
 
     const analysisKeys = ['analysis-1', 'analysis-2', 'analysis-3'];
