@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { toPersianDateTime, toPersianNumber } from '@/lib/date';
 import ShamsiDateTimePicker from '@/components/admin/ShamsiDateTimePicker';
+import ImageCropper from '@/components/admin/ImageCropper';
 
 interface Article {
   id: string;
@@ -76,6 +77,8 @@ function ArticlesContent() {
   const [uploading, setUploading] = useState(false);
   const [socialDialog, setSocialDialog] = useState<{ articleId: string; articleTitle: string } | null>(null);
   const [sharing, setSharing] = useState(false);
+  const [cropSrc, setCropSrc] = useState<{ url: string; name: string } | null>(null);
+  const [imgSettings, setImgSettings] = useState({ maxMb: 4, quality: 80, maxDim: 1280, aspect: '16:9', format: 'jpeg' });
 
   const [form, setForm] = useState({
     title: '',
@@ -109,6 +112,18 @@ function ArticlesContent() {
       fetchArticles();
       fetchCategories();
       fetchTags();
+      fetch('/api/admin/settings')
+        .then(r => r.json())
+        .then(data => {
+          setImgSettings({
+            maxMb: parseFloat(data.image_max_mb) || 4,
+            quality: parseInt(data.image_quality, 10) || 80,
+            maxDim: parseInt(data.image_max_dim, 10) || 1280,
+            aspect: data.image_aspect || '16:9',
+            format: data.image_format || 'jpeg',
+          });
+        })
+        .catch(() => {});
     }
   }, [isAuthenticated, isAdmin]);
 
@@ -212,16 +227,27 @@ function ArticlesContent() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 4 * 1024 * 1024) {
-      alert('حجم عکس نباید بیشتر از ۴ مگابایت باشد');
+    if (file.size > imgSettings.maxMb * 1024 * 1024) {
+      alert(`حجم عکس نباید بیشتر از ${imgSettings.maxMb} مگابایت باشد`);
       e.target.value = '';
       return;
     }
 
+    // باز کردن ابزار تنظیم عکس (برش + کم/زیاد) قبل از آپلود
+    const url = URL.createObjectURL(file);
+    setCropSrc({ url, name: file.name });
+    e.target.value = '';
+  };
+
+  const handleCropDone = async (blob: Blob) => {
+    if (!cropSrc) return;
+    const url = cropSrc.url;
+    setCropSrc(null);
     setUploading(true);
     try {
+      const croppedFile = new File([blob], cropSrc.name.replace(/\.[^.]+$/, '') + (imgSettings.format === 'webp' ? '.webp' : imgSettings.format === 'png' ? '.png' : '.jpg'), { type: blob.type });
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', croppedFile);
 
       const res = await fetch('/api/admin/upload', {
         method: 'POST',
@@ -238,7 +264,7 @@ function ArticlesContent() {
       alert('خطا در آپلود عکس - اتصال را بررسی کنید');
     } finally {
       setUploading(false);
-      e.target.value = '';
+      URL.revokeObjectURL(url);
     }
   };
 
@@ -527,7 +553,10 @@ function ArticlesContent() {
               <div className="space-y-4">
                 {/* عکس شاخص */}
                 <div className="bg-gray-50 rounded-xl p-6">
-                  <label className="block text-sm font-bold text-gray-700 mb-3">عکس شاخص</label>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="block text-sm font-bold text-gray-700">عکس شاخص</label>
+                    <Link href="/dashboard/image-settings" className="text-xs text-[#C9A96E] hover:underline font-bold">تنظیم عکس</Link>
+                  </div>
                   {form.featuredImage ? (
                     <div className="relative">
                       {form.featuredImage.startsWith('data:') ? (
@@ -740,6 +769,20 @@ function ArticlesContent() {
           )}
         </div>
       </div>
+
+      {/* ابزار تنظیم عکس (برش + کم/زیاد) */}
+      {cropSrc && (
+        <ImageCropper
+          imageSrc={cropSrc.url}
+          fileName={cropSrc.name}
+          defaultAspect={imgSettings.aspect}
+          outputWidth={imgSettings.maxDim}
+          quality={imgSettings.quality}
+          format={imgSettings.format}
+          onDone={handleCropDone}
+          onCancel={() => { URL.revokeObjectURL(cropSrc.url); setCropSrc(null); }}
+        />
+      )}
 
       {/* مodal پیش‌نمایش */}
       {previewArticle && (
