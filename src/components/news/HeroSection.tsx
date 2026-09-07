@@ -27,8 +27,7 @@ export default function HeroSection({ main, side1, side2 }: { main: NewsItem | n
               ) : (
                 <div className={`absolute inset-0 bg-gradient-to-br ${getCategoryStyle(main.category).gradient}`} />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-[#0a1628]/40 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-l from-[#0a1628]/50 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628]/90 via-[#0a1628]/25 to-transparent pointer-events-none" />
               <div className="absolute top-5 right-5 z-20">
                 <img src="/logo.png" alt="لیان دید" className="h-12 sm:h-14 drop-shadow-lg" />
               </div>

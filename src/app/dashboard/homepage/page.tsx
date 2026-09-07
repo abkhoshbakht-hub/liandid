@@ -376,6 +376,12 @@ function CustomNewsForm({ slot, onSave, saving }: { slot: Slot; onSave: (t: stri
         {image ? (
           <div className="relative mb-2 rounded-xl overflow-hidden border border-gray-200" style={{ aspectRatio: slot.slotKey.startsWith('hero') ? '2 / 1' : '16 / 9' }}>
             <HeroImage src={image} alt="پیش‌نمایش" position={slot.slotKey === 'hero-main' ? 'object-top' : undefined} />
+            {slot.slotKey === 'hero-main' && (
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628]/90 via-[#0a1628]/25 to-transparent pointer-events-none" />
+            )}
+            {slot.slotKey.startsWith('hero-side') && (
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-[#0a1628]/30 to-transparent pointer-events-none" />
+            )}
             <button onClick={() => setImage('')} className="absolute top-2 left-2 z-10 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button>
           </div>
         ) : null}
