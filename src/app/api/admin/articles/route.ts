@@ -82,6 +82,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    try {
+      const { revalidatePath } = await import('next/cache');
+      revalidatePath('/');
+      revalidatePath('/archive');
+    } catch {}
+
     return NextResponse.json({
       success: true,
       message: 'خبر با موفقیت ایجاد شد',

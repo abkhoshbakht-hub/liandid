@@ -42,6 +42,11 @@ export async function PUT(request: NextRequest) {
       where: { id },
       data: { status, adminNote: adminNote || null },
     });
+    try {
+      const { revalidatePath } = await import('next/cache');
+      revalidatePath('/');
+      revalidatePath('/archive');
+    } catch {}
     return NextResponse.json({ success: true, item: submission });
   } catch {
     return NextResponse.json({ error: 'خطا در بروزرسانی' }, { status: 500 });

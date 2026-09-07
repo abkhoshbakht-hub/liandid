@@ -63,6 +63,12 @@ export async function PUT(req: NextRequest) {
       }
     }
 
+    try {
+      const { revalidatePath } = await import('next/cache');
+      revalidatePath('/');
+      revalidatePath('/archive');
+    } catch {}
+
     return NextResponse.json({ success: true, data: slot });
   } catch (error) {
     return NextResponse.json({ success: false, message: 'خطای داخلی سرور' }, { status: 500 });

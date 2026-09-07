@@ -98,6 +98,12 @@ export async function PUT(req: NextRequest) {
       data,
     });
 
+    try {
+      const { revalidatePath } = await import('next/cache');
+      revalidatePath('/');
+      revalidatePath('/archive');
+    } catch {}
+
     return NextResponse.json({
       success: true,
       message: `${result.count} خبر بروزرسانی شد`,

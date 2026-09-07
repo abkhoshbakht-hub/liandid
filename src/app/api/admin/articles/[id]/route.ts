@@ -171,6 +171,12 @@ export async function PUT(
       } catch {}
     }
 
+    try {
+      const { revalidatePath } = await import('next/cache');
+      revalidatePath('/');
+      revalidatePath('/archive');
+    } catch {}
+
     return NextResponse.json({
       success: true,
       message: 'خبر با موفقیت به‌روزرسانی شد',
@@ -225,6 +231,12 @@ export async function DELETE(
     }
 
     await prisma.article.delete({ where: { id } });
+
+    try {
+      const { revalidatePath } = await import('next/cache');
+      revalidatePath('/');
+      revalidatePath('/archive');
+    } catch {}
 
     return NextResponse.json({
       success: true,

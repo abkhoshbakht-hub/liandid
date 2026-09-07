@@ -8,6 +8,9 @@ import RssNewsFeed from '@/components/news/RssNewsFeed';
 import SubmitBanner from '@/components/home/SubmitBanner';
 import { Metadata } from 'next';
 
+// پشتیبان: حداکثر هر ۵ دقیقه بازسازی (به‌روزرسانی اصلی با انتشار خبر انجام می‌شود)
+export const revalidate = 300;
+
 export const metadata: Metadata = {
   title: {
     default: 'لیان دید | پایگاه خبری تحلیلی استان بوشهر',
@@ -110,9 +113,32 @@ async function getHomepageData() {
 
     const findSlot = (key: string) => slots.find(s => s.slotKey === key) || null;
 
-    const heroMain = resolve(findSlot('hero-main'), heroPool[0] || null);
-    const heroSide1 = resolve(findSlot('hero-side-1'), heroPool[1] || null);
-    const heroSide2 = resolve(findSlot('hero-side-2'), heroPool[2] || null);
+    // خبرهایی که مدیر جایگاه «هیرو» داده، اول در باکس‌های هیرو می‌نشینند (جدیدترین اول، حداکثر ۳ تا)
+    const heroShownIds = new Set<string>();
+    const takeHeroPlaced = () => heroPlacedItems.find(i => !heroShownIds.has(i.id));
+    const takePool = () => heroPool.find(i => !heroShownIds.has(i.id));
+    const pickHero = (slotKey: string): Item | null => {
+      const placed = takeHeroPlaced();
+      if (placed) {
+        heroShownIds.add(placed.id);
+        return placed;
+      }
+      const r = resolve(findSlot(slotKey));
+      if (r && !heroShownIds.has(r.id)) {
+        heroShownIds.add(r.id);
+        return r;
+      }
+      const f = takePool();
+      if (f) {
+        heroShownIds.add(f.id);
+        return f;
+      }
+      return null;
+    };
+
+    const heroMain = pickHero('hero-main');
+    const heroSide1 = pickHero('hero-side-1');
+    const heroSide2 = pickHero('hero-side-2');
 
     const heroIds = [heroMain?.id, heroSide1?.id, heroSide2?.id].filter(Boolean);
 
