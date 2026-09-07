@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import HeroImage from '@/components/news/HeroImage';
 
 interface Slot {
   id: string;
@@ -371,11 +372,11 @@ function CustomNewsForm({ slot, onSave, saving }: { slot: Slot; onSave: (t: stri
         <textarea value={content} onChange={e => setContent(e.target.value)} rows={3} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#C9A96E] resize-none" placeholder="خلاصه خبر..." />
       </div>
       <div>
-        <label className="block text-sm font-bold text-gray-700 mb-1">تصویر باکس</label>
+        <label className="block text-sm font-bold text-gray-700 mb-1">تصویر باکس (نمایش دقیق سایت)</label>
         {image ? (
-          <div className="relative mb-2">
-            <img src={image} alt="پیش‌نمایش" className="w-full h-44 object-cover rounded-xl border border-gray-200" />
-            <button onClick={() => setImage('')} className="absolute top-2 left-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button>
+          <div className="relative mb-2 rounded-xl overflow-hidden border border-gray-200" style={{ aspectRatio: slot.slotKey.startsWith('hero') ? '2 / 1' : '16 / 9' }}>
+            <HeroImage src={image} alt="پیش‌نمایش" />
+            <button onClick={() => setImage('')} className="absolute top-2 left-2 z-10 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button>
           </div>
         ) : null}
         <div className="flex gap-2">
