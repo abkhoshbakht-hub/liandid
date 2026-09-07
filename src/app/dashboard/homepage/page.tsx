@@ -336,6 +336,29 @@ function CustomNewsForm({ slot, onSave, saving }: { slot: Slot; onSave: (t: stri
   const [content, setContent] = useState(slot.customContent || '');
   const [image, setImage] = useState(slot.customImage || '');
   const [link, setLink] = useState(slot.customLink || '');
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.success) {
+        setImage(data.data.url);
+      } else {
+        alert(data.message || 'خطا در آپلود عکس');
+      }
+    } catch {
+      alert('خطا در آپلود عکس - اتصال را بررسی کنید');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
 
   return (
     <div className="p-6 space-y-4">
@@ -348,8 +371,20 @@ function CustomNewsForm({ slot, onSave, saving }: { slot: Slot; onSave: (t: stri
         <textarea value={content} onChange={e => setContent(e.target.value)} rows={3} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#C9A96E] resize-none" placeholder="خلاصه خبر..." />
       </div>
       <div>
-        <label className="block text-sm font-bold text-gray-700 mb-1">لینک تصویر (اختیاری)</label>
-        <input type="text" value={image} onChange={e => setImage(e.target.value)} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#C9A96E]" placeholder="https://..." />
+        <label className="block text-sm font-bold text-gray-700 mb-1">تصویر باکس</label>
+        {image ? (
+          <div className="relative mb-2">
+            <img src={image} alt="پیش‌نمایش" className="w-full h-44 object-cover rounded-xl border border-gray-200" />
+            <button onClick={() => setImage('')} className="absolute top-2 left-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">✕</button>
+          </div>
+        ) : null}
+        <div className="flex gap-2">
+          <input type="text" value={image} onChange={e => setImage(e.target.value)} className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#C9A96E]" placeholder="https://... (یا از دستگاه آپلود کنید)" />
+          <label className="px-4 py-3 bg-[#1B365D] text-white text-sm font-bold rounded-xl cursor-pointer hover:bg-[#2a4a7a] transition-colors whitespace-nowrap">
+            {uploading ? '...' : 'آپلود'}
+            <input type="file" accept="image/*" onChange={handleImageFile} className="hidden" disabled={uploading} />
+          </label>
+        </div>
       </div>
       <div>
         <label className="block text-sm font-bold text-gray-700 mb-1">لینک خبر (اختیاری)</label>
