@@ -17,7 +17,7 @@ interface RssNews {
 export default function RssNewsFeed() {
   const [news, setNews] = useState<RssNews[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'all' | 'ملی' | 'بوشهر'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'ملی' | 'بوشهر' | 'روزنامه'>('all');
   const [refreshing, setRefreshing] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -110,6 +110,7 @@ export default function RssNewsFeed() {
             { key: 'all' as const, label: 'همه' },
             { key: 'بوشهر' as const, label: 'خبر بوشهر' },
             { key: 'ملی' as const, label: 'خبرگزاری‌های سراسری' },
+            { key: 'روزنامه' as const, label: 'صفحه اول روزنامه‌های کشور' },
           ].map(tab => (
             <button
               key={tab.key}

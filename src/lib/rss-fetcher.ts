@@ -108,8 +108,11 @@ export async function fetchAllRssFeeds(): Promise<number> {
   let saved = 0;
   for (const news of allNews) {
     try {
-      const isBushehrSource = rssSources.some(s => s.name === news.sourceName && s.category === 'بوشهر');
-      const category = isBushehrSource || BUSHEHR_KEYWORDS.test(news.title) || BUSHEHR_KEYWORDS.test(news.description) ? 'بوشهر' : 'ملی';
+      const sourceDef = rssSources.find(s => s.name === news.sourceName);
+      const isBushehrSource = sourceDef?.category === 'بوشهر';
+      const isBushehr = isBushehrSource || BUSHEHR_KEYWORDS.test(news.title) || BUSHEHR_KEYWORDS.test(news.description);
+      // دسته خود منبع حفظ می‌شود (مثل «روزنامه»)؛ فقط خبر بوشهری به تب بوشهر می‌رود
+      const category = isBushehr ? 'بوشهر' : (sourceDef?.category || 'ملی');
 
       const existing = await prisma.externalNews.findUnique({
         where: { link: news.link },

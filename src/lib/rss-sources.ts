@@ -20,6 +20,10 @@ export const rssSources: RssSource[] = [
   { name: 'مهر', url: 'https://www.mehrnews.com/rss', category: 'ملی' },
   { name: 'فارس', url: 'https://www.farsnews.ir/rss', category: 'ملی' },
   { name: 'تسنیم', url: 'https://www.tasnimnews.com/rss', category: 'ملی' },
+
+  // روزنامه‌های کشور
+  { name: 'همشهری', url: 'https://www.hamshahrionline.ir/rss', category: 'روزنامه' },
+  { name: 'دنیای اقتصاد', url: 'https://donya-e-eqtesad.com/rss', category: 'روزنامه' },
 ];
 
 // RSS feeds often have different URL patterns. This is a fallback list.
