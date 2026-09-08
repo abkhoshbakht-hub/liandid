@@ -802,14 +802,14 @@ function ArticlesContent() {
             <div className="p-8 text-center text-gray-500">خبری یافت نشد</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[920px]">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="px-6 py-4 text-right text-sm font-bold text-gray-600">عنوان</th>
-                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-600">نویسنده</th>
-                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-600">دسته‌بندی</th>
-                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-600">وضعیت</th>
-                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-600">تاریخ</th>
+                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-600 whitespace-nowrap">نویسنده</th>
+                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-600 whitespace-nowrap">دسته‌بندی</th>
+                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-600 whitespace-nowrap">وضعیت</th>
+                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-600 whitespace-nowrap">تاریخ</th>
                     <th className="px-6 py-4 text-right text-sm font-bold text-gray-600">عملیات</th>
                   </tr>
                 </thead>
@@ -825,8 +825,8 @@ function ArticlesContent() {
                               <Image src={article.featuredImage} alt="" width={48} height={36} className="w-12 h-9 object-cover rounded" unoptimized={article.featuredImage.startsWith('data:')} />
                             )
                           )}
-                          <div>
-                            <div className="font-bold text-sm text-[#1B365D]">{article.title}</div>
+                          <div className="min-w-[220px] max-w-[340px]">
+                            <div className="font-bold text-sm text-[#1B365D] leading-6 line-clamp-2">{article.title}</div>
                             {article.isBreaking && <span className="text-xs text-red-500 font-bold">فوری</span>}
                             {article.isFeatured && <span className="text-xs text-[#C9A96E] font-bold mr-1">ویژه</span>}
                             {(article as any).placement && (article as any).placement !== 'latest' && (
@@ -840,9 +840,9 @@ function ArticlesContent() {
                       <td className="px-6 py-4 text-sm text-gray-600">{article.author.name}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{article.category?.name || '-'}</td>
                       <td className="px-6 py-4">{getStatusBadge(article.status)}</td>
-                      <td className="px-6 py-4 text-sm text-gray-500">{toPersianDateTime(article.createdAt)}</td>
+                      <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{toPersianDateTime(article.createdAt)}</td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-1.5 min-w-[320px] max-w-[380px]">
                           {article.status === 'PENDING' && (
                             <button onClick={() => handleQuickApprove(article.id)} className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-bold hover:bg-emerald-200 transition-colors">تایید</button>
                           )}
