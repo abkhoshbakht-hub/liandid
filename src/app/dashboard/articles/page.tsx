@@ -811,7 +811,9 @@ function ArticlesContent() {
           ) : articles.length === 0 ? (
             <div className="p-8 text-center text-gray-500">خبری یافت نشد</div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+            {/* جدول دسکتاپ */}
+            <div className="overflow-x-auto hidden md:block">
               <table className="w-full min-w-[920px]">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
@@ -879,6 +881,63 @@ function ArticlesContent() {
                 </tbody>
               </table>
             </div>
+
+            {/* کارت‌های موبایل — همه فیلدها (وضعیت، دسته، تاریخ، عملیات) دیده می‌شود */}
+            <div className="md:hidden divide-y divide-gray-100">
+              {articles.map(article => (
+                <div key={article.id} className="px-4 py-4">
+                  <div className="flex items-start gap-3">
+                    {article.featuredImage && (
+                      article.featuredImage.startsWith('data:') ? (
+                        <img src={article.featuredImage} alt="" className="w-16 h-12 object-cover rounded-lg shrink-0" />
+                      ) : (
+                        <Image src={article.featuredImage} alt="" width={64} height={48} className="w-16 h-12 object-cover rounded-lg shrink-0" unoptimized={article.featuredImage.startsWith('data:')} />
+                      )
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-sm text-[#1B365D] leading-6 line-clamp-2">{article.title}</div>
+                      <div className="mt-1">
+                        {article.isBreaking && <span className="text-xs text-red-500 font-bold">فوری</span>}
+                        {article.isFeatured && <span className="text-xs text-[#C9A96E] font-bold mr-1">ویژه</span>}
+                        {(article as any).placement && (article as any).placement !== 'latest' && (
+                          <span className="text-xs text-blue-600 font-bold mr-1">
+                            {(article as any).placement === 'hero' ? 'هیرو' : (article as any).placement === 'analysis' ? 'تحلیل' : (article as any).placement === 'pinned' ? 'سنجاق' : (article as any).placement}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-gray-500">
+                    <span>نویسنده: <b className="text-gray-700">{article.author.name}</b></span>
+                    <span>دسته: <b className="text-gray-700">{article.category?.name || '-'}</b></span>
+                    <span>{toPersianDateTime(article.createdAt)}</span>
+                    {getStatusBadge(article.status)}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1.5 mt-3">
+                    {article.status === 'PENDING' && (
+                      <button onClick={() => handleQuickApprove(article.id)} className="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold">تایید</button>
+                    )}
+                    {article.status === 'APPROVED' && (
+                      <button onClick={() => handleQuickPublish(article.id)} className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold">انتشار</button>
+                    )}
+                    {article.status !== 'PUBLISHED' && article.status !== 'APPROVED' && article.status !== 'PENDING' && (
+                      <button onClick={() => handleQuickPublish(article.id)} className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold">انتشار</button>
+                    )}
+                    <button onClick={() => handleEdit(article)} className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold">ویرایش</button>
+                    <button onClick={() => handleCopyShortLink(article.slug)} className="px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg text-xs font-bold">
+                      {copiedSlug === article.slug ? 'کپی شد!' : 'لینک کوتاه'}
+                    </button>
+                    <button onClick={() => openShareDialog(article.slug, article.title)} className="px-3 py-1.5 bg-teal-100 text-teal-700 rounded-lg text-xs font-bold">ارسال</button>
+                    {article.status === 'PUBLISHED' && (
+                      <button onClick={() => handleQuickArchive(article.id, article.title)} className="px-3 py-1.5 bg-amber-100 text-amber-700 rounded-lg text-xs font-bold">آرشیو</button>
+                    )}
+                    <button onClick={() => setPreviewArticle(article)} className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-bold">مشاهده</button>
+                    <button onClick={() => handleDelete(article.id)} className="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-xs font-bold">حذف</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            </>
           )}
         </div>
       </div>

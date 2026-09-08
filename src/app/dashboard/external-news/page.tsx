@@ -253,9 +253,9 @@ export default function ExternalNewsPage() {
             <p className="text-gray-500">خبری یافت نشد</p>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <div className="bg-white rounded-2xl border border-gray-100 overflow-x-auto">
             {/* هدر جدول */}
-            <div className="bg-gray-50 px-6 py-3 flex items-center gap-4 border-b border-gray-100">
+            <div className="bg-gray-50 px-6 py-3 flex items-center gap-4 border-b border-gray-100 min-w-[780px]">
               <input
                 type="checkbox"
                 checked={selected.length === news.length && news.length > 0}
@@ -273,7 +273,7 @@ export default function ExternalNewsPage() {
             {/* ردیف‌ها */}
             <div className="divide-y divide-gray-50">
               {news.map((item, index) => (
-                <div key={item.id} className="px-6 py-4 flex items-center gap-4 hover:bg-gray-50 transition-colors">
+                <div key={item.id} className="px-6 py-4 flex items-center gap-4 hover:bg-gray-50 transition-colors min-w-[780px]">
                   <input
                     type="checkbox"
                     checked={selected.includes(item.id)}
