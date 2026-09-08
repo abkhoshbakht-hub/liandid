@@ -127,8 +127,7 @@ function ArticlesContent() {
 
   const shareTextOf = () => shareDialog ? `${shareDialog.title}\n${shareDialog.short}` : '';
 
-  const copyShareText = async (doneMsg?: string) => {
-    const text = shareTextOf();
+  const copyTextSilent = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
     } catch {
@@ -139,7 +138,18 @@ function ArticlesContent() {
       document.execCommand('copy');
       document.body.removeChild(ta);
     }
+  };
+
+  const copyShareText = async (doneMsg?: string) => {
+    await copyTextSilent(shareTextOf());
     alert(doneMsg || 'متن و لینک خبر کپی شد');
+  };
+
+  // بله و روبیکا لینک اشتراک مستقیم ندارند؛ متن کپی می‌شود و نسخه وب اپ باز می‌شود تا به مخاطب بدهید
+  const shareViaWebApp = async (appUrl: string, appName: string) => {
+    await copyTextSilent(shareTextOf());
+    window.open(appUrl, '_blank', 'noopener,noreferrer');
+    alert(`متن و لینک خبر کپی شد! ${appName} باز شد — مخاطب مورد نظر را انتخاب کنید و بچسبانید`);
   };
 
   const nativeShare = async () => {
@@ -917,10 +927,10 @@ function ArticlesContent() {
                   >
                     ارسال در تلگرام
                   </a>
-                  <button onClick={() => copyShareText('کپی شد! حالا در بله بچسبانید')} className="w-full px-4 py-3 bg-sky-100 text-sky-700 rounded-xl font-bold hover:bg-sky-200 transition-colors">
+                  <button onClick={() => shareViaWebApp('https://web.bale.ai', 'بله')} className="w-full px-4 py-3 bg-sky-100 text-sky-700 rounded-xl font-bold hover:bg-sky-200 transition-colors">
                     ارسال در بله
                   </button>
-                  <button onClick={() => copyShareText('کپی شد! حالا در روبیکا بچسبانید')} className="w-full px-4 py-3 bg-orange-100 text-orange-700 rounded-xl font-bold hover:bg-orange-200 transition-colors">
+                  <button onClick={() => shareViaWebApp('https://web.rubika.ir', 'روبیکا')} className="w-full px-4 py-3 bg-orange-100 text-orange-700 rounded-xl font-bold hover:bg-orange-200 transition-colors">
                     ارسال در روبیکا
                   </button>
                   <button onClick={() => copyShareText()} className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors">
