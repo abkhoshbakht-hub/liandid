@@ -127,7 +127,7 @@ function ArticlesContent() {
 
   const shareTextOf = () => shareDialog ? `${shareDialog.title}\n${shareDialog.short}` : '';
 
-  const copyShareText = async () => {
+  const copyShareText = async (doneMsg?: string) => {
     const text = shareTextOf();
     try {
       await navigator.clipboard.writeText(text);
@@ -139,7 +139,7 @@ function ArticlesContent() {
       document.execCommand('copy');
       document.body.removeChild(ta);
     }
-    alert('متن و لینک خبر کپی شد');
+    alert(doneMsg || 'متن و لینک خبر کپی شد');
   };
 
   const nativeShare = async () => {
@@ -917,7 +917,13 @@ function ArticlesContent() {
                   >
                     ارسال در تلگرام
                   </a>
-                  <button onClick={copyShareText} className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors">
+                  <button onClick={() => copyShareText('کپی شد! حالا در بله بچسبانید')} className="w-full px-4 py-3 bg-sky-100 text-sky-700 rounded-xl font-bold hover:bg-sky-200 transition-colors">
+                    ارسال در بله
+                  </button>
+                  <button onClick={() => copyShareText('کپی شد! حالا در روبیکا بچسبانید')} className="w-full px-4 py-3 bg-orange-100 text-orange-700 rounded-xl font-bold hover:bg-orange-200 transition-colors">
+                    ارسال در روبیکا
+                  </button>
+                  <button onClick={() => copyShareText()} className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors">
                     کپی متن و لینک خبر
                   </button>
                   {'share' in navigator && (
