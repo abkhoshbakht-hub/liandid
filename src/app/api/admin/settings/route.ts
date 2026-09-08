@@ -5,8 +5,8 @@ export async function GET() {
   try {
     const settings = await prisma.siteSetting.findMany();
     const data: Record<string, string> = {};
-    // لینک‌های کوتاه در پاسخ عمومی نمی‌آیند (جدا مدیریت می‌شوند)
-    settings.forEach(s => { if (!s.key.startsWith('short:')) data[s.key] = s.value; });
+    // لینک‌های کوتاه و جلد روزنامه‌ها در پاسخ عمومی نمی‌آیند (جدا مدیریت می‌شوند)
+    settings.forEach(s => { if (!s.key.startsWith('short:') && !s.key.startsWith('frontpage:')) data[s.key] = s.value; });
     return NextResponse.json(data);
   } catch {
     return NextResponse.json({});

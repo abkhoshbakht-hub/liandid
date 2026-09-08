@@ -127,6 +127,12 @@ export default function RssNewsFeed() {
         </div>
       </div>
 
+      {activeTab === 'روزنامه' && (
+        <a href="/kiosk" className="block mx-4 mt-3 px-4 py-2.5 bg-[#1B365D] text-white text-center text-[13px] font-extrabold rounded-xl hover:bg-[#0f2d52] transition-colors">
+          مشاهده تصویر صفحه اول روزنامه‌ها
+        </a>
+      )}
+
       {/* لیست اخبار */}
       <div className="flex-1 min-h-0 overflow-y-auto">
         {loading ? (
