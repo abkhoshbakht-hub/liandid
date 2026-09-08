@@ -86,6 +86,92 @@ function ArticlesContent() {
   const [sharing, setSharing] = useState(false);
   const [cropSrc, setCropSrc] = useState<{ url: string; name: string } | null>(null);
   const [imgSettings, setImgSettings] = useState({ maxMb: 1, quality: 75, maxDim: 1280, aspect: '16:9', format: 'webp' });
+  const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+  const [shareDialog, setShareDialog] = useState<{ slug: string; title: string; short: string } | null>(null);
+  const [shareLoading, setShareLoading] = useState(false);
+
+  const getShortUrl = async (slug: string): Promise<string | null> => {
+    const url = `/news/${slug}`;
+    let res = await fetch(`/api/admin/shortlinks?url=${encodeURIComponent(url)}`);
+    let data = await res.json();
+    let code = data?.data?.code;
+    if (!code) {
+      res = await fetch('/api/admin/shortlinks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
+      data = await res.json();
+      code = data?.data?.code;
+    }
+    return code ? `${window.location.origin}/s/${code}` : null;
+  };
+
+  const openShareDialog = async (slug: string, title: string) => {
+    setShareLoading(true);
+    setShareDialog({ slug, title, short: '' });
+    try {
+      const short = await getShortUrl(slug);
+      if (short) setShareDialog({ slug, title, short });
+      else {
+        alert('خطا در ساخت لینک کوتاه');
+        setShareDialog(null);
+      }
+    } catch {
+      alert('خطا در ساخت لینک کوتاه');
+      setShareDialog(null);
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
+  const shareTextOf = () => shareDialog ? `${shareDialog.title}\n${shareDialog.short}` : '';
+
+  const copyShareText = async () => {
+    const text = shareTextOf();
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    alert('متن و لینک خبر کپی شد');
+  };
+
+  const nativeShare = async () => {
+    if (!shareDialog || !('share' in navigator)) return;
+    try {
+      await (navigator as any).share({ title: shareDialog.title, text: shareDialog.title, url: shareDialog.short });
+    } catch {}
+  };
+
+  const handleCopyShortLink = async (slug: string) => {
+    try {
+      const short = await getShortUrl(slug);
+      if (!short) {
+        alert('خطا در ساخت لینک کوتاه');
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(short);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = short;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      setCopiedSlug(slug);
+      setTimeout(() => setCopiedSlug(null), 2000);
+    } catch {
+      alert('خطا در ساخت لینک کوتاه');
+    }
+  };
 
   const [form, setForm] = useState({
     title: '',
@@ -767,6 +853,10 @@ function ArticlesContent() {
                             <button onClick={() => handleQuickPublish(article.id)} className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold hover:bg-blue-200 transition-colors">انتشار</button>
                           )}
                           <button onClick={() => handleEdit(article)} className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold hover:bg-blue-200 transition-colors">ویرایش</button>
+                          <button onClick={() => handleCopyShortLink(article.slug)} className="px-3 py-1 bg-purple-100 text-purple-700 rounded text-xs font-bold hover:bg-purple-200 transition-colors">
+                            {copiedSlug === article.slug ? 'کپی شد!' : 'لینک کوتاه'}
+                          </button>
+                          <button onClick={() => openShareDialog(article.slug, article.title)} className="px-3 py-1 bg-teal-100 text-teal-700 rounded text-xs font-bold hover:bg-teal-200 transition-colors">ارسال</button>
                           {article.status === 'PUBLISHED' && (
                             <button onClick={() => handleQuickArchive(article.id, article.title)} className="px-3 py-1 bg-amber-100 text-amber-700 rounded text-xs font-bold hover:bg-amber-200 transition-colors">آرشیو</button>
                           )}
@@ -795,6 +885,54 @@ function ArticlesContent() {
           onDone={handleCropDone}
           onCancel={() => { URL.revokeObjectURL(cropSrc.url); setCropSrc(null); }}
         />
+      )}
+
+      {/* پاپ‌آپ ارسال خبر به دیگران */}
+      {shareDialog && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => !shareLoading && setShareDialog(null)}>
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6" onClick={e => e.stopPropagation()}>
+            <h3 className="font-black text-lg text-[#1B365D] mb-2">ارسال خبر</h3>
+            <p className="font-bold text-sm text-gray-700 line-clamp-2 mb-1">{shareDialog.title}</p>
+            {shareDialog.short ? (
+              <p className="text-xs text-gray-400 mb-5" dir="ltr">{shareDialog.short}</p>
+            ) : (
+              <p className="text-xs text-gray-400 mb-5">در حال ساخت لینک کوتاه...</p>
+            )}
+            <div className="space-y-2">
+              {shareDialog.short && (
+                <>
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(shareTextOf())}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-500 text-white rounded-xl font-bold hover:bg-green-600 transition-colors"
+                  >
+                    ارسال در واتساپ
+                  </a>
+                  <a
+                    href={`https://t.me/share/url?url=${encodeURIComponent(shareDialog.short)}&text=${encodeURIComponent(shareDialog.title)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-sky-500 text-white rounded-xl font-bold hover:bg-sky-600 transition-colors"
+                  >
+                    ارسال در تلگرام
+                  </a>
+                  <button onClick={copyShareText} className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors">
+                    کپی متن و لینک خبر
+                  </button>
+                  {'share' in navigator && (
+                    <button onClick={nativeShare} className="w-full px-4 py-3 bg-[#1B365D] text-white rounded-xl font-bold hover:bg-[#0f2d52] transition-colors">
+                      اشتراک‌گذاری با...
+                    </button>
+                  )}
+                </>
+              )}
+              <button onClick={() => setShareDialog(null)} disabled={shareLoading} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-gray-600 font-bold hover:bg-gray-50 transition-colors disabled:opacity-50">
+                بستن
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* مodal پیش‌نمایش */}
