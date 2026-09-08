@@ -29,5 +29,14 @@ export default async function ShortLinkPage({ params }: { params: Promise<{ code
     });
   } catch {}
 
-  redirect(url);
+  // هدر Location فقط ASCII قبول می‌کند؛ مسیر فارسی باید انکد شود
+  let target = url;
+  if (url.startsWith('/')) {
+    try {
+      target = encodeURI(decodeURI(url));
+    } catch {
+      target = encodeURI(url);
+    }
+  }
+  redirect(target);
 }
