@@ -119,11 +119,14 @@ export async function fetchAllRssFeeds(): Promise<number> {
         select: { id: true, status: true },
       });
 
+      // خبر روزنامه بدون نیاز به تایید مدیر منتشر می‌شود
+      const autoApprove = category === 'روزنامه';
+
       if (existing) {
         if (existing.status !== 'APPROVED' && existing.status !== 'REJECTED') {
           await prisma.externalNews.update({
             where: { id: existing.id },
-            data: { title: news.title, description: news.description, image: news.image, publishedAt: news.publishedAt, category, topic: classifyNews(news.title, news.description), fetchedAt: new Date() },
+            data: { title: news.title, description: news.description, image: news.image, publishedAt: news.publishedAt, category, topic: classifyNews(news.title, news.description), fetchedAt: new Date(), ...(autoApprove ? { status: 'APPROVED' as const } : {}) },
           });
         } else {
           await prisma.externalNews.update({
@@ -135,7 +138,7 @@ export async function fetchAllRssFeeds(): Promise<number> {
         await prisma.externalNews.create({
           data: {
             title: news.title, link: news.link, description: news.description, image: news.image,
-            source: news.source, sourceName: news.sourceName, category, status: 'PENDING', publishedAt: news.publishedAt,
+            source: news.source, sourceName: news.sourceName, category, status: autoApprove ? 'APPROVED' : 'PENDING', publishedAt: news.publishedAt,
             topic: classifyNews(news.title, news.description),
           },
         });

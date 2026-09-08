@@ -21,9 +21,14 @@ export const rssSources: RssSource[] = [
   { name: 'فارس', url: 'https://www.farsnews.ir/rss', category: 'ملی' },
   { name: 'تسنیم', url: 'https://www.tasnimnews.com/rss', category: 'ملی' },
 
-  // روزنامه‌های کشور
+  // روزنامه‌های کشور (تک‌تک تست شده)
   { name: 'همشهری', url: 'https://www.hamshahrionline.ir/rss', category: 'روزنامه' },
   { name: 'دنیای اقتصاد', url: 'https://donya-e-eqtesad.com/rss', category: 'روزنامه' },
+  { name: 'اطلاعات', url: 'https://www.ettelaat.com/rss', category: 'روزنامه' },
+  { name: 'رسالت', url: 'https://resalat-news.com/rss', category: 'روزنامه' },
+  { name: 'اعتماد', url: 'https://etemadnewspaper.ir/fa/rss', category: 'روزنامه' },
+  { name: 'خبر ورزشی', url: 'https://khabarvarzeshi.com/rss', category: 'روزنامه' },
+  { name: 'طرفداری', url: 'https://www.tarafdari.com/rss', category: 'روزنامه' },
 ];
 
 // RSS feeds often have different URL patterns. This is a fallback list.
