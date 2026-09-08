@@ -134,22 +134,22 @@ export default function Footer() {
           </div>
 
           {/* ستون پنجم: خبرنامه */}
-          <div className="relative text-center hidden md:block">
+          <div className="relative text-center col-span-2 md:col-span-2 lg:col-span-1">
             <h3 className="text-[#C9A96E] font-black text-base mb-2">خبرنامه</h3>
             <p className="text-white/60 text-sm mb-2">
               آخرین اخبار را در ایمیل خود دریافت کنید
             </p>
             <NewsletterForm />
+            <div className="mt-4 flex justify-center">
+              <div id="div_eRasanehTrustseal_96227" className="bg-white rounded-lg p-1 inline-block" />
+            </div>
           </div>
         </div>
 
         <div className="border-t border-white/10 pt-3 pb-1 flex flex-col md:flex-row justify-between items-center gap-2">
-          <div className="flex items-center gap-3">
-            <div id="div_eRasanehTrustseal_96227" className="bg-white rounded-lg p-1" />
-            <p className="text-white/50 text-sm">
-              © {new Date().getFullYear()} {settings.footerCopyright || 'لیان دید. تمامی حقوق محفوظ است.'}
-            </p>
-          </div>
+          <p className="text-white/50 text-sm">
+            © {new Date().getFullYear()} {settings.footerCopyright || 'لیان دید. تمامی حقوق محفوظ است.'}
+          </p>
           <a href="https://liandesign.ir" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-white/50 hover:text-[#C9A96E] transition-colors text-sm">
             <Image src="/liandesign.logo.png" alt="لیان دیزاین" width={40} height={40} className="rounded-sm" />
             <span>طراحی و تولید: <span className="font-bold">لیان دیزاین</span></span>
