@@ -23,6 +23,23 @@ export default function Footer() {
     fetch('/api/admin/categories').then(r => r.json()).then(data => {
       if (data.success) setCategories(data.data.map((c: any) => ({ name: c.name, slug: c.slug })));
     }).catch(() => {});
+    // لوگوی اعلام وصول پایگاه خبری (e-rasaneh)
+    try {
+      if (!document.getElementById('erasaneh-seal-script')) {
+        const s1 = document.createElement('script');
+        s1.id = 'erasaneh-seal-script';
+        s1.src = 'https://trustseal.e-rasaneh.ir/trustseal.js';
+        s1.async = true;
+        s1.onload = () => {
+          try {
+            const s2 = document.createElement('script');
+            s2.text = 'eRasaneh_Trustseal(96227, true);';
+            document.body.appendChild(s2);
+          } catch {}
+        };
+        document.body.appendChild(s1);
+      }
+    } catch {}
   }, []);
 
   const address = settings.footerAddress || 'بوشهر، امامزاده مهر ۱۸';
@@ -127,9 +144,12 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 pt-3 pb-1 flex flex-col md:flex-row justify-between items-center gap-2">
-          <p className="text-white/50 text-sm">
-            © {new Date().getFullYear()} {settings.footerCopyright || 'لیان دید. تمامی حقوق محفوظ است.'}
-          </p>
+          <div className="flex items-center gap-3">
+            <div id="div_eRasanehTrustseal_96227" className="bg-white rounded-lg p-1" />
+            <p className="text-white/50 text-sm">
+              © {new Date().getFullYear()} {settings.footerCopyright || 'لیان دید. تمامی حقوق محفوظ است.'}
+            </p>
+          </div>
           <a href="https://liandesign.ir" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-white/50 hover:text-[#C9A96E] transition-colors text-sm">
             <Image src="/liandesign.logo.png" alt="لیان دیزاین" width={40} height={40} className="rounded-sm" />
             <span>طراحی و تولید: <span className="font-bold">لیان دیزاین</span></span>
