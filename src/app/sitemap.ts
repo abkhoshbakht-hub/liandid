@@ -13,12 +13,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/gallery`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
     { url: `${base}/archive`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
     { url: `${base}/kiosk`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
+    { url: `${base}/newspapers`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    { url: `${base}/newspapers/archive`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
     { url: `${base}/ostanha`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.6 },
     { url: `${base}/submit`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
   ];
 
   try {
-    const [articles, categories] = await Promise.all([
+    const [articles, categories, papers] = await Promise.all([
       prisma.article.findMany({
         where: { status: 'PUBLISHED' },
         select: { slug: true, updatedAt: true, publishedAt: true },
@@ -27,6 +29,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       prisma.category.findMany({
         select: { slug: true },
       }),
+      prisma.newspaper.findMany({
+        where: { active: true },
+        select: { slug: true, updatedAt: true },
+      }).catch(() => []),
     ]);
 
     const articlePages: MetadataRoute.Sitemap = articles.map((a) => ({
@@ -45,7 +51,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
       }));
 
-    return [...staticPages, ...articlePages, ...categoryPages];
+    const paperPages: MetadataRoute.Sitemap = (papers as any[]).map((p) => ({
+      url: `${base}/newspapers/${p.slug}`,
+      lastModified: p.updatedAt || new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.8,
+    }));
+
+    return [...staticPages, ...articlePages, ...categoryPages, ...paperPages];
   } catch {
     return staticPages;
   }
