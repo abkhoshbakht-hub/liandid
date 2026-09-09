@@ -82,22 +82,30 @@ function DashTab() {
     setBusyId(null);
     load();
   }
+  async function seedSources() {
+    if (!confirm('سورس‌های خودکار (کیهان + ۹ کانال تلگرام) برای روزنامه‌های بدون سورس ساخته شود؟')) return;
+    const d = await api('/api/admin/newspapers/init', { method: 'POST' });
+    alert(d.success ? 'انجام شد' : (d.message || 'خطا'));
+    load();
+  }
   async function runAll() {
     if (!s?.papers?.length) return;
     if (!confirm('دریافت امروز برای همه روزنامه‌ها تک‌تک اجرا شود؟ (چند دقیقه، صفحه را نبند)')) return;
     setRunning(true);
-    let ok = 0, fail = 0;
+    let ok = 0;
+    const fails: string[] = [];
     for (let i = 0; i < s.papers.length; i++) {
       const p = s.papers[i];
       if (p.todayStatus === 'PUBLISHED') { ok++; continue; }
       setProgress(`${p.name} (${i + 1} از ${s.papers.length})`);
       const d = await runOnePaper(p.id);
-      if (d.success && d.data?.ok) ok++; else fail++;
+      if (d.success && d.data?.ok) ok++;
+      else fails.push(`${p.name}: ${d.data?.error || d.message || 'نامشخص'}`);
       load();
     }
     setRunning(false);
     setProgress('');
-    alert(`تمام شد — موفق: ${ok}، ناموفق: ${fail}`);
+    alert(`تمام شد — موفق: ${ok}، ناموفق: ${fails.length}` + (fails.length ? `\n${fails.slice(0, 6).join('\n')}` : ''));
     load();
   }
   if (!s) return <div className="text-white">در حال بارگذاری...</div>;
@@ -110,6 +118,7 @@ function DashTab() {
       </div>
       <div className="bg-white rounded-xl p-4 shadow flex flex-wrap items-center gap-3">
         <button onClick={runAll} disabled={running} className="bg-[#1B365D] text-white px-5 py-2 rounded-lg font-bold text-sm disabled:opacity-50">{running ? `در حال دریافت... ${progress}` : 'اجرای دریافت امروز'}</button>
+        <button onClick={seedSources} disabled={running} className="border border-[#1B365D] text-[#1B365D] px-4 py-2 rounded-lg font-bold text-sm disabled:opacity-50">تکمیل سورس‌های خودکار</button>
         <span className="text-xs text-gray-500">آخرین کرون: {s.lastCron ? new Date(s.lastCron).toLocaleString('fa-IR') : '—'} — آرشیو: {s.archiveTotal} شماره</span>
       </div>
       <div className="grid md:grid-cols-2 gap-3">
