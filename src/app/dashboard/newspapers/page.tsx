@@ -10,6 +10,12 @@ const TABS = [
 const STATUS_FA: Record<string, string> = { PUBLISHED: 'منتشرشده', NEEDS_REVIEW: 'نیاز به بررسی', PENDING: 'در انتظار', PROCESSING: 'در حال پردازش', FAILED: 'ناموفق', REJECTED: 'ردشده' };
 const TYPE_FA: Record<string, string> = { official: 'سایت رسمی', telegram: 'تلگرام', news_agency: 'خبرگزاری', other: 'سایر', manual: 'دستی' };
 
+function toFa(n: any): string {
+  if (n == null) return '—';
+  const s = String(n);
+  return s.replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[+d]);
+}
+
 async function api(path: string, opts?: RequestInit) {
   const r = await fetch(path, opts);
   return r.json();
@@ -123,8 +129,8 @@ function DashTab() {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        {[['امروز', s.date], ['کل روزنامه‌ها', s.total], ['موفق', s.ok], ['نیاز به بررسی', s.review], ['بدون جلد', s.failed]].map(([l, v]) => (
-          <div key={l as string} className="bg-white rounded-xl p-4 text-center shadow"><div className="text-2xl font-black text-[#1B365D]">{v as any}</div><div className="text-xs text-gray-500 mt-1">{l}</div></div>
+        {[['امروز', toFa(s.date)], ['کل روزنامه‌ها', toFa(s.total)], ['موفق', toFa(s.ok)], ['نیاز به بررسی', toFa(s.review)], ['بدون جلد', toFa(s.failed)]].map(([l, v]) => (
+          <div key={l as string} className="bg-white rounded-xl p-4 text-center shadow"><div className="text-2xl font-black text-[#1B365D]">{v}</div><div className="text-xs text-gray-500 mt-1">{l}</div></div>
         ))}
       </div>
       <div className="bg-white rounded-xl p-4 shadow flex flex-wrap items-center gap-3">
@@ -371,10 +377,14 @@ function IssuesTab() {
 
 function ErrorsTab() {
   const [logs, setLogs] = useState<any[]>([]);
-  useEffect(() => { api('/api/admin/newspapers/logs?status=FAILED&limit=100').then((d) => d.success && setLogs(d.data)); }, []);
+  const load = () => api('/api/admin/newspapers/logs?status=FAILED&limit=100').then((d) => d.success && setLogs(d.data));
+  useEffect(() => { load(); }, []);
   return (
     <div className="bg-white rounded-xl p-4 shadow text-sm">
-      <h3 className="font-bold mb-2">خطاهای دریافت ({logs.length})</h3>
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-bold">خطاهای دریافت ({toFa(logs.length)})</h3>
+        <button onClick={load} className="text-xs bg-[#1B365D] text-white px-3 py-1 rounded-lg">بروزرسانی</button>
+      </div>
       <div className="space-y-1 max-h-[60vh] overflow-auto">
         {logs.length === 0 && <div className="text-gray-400">خطایی ثبت نشده است.</div>}
         {logs.map((l) => (
