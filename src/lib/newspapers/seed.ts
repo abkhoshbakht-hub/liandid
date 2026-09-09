@@ -28,6 +28,25 @@ export const NEWSPAPER_SEEDS: NewspaperSeed[] = [
   { name: 'گل', slug: 'goal', category: 'sports', displayOrder: 14, website: 'https://goaldaily.ir' },
 ];
 
+// کانال‌های تلگرام اعلام‌شده توسط مدیر سایت (نه حدسی)
+export interface TelegramSeed {
+  slug: string;
+  name: string;
+  channel: string;
+}
+
+export const TELEGRAM_SOURCES: TelegramSeed[] = [
+  { slug: 'iran', name: 'کانال تلگرام ایران', channel: 'irannewspaper' },
+  { slug: 'shargh', name: 'کانال تلگرام شرق', channel: 'roznamehsharghsvb' },
+  { slug: 'donya-e-eqtesad', name: 'کانال تلگرام دنیای اقتصاد', channel: 'den_ir' },
+  { slug: 'javan', name: 'کانال تلگرام جوان', channel: 'newsjavan' },
+  { slug: 'vatan-emrooz', name: 'کانال تلگرام وطن امروز', channel: 'vatanemrooz' },
+  { slug: 'farhikhtegan', name: 'کانال تلگرام فرهیختگان', channel: 'farhikhteganonline' },
+  { slug: 'bamdad-jonoob', name: 'کانال تلگرام بامداد جنوب', channel: 'bamdadjonub' },
+  { slug: 'payam-asaluyeh', name: 'کانال تلگرام پیام عسلویه', channel: 'payameasalooye' },
+  { slug: 'goal', name: 'کانال تلگرام گل', channel: 'TVGoalnewspaper' },
+];
+
 // تنها سورس خودکار تأییدشده: جلد روزانه کیهان از سایت رسمی
 export const KAYHAN_SOURCE = {
   slug: 'kayhan',

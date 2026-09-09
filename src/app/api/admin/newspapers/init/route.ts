@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { NEWSPAPER_SEEDS, KAYHAN_SOURCE } from '@/lib/newspapers/seed';
+import { NEWSPAPER_SEEDS, KAYHAN_SOURCE, TELEGRAM_SOURCES } from '@/lib/newspapers/seed';
 
 // وضعیت راه‌اندازی ماژول روزنامه‌ها
 export async function GET() {
@@ -76,8 +76,26 @@ export async function POST() {
       }
     }
 
+    // سورس‌های تلگرام اعلام‌شده توسط مدیر (فقط یک بار برای هر روزنامه)
+    let telegramSeeded = 0;
+    for (const t of TELEGRAM_SOURCES) {
+      const paper = await prisma.newspaper.findUnique({ where: { slug: t.slug } });
+      if (!paper) continue;
+      const ex = await prisma.newspaperSource.findFirst({ where: { newspaperId: paper.id, type: 'telegram' } });
+      if (!ex) {
+        await prisma.newspaperSource.create({
+          data: {
+            newspaperId: paper.id, name: t.name, type: 'telegram',
+            url: `https://t.me/${t.channel}`, priority: 0, active: true,
+            configuration: JSON.stringify({ telegram_channel: t.channel }),
+          },
+        });
+        telegramSeeded++;
+      }
+    }
+
     const papers = await prisma.newspaper.count();
-    return NextResponse.json({ success: true, data: { tables: true, seeded, papers, kayhanSource } });
+    return NextResponse.json({ success: true, data: { tables: true, seeded, papers, kayhanSource, telegramSeeded } });
   } catch (e) {
     console.error('Newspaper init error:', e);
     return NextResponse.json({ success: false, message: 'خطا در راه‌اندازی جداول' }, { status: 500 });
