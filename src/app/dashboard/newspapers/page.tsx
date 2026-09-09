@@ -62,12 +62,22 @@ function DashTab() {
   const load = () => api('/api/admin/newspapers/stats').then((d) => d.success && setS(d.data));
   useEffect(() => { load(); }, []);
   async function runAll() {
-    if (!confirm('دریافت امروز برای همه روزنامه‌ها اجرا شود؟ (چند دقیقه طول می‌کشد)')) return;
+    if (!confirm('دریافت امروز برای همه روزنامه‌ها اجرا شود؟ (۲ تا ۴ دقیقه طول می‌کشد، صفحه را نبند)')) return;
     setRunning(true);
-    const d = await api('/api/admin/newspapers/fetch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
-    setRunning(false);
-    alert(d.success ? 'انجام شد' : (d.message || 'خطا'));
-    load();
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 280000);
+      const r = await fetch('/api/admin/newspapers/fetch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}), signal: ctrl.signal });
+      clearTimeout(timer);
+      const d = await r.json();
+      if (d.success) alert(`تمام شد — موفق: ${d.data.ok}، ناموفق: ${d.data.failed}`);
+      else alert(d.message || 'خطا');
+    } catch {
+      alert('زمان دریافت تمام شد؛ نتیجه را در همین صفحه ببین (ممکن است بخشی انجام شده باشد).');
+    } finally {
+      setRunning(false);
+      load();
+    }
   }
   if (!s) return <div className="text-white">در حال بارگذاری...</div>;
   return (

@@ -147,16 +147,23 @@ export async function fetchPaperDay(
   return { newspaperId: paper.id, name: paper.name, ok: false, status: 'FAILED', error: lastError };
 }
 
-export async function fetchAllPapers(day: TehranDay = tehranToday()): Promise<FetchOutcome[]> {
+export async function fetchAllPapers(day: TehranDay = tehranToday(), concurrency = 4): Promise<FetchOutcome[]> {
   const papers = await prisma.newspaper.findMany({ where: { active: true }, orderBy: { displayOrder: 'asc' } });
-  const out: FetchOutcome[] = [];
-  for (const p of papers) {
-    try {
-      out.push(await fetchPaperDay(p, day));
-    } catch (e: any) {
-      out.push({ newspaperId: p.id, name: p.name, ok: false, status: 'FAILED', error: String(e?.message || e).slice(0, 200) });
+  const out: FetchOutcome[] = new Array(papers.length);
+  let cursor = 0;
+  async function worker() {
+    while (true) {
+      const i = cursor++;
+      if (i >= papers.length) return;
+      const p = papers[i];
+      try {
+        out[i] = await fetchPaperDay(p, day);
+      } catch (e: any) {
+        out[i] = { newspaperId: p.id, name: p.name, ok: false, status: 'FAILED', error: String(e?.message || e).slice(0, 200) };
+      }
+      await sleep(BETWEEN_PAPERS_MS);
     }
-    await sleep(BETWEEN_PAPERS_MS);
   }
+  await Promise.all(Array.from({ length: Math.min(concurrency, papers.length) }, () => worker()));
   return out;
 }

@@ -29,7 +29,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: r.ok, data: r });
     }
     const results = await fetchAllPapers(day);
-    return NextResponse.json({ success: true, data: { date: day.persian, results } });
+    const ok = results.filter((r) => r.ok && r.status !== 'SKIPPED').length;
+    const failed = results.filter((r) => !r.ok).length;
+    return NextResponse.json({ success: true, data: { date: day.persian, ok, failed, results } });
   } catch (e) {
     console.error('Manual newspapers fetch error:', e);
     return NextResponse.json({ success: false, message: 'خطا در دریافت' }, { status: 500 });
