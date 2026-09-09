@@ -62,10 +62,15 @@ async function runOnePaper(newspaperId: string) {
   try {
     const r = await fetch('/api/admin/newspapers/fetch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newspaperId }), signal: ctrl.signal });
     clearTimeout(timer);
-    return await r.json();
-  } catch {
+    const text = await r.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      return { success: false, message: `HTTP ${r.status}: ${text.slice(0, 150)}` };
+    }
+  } catch (e: any) {
     clearTimeout(timer);
-    return { success: false, message: 'timeout' };
+    return { success: false, message: e?.name === 'AbortError' ? 'timeout(55s)' : String(e?.message || e).slice(0, 150) };
   }
 }
 

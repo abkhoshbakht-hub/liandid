@@ -34,9 +34,9 @@ export async function POST(req: Request) {
     const ok = results.filter((r) => r.ok && r.status !== 'SKIPPED').length;
     const failed = results.filter((r) => !r.ok).length;
     return NextResponse.json({ success: true, data: { date: day.persian, ok, failed, results } });
-  } catch (e) {
+  } catch (e: any) {
     console.error('Manual newspapers fetch error:', e);
-    return NextResponse.json({ success: false, message: 'خطا در دریافت' }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'ERR: ' + String(e?.message || e).slice(0, 300) }, { status: 500 });
   }
 }
 
