@@ -96,8 +96,8 @@ export async function POST() {
 
     const papers = await prisma.newspaper.count();
     return NextResponse.json({ success: true, data: { tables: true, seeded, papers, kayhanSource, telegramSeeded } });
-  } catch (e) {
+  } catch (e: any) {
     console.error('Newspaper init error:', e);
-    return NextResponse.json({ success: false, message: 'خطا در راه‌اندازی جداول' }, { status: 500 });
+    return NextResponse.json({ success: false, message: 'ERR: ' + String(e?.message || e).slice(0, 400) }, { status: 500 });
   }
 }
