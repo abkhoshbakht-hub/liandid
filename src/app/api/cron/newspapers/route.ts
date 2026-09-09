@@ -7,7 +7,7 @@ import { ensureDefaultSources } from '@/lib/newspapers/ensure';
 import { tehranToday } from '@/lib/newspapers/date';
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 // کرون روزانه ۶ صبح تهران + اجرای دستی ادمین (?now=1 با سشن ادمین)
 // محافظ: اجرای خودکار فقط اگر بیش از ۲۰ ساعت از اجرای قبلی گذشته باشد
