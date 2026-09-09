@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { fetchAllPapers } from '@/lib/newspapers/fetcher';
+import { ensureDefaultSources } from '@/lib/newspapers/ensure';
 import { tehranToday } from '@/lib/newspapers/date';
 
 export const dynamic = 'force-dynamic';
@@ -41,6 +42,7 @@ export async function GET(req: Request) {
     }
 
     const day = tehranToday();
+    try { await ensureDefaultSources(); } catch {}
     const results = await fetchAllPapers(day);
     const ok = results.filter((r) => r.ok && r.status !== 'SKIPPED').length;
     const failed = results.filter((r) => !r.ok).length;

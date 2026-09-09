@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { fetchPaperDay, fetchAllPapers } from '@/lib/newspapers/fetcher';
+import { ensureDefaultSources } from '@/lib/newspapers/ensure';
 import { tehranToday } from '@/lib/newspapers/date';
 import { getAdapter, downloadCandidate } from '@/lib/newspapers/adapters';
 
@@ -21,6 +22,7 @@ export async function POST(req: Request) {
   }
   try {
     const body = await req.json().catch(() => ({}));
+    try { await ensureDefaultSources(); } catch {}
     const day = tehranToday();
     if (body.newspaperId) {
       const paper = await prisma.newspaper.findUnique({ where: { id: body.newspaperId } });
