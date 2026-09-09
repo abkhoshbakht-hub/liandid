@@ -4,6 +4,10 @@ import { NEWSPAPER_SEEDS, KAYHAN_SOURCE, TELEGRAM_SOURCES } from './seed';
 // خودترمیم: روزنامه‌ها و سورس‌های پیش‌فرض گمشده را می‌سازد (idempotent).
 // در ابتدای هر دریافت (دستی و کرون) صدا زده می‌شود تا هیچ‌وقت «بدون سورس» نمانیم.
 export async function ensureDefaultSources(): Promise<{ papers: number; sources: number }> {
+  // ترمیم ستون‌های جاافتاده (مثل lastError) در دیتابیس‌های قدیمی
+  try {
+    await prisma.$executeRawUnsafe(`ALTER TABLE "NewspaperSource" ADD COLUMN IF NOT EXISTS "lastError" TEXT`);
+  } catch {}
   let papers = 0;
   let sources = 0;
   const existing = await prisma.newspaper.findMany({

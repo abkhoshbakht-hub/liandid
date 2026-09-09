@@ -30,7 +30,7 @@ export async function POST() {
     const ddl = [
       `CREATE TABLE IF NOT EXISTS "Newspaper" ("id" TEXT NOT NULL, "name" TEXT NOT NULL, "slug" TEXT NOT NULL, "category" TEXT NOT NULL, "logo" TEXT, "website" TEXT, "telegram" TEXT, "description" TEXT, "active" BOOLEAN NOT NULL DEFAULT true, "displayOrder" INTEGER NOT NULL DEFAULT 0, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL, CONSTRAINT "Newspaper_pkey" PRIMARY KEY ("id"))`,
       `CREATE UNIQUE INDEX IF NOT EXISTS "Newspaper_slug_key" ON "Newspaper"("slug")`,
-      `CREATE TABLE IF NOT EXISTS "NewspaperSource" ("id" TEXT NOT NULL, "newspaperId" TEXT NOT NULL, "name" TEXT NOT NULL, "type" TEXT NOT NULL, "url" TEXT, "priority" INTEGER NOT NULL DEFAULT 0, "active" BOOLEAN NOT NULL DEFAULT true, "parserType" TEXT, "configuration" TEXT, "lastSuccessAt" TIMESTAMP(3), "lastFailureAt" TIMESTAMP(3), "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL, CONSTRAINT "NewspaperSource_pkey" PRIMARY KEY ("id"))`,
+      `CREATE TABLE IF NOT EXISTS "NewspaperSource" ("id" TEXT NOT NULL, "newspaperId" TEXT NOT NULL, "name" TEXT NOT NULL, "type" TEXT NOT NULL, "url" TEXT, "priority" INTEGER NOT NULL DEFAULT 0, "active" BOOLEAN NOT NULL DEFAULT true, "parserType" TEXT, "configuration" TEXT, "lastSuccessAt" TIMESTAMP(3), "lastFailureAt" TIMESTAMP(3), "lastError" TEXT, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL, CONSTRAINT "NewspaperSource_pkey" PRIMARY KEY ("id"))`,
       `CREATE INDEX IF NOT EXISTS "NewspaperSource_newspaperId_idx" ON "NewspaperSource"("newspaperId")`,
       `CREATE TABLE IF NOT EXISTS "NewspaperIssue" ("id" TEXT NOT NULL, "newspaperId" TEXT NOT NULL, "date" TIMESTAMP(3) NOT NULL, "persianDate" TEXT NOT NULL, "issueNumber" TEXT, "title" TEXT, "originalUrl" TEXT, "imageUrl" TEXT, "thumbnailUrl" TEXT, "sourceId" TEXT, "imageHash" TEXT, "confidence" INTEGER NOT NULL DEFAULT 0, "status" TEXT NOT NULL DEFAULT 'PENDING', "publishedAt" TIMESTAMP(3), "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL, CONSTRAINT "NewspaperIssue_pkey" PRIMARY KEY ("id"))`,
       `CREATE UNIQUE INDEX IF NOT EXISTS "NewspaperIssue_newspaperId_date_key" ON "NewspaperIssue"("newspaperId", "date")`,
@@ -42,6 +42,17 @@ export async function POST() {
     ];
     for (const sql of ddl) {
       await prisma.$executeRawUnsafe(sql);
+    }
+    // خودترمیم ستون‌های جاافتاده در نصب‌های قبلی
+    const heal = [
+      `ALTER TABLE "NewspaperSource" ADD COLUMN IF NOT EXISTS "lastError" TEXT`,
+      `ALTER TABLE "NewspaperSource" ADD COLUMN IF NOT EXISTS "lastSuccessAt" TIMESTAMP(3)`,
+      `ALTER TABLE "NewspaperSource" ADD COLUMN IF NOT EXISTS "lastFailureAt" TIMESTAMP(3)`,
+      `ALTER TABLE "NewspaperSource" ADD COLUMN IF NOT EXISTS "parserType" TEXT`,
+      `ALTER TABLE "NewspaperSource" ADD COLUMN IF NOT EXISTS "configuration" TEXT`,
+    ];
+    for (const sql of heal) {
+      try { await prisma.$executeRawUnsafe(sql); } catch {}
     }
     // کلیدهای خارجی (اگر جدول‌ها تازه ساخته شده باشند)
     try {
