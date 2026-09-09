@@ -123,33 +123,39 @@ export class TelegramAdapter implements BaseAdapter {
     const html = await fetchText(pageUrl);
     if (html.includes('tgme_page_title') && /not found|does not exist/i.test(html)) throw new Error('channel-not-found');
 
-    // بلوک‌های پیام
+    // بلوک‌های پیام — همه پست‌های عکس‌دار امروز را جمع کن، بعد امتیاز بده
     const blocks = html.split('tgme_widget_message_wrap').slice(1);
-    let pick: { img: string; caption: string; dt: string } | null = null;
+    const todays: { img: string; caption: string; dt: string; score: number }[] = [];
     for (const b of blocks) {
-      const imgM = b.match(/background-image:url\(['"]?(https:\/\/cdn\d*\.telegram\.org\/[^'")]+)['"]?\)/);
+      const imgM =
+        b.match(/background-image:url\(['"]?(https:\/\/cdn\d*\.telegram\.org\/[^'")]+)['"]?\)/) ||
+        b.match(/(https:\/\/cdn\d*\.telegram\.org\/file\/[A-Za-z0-9_-]+)/);
       if (!imgM) continue;
       const txtM = b.match(/tgme_widget_message_text[^>]*>([\s\S]{0,2000}?)(<\/div>)/);
       const rawTxt = txtM ? txtM[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '';
       const dtM = b.match(/datetime="([^"]+)"/);
       const dt = dtM?.[1] || '';
-      // پست امروز تهران + کپشن جلد
-      if (rawTxt && COVER_WORDS.test(rawTxt) && this.isToday(dt, day)) {
-        // پیام‌ها قدیمی‌به‌جدید مرتب‌اند؛ آخری (جدیدترین) را نگه می‌داریم
-        pick = { img: imgM[1].replace(/&amp;/g, '&'), caption: rawTxt.slice(0, 300), dt };
-      }
+      if (!this.isToday(dt, day)) continue;
+      let score = 0;
+      if (COVER_WORDS.test(rawTxt)) score += 50;
+      if (rawTxt.includes(paper.name)) score += 25;
+      if (/روزنامه/.test(rawTxt)) score += 10;
+      todays.push({ img: imgM[1].replace(/&amp;/g, '&'), caption: rawTxt.slice(0, 300), dt, score });
     }
-    if (!pick) throw new Error('no-cover-post-today');
+    if (todays.length === 0) throw new Error('no-posts-today');
+    // بهترین کپشن؛ مساوی → قدیمی‌ترین امروز (جلد معمولاً اول صبح است)
+    todays.sort((a, b) => b.score - a.score);
+    const top = todays[0]; // سورت پایدار: مساوی‌ها قدیمی‌ترین (اول صبح) اول می‌ماند
     return {
-      imageUrl: pick.img,
+      imageUrl: top.img,
       pageUrl,
-      title: pick.caption,
-      discoveredDate: pick.dt,
+      title: top.caption || undefined,
+      discoveredDate: top.dt,
       evidence: {
         dateMatch: true,
-        nameMatch: pick.caption.includes(paper.name),
+        nameMatch: top.score >= 25,
         official: true,
-        caption: pick.caption,
+        caption: top.caption,
       },
     };
   }
