@@ -51,7 +51,7 @@ export default function NewspapersAdminPage() {
       <h1 className="text-xl font-bold text-white mb-4">صفحه اول روزنامه‌ها</h1>
       <div className="flex gap-2 mb-5 flex-wrap">
         {TABS.map((t) => (
-          <button key={t.id} onClick={() => setTab(t.id)} className={`px-4 py-2 rounded-lg text-sm font-bold ${tab === t.id ? 'bg-[#C9A96E] text-[#0f1d35]' : 'bg-white/10 text-white'}`}>{t.label}</button>
+          <button key={t.id} onClick={() => setTab(t.id)} className={`px-4 py-2 rounded-lg text-sm font-bold ${tab === t.id ? 'bg-[#C9A96E] text-[#0f1d35]' : 'bg-white text-[#1B365D] hover:bg-gray-100'}`}>{t.label}</button>
         ))}
       </div>
       {tab === 'dash' && <DashTab />}
