@@ -166,3 +166,86 @@ model SiteSetting {
   value     String
   updatedAt DateTime @updatedAt
 }
+
+// ===== ماژول صفحه اول روزنامه‌ها =====
+model Newspaper {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  category     String   @default("national") // national | bushehr | sports
+  logo         String?
+  website      String?
+  telegram     String?
+  description  String?
+  active       Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  sources      NewspaperSource[]
+  issues       NewspaperIssue[]
+  fetchLogs    NewspaperFetchLog[]
+}
+
+model NewspaperSource {
+  id            String   @id @default(cuid())
+  newspaperId   String
+  name          String
+  type          String   @default("official") // official | telegram | news_agency | other | manual
+  url           String?
+  priority      Int      @default(0)
+  active        Boolean  @default(true)
+  parserType    String?  // rss | telegram | html | manual
+  configuration String?  // JSON
+  lastSuccessAt DateTime?
+  lastFailureAt DateTime?
+  lastError     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  newspaper     Newspaper @relation(fields: [newspaperId], references: [id], onDelete: Cascade)
+  issues        NewspaperIssue[]
+  fetchLogs     NewspaperFetchLog[]
+  @@index([newspaperId])
+}
+
+model NewspaperIssue {
+  id           String   @id @default(cuid())
+  newspaperId  String
+  date         DateTime // میلادی، نیمه‌شب UTC همان روز
+  persianDate  String   // 1405-06-17
+  issueNumber  String?
+  title        String?
+  originalUrl  String?
+  imageUrl     String?
+  thumbnailUrl String?
+  sourceId     String?
+  imageHash    String?  // SHA-256
+  confidence   Int      @default(0)
+  status       String   @default("PENDING") // PENDING PROCESSING PUBLISHED NEEDS_REVIEW FAILED REJECTED
+  publishedAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  newspaper    Newspaper @relation(fields: [newspaperId], references: [id], onDelete: Cascade)
+  source       NewspaperSource? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  @@unique([newspaperId, date])
+  @@index([date])
+  @@index([status])
+}
+
+model NewspaperFetchLog {
+  id                 String   @id @default(cuid())
+  newspaperId        String?
+  sourceId           String?
+  startedAt          DateTime @default(now())
+  finishedAt         DateTime?
+  status             String   @default("FAILED") // SUCCESS FAILED SKIPPED INVALID_DATE INVALID_IMAGE DUPLICATE
+  httpStatus         Int?
+  errorMessage       String?
+  discoveredImageUrl String?
+  discoveredDate     String?
+  responseTimeMs     Int?
+  createdAt          DateTime @default(now())
+  newspaper          Newspaper? @relation(fields: [newspaperId], references: [id], onDelete: Cascade)
+  source             NewspaperSource? @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  @@index([newspaperId])
+  @@index([createdAt])
+}
