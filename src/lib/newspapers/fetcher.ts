@@ -5,8 +5,8 @@ import { processCover, sleep, type DownloadedImage } from './image';
 import { getCoverStorage } from './storage';
 
 const MAX_ATTEMPTS = 2;
-const RETRY_DELAY_MS = 4000;
-const BETWEEN_PAPERS_MS = 1500;
+const RETRY_DELAY_MS = 3000;
+const BETWEEN_PAPERS_MS = 1000;
 
 export interface FetchOutcome {
   newspaperId: string;

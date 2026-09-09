@@ -25,13 +25,19 @@ export async function GET(req: Request) {
     }
 
     if (!manual) {
-      const last = await prisma.siteSetting.findUnique({ where: { key: 'newspapers:lastCron' } }).catch(() => null);
-      if (last) {
-        const diffH = (Date.now() - new Date(last.value).getTime()) / 3600000;
-        if (diffH < 20) {
-          return NextResponse.json({ success: true, data: { skipped: true, reason: 'already-ran' } });
+      // قفل ضد اجرای همزمان (۱۵ دقیقه) — جایگزین محافظ ۲۰ ساعته که اجرای ناقص را قفل می‌کرد
+      const lock = await prisma.siteSetting.findUnique({ where: { key: 'newspapers:cronLock' } }).catch(() => null);
+      if (lock) {
+        const diffM = (Date.now() - new Date(lock.value).getTime()) / 60000;
+        if (diffM < 15) {
+          return NextResponse.json({ success: true, data: { skipped: true, reason: 'locked' } });
         }
       }
+      await prisma.siteSetting.upsert({
+        where: { key: 'newspapers:cronLock' },
+        create: { key: 'newspapers:cronLock', value: new Date().toISOString() },
+        update: { value: new Date().toISOString() },
+      }).catch(() => null);
     }
 
     const day = tehranToday();

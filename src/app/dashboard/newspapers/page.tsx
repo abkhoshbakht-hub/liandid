@@ -56,28 +56,49 @@ export default function NewspapersAdminPage() {
   );
 }
 
+async function runOnePaper(newspaperId: string) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 55000);
+  try {
+    const r = await fetch('/api/admin/newspapers/fetch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newspaperId }), signal: ctrl.signal });
+    clearTimeout(timer);
+    return await r.json();
+  } catch {
+    clearTimeout(timer);
+    return { success: false, message: 'timeout' };
+  }
+}
+
 function DashTab() {
   const [s, setS] = useState<any>(null);
   const [running, setRunning] = useState(false);
+  const [progress, setProgress] = useState('');
+  const [busyId, setBusyId] = useState<string | null>(null);
   const load = () => api('/api/admin/newspapers/stats').then((d) => d.success && setS(d.data));
   useEffect(() => { load(); }, []);
+  async function runOne(id: string) {
+    setBusyId(id);
+    await runOnePaper(id);
+    setBusyId(null);
+    load();
+  }
   async function runAll() {
-    if (!confirm('دریافت امروز برای همه روزنامه‌ها اجرا شود؟ (۲ تا ۴ دقیقه طول می‌کشد، صفحه را نبند)')) return;
+    if (!s?.papers?.length) return;
+    if (!confirm('دریافت امروز برای همه روزنامه‌ها تک‌تک اجرا شود؟ (چند دقیقه، صفحه را نبند)')) return;
     setRunning(true);
-    try {
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 280000);
-      const r = await fetch('/api/admin/newspapers/fetch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}), signal: ctrl.signal });
-      clearTimeout(timer);
-      const d = await r.json();
-      if (d.success) alert(`تمام شد — موفق: ${d.data.ok}، ناموفق: ${d.data.failed}`);
-      else alert(d.message || 'خطا');
-    } catch {
-      alert('زمان دریافت تمام شد؛ نتیجه را در همین صفحه ببین (ممکن است بخشی انجام شده باشد).');
-    } finally {
-      setRunning(false);
+    let ok = 0, fail = 0;
+    for (let i = 0; i < s.papers.length; i++) {
+      const p = s.papers[i];
+      if (p.todayStatus === 'PUBLISHED') { ok++; continue; }
+      setProgress(`${p.name} (${i + 1} از ${s.papers.length})`);
+      const d = await runOnePaper(p.id);
+      if (d.success && d.data?.ok) ok++; else fail++;
       load();
     }
+    setRunning(false);
+    setProgress('');
+    alert(`تمام شد — موفق: ${ok}، ناموفق: ${fail}`);
+    load();
   }
   if (!s) return <div className="text-white">در حال بارگذاری...</div>;
   return (
@@ -88,7 +109,7 @@ function DashTab() {
         ))}
       </div>
       <div className="bg-white rounded-xl p-4 shadow flex flex-wrap items-center gap-3">
-        <button onClick={runAll} disabled={running} className="bg-[#1B365D] text-white px-5 py-2 rounded-lg font-bold text-sm disabled:opacity-50">{running ? 'در حال دریافت...' : 'اجرای دریافت امروز'}</button>
+        <button onClick={runAll} disabled={running} className="bg-[#1B365D] text-white px-5 py-2 rounded-lg font-bold text-sm disabled:opacity-50">{running ? `در حال دریافت... ${progress}` : 'اجرای دریافت امروز'}</button>
         <span className="text-xs text-gray-500">آخرین کرون: {s.lastCron ? new Date(s.lastCron).toLocaleString('fa-IR') : '—'} — آرشیو: {s.archiveTotal} شماره</span>
       </div>
       <div className="grid md:grid-cols-2 gap-3">
@@ -96,7 +117,15 @@ function DashTab() {
           <h3 className="font-bold mb-2 text-sm">وضعیت امروز روزنامه‌ها</h3>
           <div className="space-y-1 max-h-72 overflow-auto text-sm">
             {s.papers.map((p: any) => (
-              <div key={p.id} className="flex justify-between border-b py-1.5"><span>{p.name}</span><span className={p.todayStatus === 'PUBLISHED' ? 'text-green-600' : p.todayStatus === 'NEEDS_REVIEW' ? 'text-amber-600' : 'text-red-500'}>{p.todayStatus ? STATUS_FA[p.todayStatus] : '— بدون جلد'}</span></div>
+              <div key={p.id} className="flex justify-between items-center border-b py-1.5">
+                <span>{p.name}</span>
+                <span className="flex items-center gap-2">
+                  <span className={p.todayStatus === 'PUBLISHED' ? 'text-green-600' : p.todayStatus === 'NEEDS_REVIEW' ? 'text-amber-600' : 'text-red-500'}>{p.todayStatus ? STATUS_FA[p.todayStatus] : '— بدون جلد'}</span>
+                  {p.todayStatus !== 'PUBLISHED' && (
+                    <button onClick={() => runOne(p.id)} disabled={busyId === p.id || running} className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded disabled:opacity-50">{busyId === p.id ? '...' : 'دریافت'}</button>
+                  )}
+                </span>
+              </div>
             ))}
           </div>
         </div>

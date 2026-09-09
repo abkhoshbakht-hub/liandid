@@ -14,7 +14,7 @@ export interface DownloadedImage {
   hash: string;
 }
 
-export async function downloadImage(url: string, timeoutMs = 15000): Promise<DownloadedImage> {
+export async function downloadImage(url: string, timeoutMs = 10000): Promise<DownloadedImage> {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
@@ -41,7 +41,7 @@ export async function downloadImage(url: string, timeoutMs = 15000): Promise<Dow
   }
 }
 
-export async function fetchText(url: string, timeoutMs = 12000): Promise<string> {
+export async function fetchText(url: string, timeoutMs = 8000): Promise<string> {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
