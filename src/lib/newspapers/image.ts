@@ -1,5 +1,4 @@
 import crypto from 'crypto';
-import sharp from 'sharp';
 
 export const FETCH_UA =
   'Mozilla/5.0 (compatible; LianDidBot/1.0; +https://liandid.ir) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36';
@@ -12,6 +11,58 @@ export interface DownloadedImage {
   width: number;
   height: number;
   hash: string;
+}
+
+// --- تشخیص ابعاد بدون هیچ وابستگی native (pure JS) ---
+export function parseImageDims(buf: Buffer): { mime: string; width: number; height: number } | null {
+  if (buf.length < 24) return null;
+  // PNG: امضا + IHDR
+  if (buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) {
+    return { mime: 'image/png', width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
+  }
+  // GIF
+  if (buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46) {
+    return { mime: 'image/gif', width: buf.readUInt16LE(6), height: buf.readUInt16LE(8) };
+  }
+  // WebP: RIFF....WEBP
+  if (buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') {
+    const chunk = buf.toString('ascii', 12, 16);
+    if (chunk === 'VP8 ') {
+      const w = buf.readUInt16LE(26) & 0x3fff;
+      const h = buf.readUInt16LE(28) & 0x3fff;
+      if (w && h) return { mime: 'image/webp', width: w, height: h };
+    } else if (chunk === 'VP8L') {
+      const b0 = buf[21], b1 = buf[22], b2 = buf[23], b3 = buf[24];
+      const w = 1 + (((b1 & 0x3f) << 8) | b0);
+      const h = 1 + (((b3 & 0xf) << 10) | (b2 << 2) | ((b1 & 0xc0) >> 6));
+      if (w && h) return { mime: 'image/webp', width: w, height: h };
+    } else if (chunk === 'VP8X') {
+      const w = 1 + buf.readUIntLE(24, 3);
+      const h = 1 + buf.readUIntLE(27, 3);
+      if (w && h) return { mime: 'image/webp', width: w, height: h };
+    }
+    return null;
+  }
+  // JPEG: جستجوی SOF
+  if (buf[0] === 0xff && buf[1] === 0xd8) {
+    let i = 2;
+    while (i + 4 < buf.length) {
+      if (buf[i] !== 0xff) { i++; continue; }
+      const marker = buf[i + 1];
+      if (marker === 0xd8 || marker === 0xd9 || (marker >= 0xd0 && marker <= 0xd7) || marker === 0x01) { i += 2; continue; }
+      const len = buf.readUInt16BE(i + 2);
+      if (len < 2) break;
+      if ((marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc)) {
+        const h = buf.readUInt16BE(i + 5);
+        const w = buf.readUInt16BE(i + 7);
+        if (w && h) return { mime: 'image/jpeg', width: w, height: h };
+        break;
+      }
+      i += 2 + len;
+    }
+    return null;
+  }
+  return null;
 }
 
 export async function downloadImage(url: string, timeoutMs = 10000): Promise<DownloadedImage> {
@@ -29,13 +80,13 @@ export async function downloadImage(url: string, timeoutMs = 10000): Promise<Dow
       throw new Error(`not-image: ${ct}`);
     }
     const ab = await res.arrayBuffer();
-    if (ab.byteLength < 20 * 1024) throw new Error('too-small');
+    if (ab.byteLength < 10 * 1024) throw new Error('too-small');
     if (ab.byteLength > MAX_BYTES) throw new Error('too-large');
     const buffer = Buffer.from(ab);
-    const meta = await sharp(buffer).metadata();
-    if (!meta.width || !meta.height) throw new Error('bad-image');
+    const dims = parseImageDims(buffer);
+    if (!dims || !dims.width || !dims.height) throw new Error('bad-image');
     const hash = crypto.createHash('sha256').update(buffer).digest('hex');
-    return { buffer, mime: `image/${meta.format || 'jpeg'}`, width: meta.width, height: meta.height, hash };
+    return { buffer, mime: dims.mime, width: dims.width, height: dims.height, hash };
   } finally {
     clearTimeout(t);
   }
@@ -57,19 +108,13 @@ export async function fetchText(url: string, timeoutMs = 8000): Promise<string> 
   }
 }
 
-// نسخه وب (WebP، حداکثر ۱۲۰۰px) + بندانگشتی (WebP، ۴۰۰px)
+// بدون sharp: نسخه اصلی نگه داشته می‌شود (بهینه‌سازی WebP در فاز بعد با سرویس خارجی)
 export async function processCover(buffer: Buffer): Promise<{ original: Buffer; web: Buffer; thumb: Buffer }> {
-  const web = await sharp(buffer)
-    .rotate()
-    .resize({ width: 1200, withoutEnlargement: true })
-    .webp({ quality: 78 })
-    .toBuffer();
-  const thumb = await sharp(buffer)
-    .rotate()
-    .resize({ width: 400, withoutEnlargement: true })
-    .webp({ quality: 65 })
-    .toBuffer();
-  return { original: buffer, web, thumb };
+  return { original: buffer, web: buffer, thumb: buffer };
+}
+
+export function hashBuffer(buf: Buffer): string {
+  return crypto.createHash('sha256').update(buf).digest('hex');
 }
 
 export function sleep(ms: number): Promise<void> {

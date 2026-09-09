@@ -2,10 +2,8 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { processCover } from '@/lib/newspapers/image';
+import { parseImageDims, hashBuffer } from '@/lib/newspapers/image';
 import { getCoverStorage } from '@/lib/newspapers/storage';
-import crypto from 'crypto';
-import sharp from 'sharp';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,17 +23,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ iid: st
     if (!file) return NextResponse.json({ success: false, message: 'عکس لازم است' }, { status: 400 });
     const buf = Buffer.from(await file.arrayBuffer());
     if (buf.length > 12 * 1024 * 1024) return NextResponse.json({ success: false, message: 'حجم عکس بیش از ۱۲ مگابایت است' }, { status: 400 });
-    const meta = await sharp(buf).metadata();
-    if (!meta.width) return NextResponse.json({ success: false, message: 'فایل تصویر معتبر نیست' }, { status: 400 });
-    const hash = crypto.createHash('sha256').update(buf).digest('hex');
+    const dims = parseImageDims(buf);
+    if (!dims) return NextResponse.json({ success: false, message: 'فایل تصویر معتبر نیست' }, { status: 400 });
+    const hash = hashBuffer(buf);
 
-    const { web, thumb } = await processCover(buf);
     const storage = getCoverStorage();
     const datePath = issue.date.toISOString().slice(0, 10);
-    const [webUrl, thumbUrl] = await Promise.all([
-      storage.save(web, { paperSlug: issue.newspaper.slug, date: datePath, kind: 'web', mime: 'image/webp' }),
-      storage.save(thumb, { paperSlug: issue.newspaper.slug, date: datePath, kind: 'thumb', mime: 'image/webp' }),
-    ]);
+    const coverUrl = await storage.save(buf, { paperSlug: issue.newspaper.slug, date: datePath, kind: 'original', mime: dims.mime });
+    const webUrl = coverUrl;
+    const thumbUrl = coverUrl;
 
     const updated = await prisma.newspaperIssue.update({
       where: { id: iid },

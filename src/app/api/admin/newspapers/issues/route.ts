@@ -3,10 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { tehranToday } from '@/lib/newspapers/date';
-import { processCover } from '@/lib/newspapers/image';
+import { parseImageDims, hashBuffer } from '@/lib/newspapers/image';
 import { getCoverStorage } from '@/lib/newspapers/storage';
-import crypto from 'crypto';
-import sharp from 'sharp';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,10 +47,9 @@ async function bufferToCover(file: File) {
   const ab = await file.arrayBuffer();
   const buf = Buffer.from(ab);
   if (buf.length > 12 * 1024 * 1024) throw new Error('حجم عکس بیش از ۱۲ مگابایت است');
-  const meta = await sharp(buf).metadata();
-  if (!meta.width) throw new Error('فایل تصویر معتبر نیست');
-  const hash = crypto.createHash('sha256').update(buf).digest('hex');
-  return { buf, meta, hash };
+  const dims = parseImageDims(buf);
+  if (!dims) throw new Error('فایل تصویر معتبر نیست');
+  return { buf, dims, hash: hashBuffer(buf) };
 }
 
 // آپلود دستی جلد (MANUAL) — newspaperId + file + date? (پیش‌فرض امروز)
@@ -75,17 +72,15 @@ export async function POST(req: Request) {
       persian = String(form.get('persianDate') || day.persian);
     }
 
-    const { buf, hash } = await bufferToCover(file);
+    const { buf, dims, hash } = await bufferToCover(file);
     const dup = await prisma.newspaperIssue.findFirst({ where: { newspaperId, imageHash: hash } });
     if (dup) return NextResponse.json({ success: false, message: 'این تصویر قبلاً ثبت شده است' }, { status: 400 });
 
-    const { web, thumb } = await processCover(buf);
     const storage = getCoverStorage();
     const datePath = date.toISOString().slice(0, 10);
-    const [webUrl, thumbUrl] = await Promise.all([
-      storage.save(web, { paperSlug: paper.slug, date: datePath, kind: 'web', mime: 'image/webp' }),
-      storage.save(thumb, { paperSlug: paper.slug, date: datePath, kind: 'thumb', mime: 'image/webp' }),
-    ]);
+    const coverUrl = await storage.save(buf, { paperSlug: paper.slug, date: datePath, kind: 'original', mime: dims.mime });
+    const webUrl = coverUrl;
+    const thumbUrl = coverUrl;
 
     const issue = await prisma.newspaperIssue.upsert({
       where: { newspaperId_date: { newspaperId, date } },

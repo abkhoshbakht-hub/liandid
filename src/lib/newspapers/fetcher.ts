@@ -103,14 +103,12 @@ export async function fetchPaperDay(
         const confidence = scoreCandidate(candidate, img, paper.name);
         const status = confidence >= 90 ? 'PUBLISHED' : 'NEEDS_REVIEW';
 
-        const { web, thumb } = await processCover(img.buffer);
+        await processCover(img.buffer);
         const storage = getCoverStorage();
         const datePath = day.key;
-        const [originalUrl, webUrl, thumbUrl] = await Promise.all([
-          storage.save(img.buffer, { paperSlug: paper.slug, date: datePath, kind: 'original', mime: img.mime }),
-          storage.save(web, { paperSlug: paper.slug, date: datePath, kind: 'web', mime: 'image/webp' }),
-          storage.save(thumb, { paperSlug: paper.slug, date: datePath, kind: 'thumb', mime: 'image/webp' }),
-        ]);
+        const coverUrl = await storage.save(img.buffer, { paperSlug: paper.slug, date: datePath, kind: 'original', mime: img.mime });
+        const webUrl = coverUrl;
+        const thumbUrl = coverUrl;
 
         const issue = await prisma.newspaperIssue.create({
           data: {
