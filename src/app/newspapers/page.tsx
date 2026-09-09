@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { tehranToday, toFaDigits } from '@/lib/newspapers/date';
 import Board from '@/components/newspapers/Board';
 
-export const revalidate = 3600;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'صفحه اول روزنامه‌های امروز | لیان دید',

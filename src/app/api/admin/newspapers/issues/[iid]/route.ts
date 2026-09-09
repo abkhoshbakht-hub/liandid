@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
@@ -22,6 +23,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ iid: s
     if (b.issueNumber !== undefined) data.issueNumber = String(b.issueNumber).slice(0, 50) || null;
     if (b.title !== undefined) data.title = String(b.title).slice(0, 300) || null;
     const issue = await prisma.newspaperIssue.update({ where: { id: iid }, data });
+    if (data.status === 'PUBLISHED' || data.status === 'REJECTED') {
+      revalidatePath('/newspapers');
+    }
     return NextResponse.json({ success: true, data: issue });
   } catch {
     return NextResponse.json({ success: false, message: 'خطا' }, { status: 500 });
