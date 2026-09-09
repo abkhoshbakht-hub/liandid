@@ -61,6 +61,25 @@ export class OfficialWebsiteAdapter implements BaseAdapter {
     const needles = todayNeedles(day);
     const dateOnPage = needles.some((n) => html.includes(n));
 
+    // الگوی دقیق و تأییدشده (مثل جلد کیهان): اولین URL منطبق برنده است
+    if (cfg.imgPattern) {
+      try {
+        const re = new RegExp(cfg.imgPattern, 'i');
+        const all: string[] = [];
+        const attrRe = /(?:src|href)\s*=\s*"([^"]+)"|(?:src|href)\s*=\s*'([^']+)'/gi;
+        let am: RegExpExecArray | null;
+        while ((am = attrRe.exec(html))) all.push(am[1] || am[2]);
+        const hit = all.find((u) => re.test(u));
+        if (hit) {
+          return {
+            imageUrl: absolutize(hit, pageUrl),
+            pageUrl,
+            evidence: { dateMatch: dateOnPage, nameMatch: true, official: src.type === 'official' },
+          };
+        }
+      } catch {}
+    }
+
     const keywords: string[] = cfg.keywords || ['صفحه اول', 'جلد', 'نسخه چاپی', 'پیشخوان', paper.name];
     const imgRe = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
     let best: { url: string; score: number; alt: string } | null = null;

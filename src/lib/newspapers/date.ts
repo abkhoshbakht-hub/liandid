@@ -47,6 +47,8 @@ export function todayNeedles(day: TehranDay): string[] {
   return [
     `${day.jy}/${pad(day.jm)}/${pad(day.jd)}`,
     `${day.jy}-${pad(day.jm)}-${pad(day.jd)}`,
+    `${day.jy}/${day.jm}/${day.jd}`,
+    `${day.jy}-${day.jm}-${day.jd}`,
     `${day.jd} ${faMonths[day.jm]}`,
     `${day.jd} ${faMonths[day.jm]} ${day.jy}`,
     `${day.gy}-${pad(day.gm)}-${pad(day.gd)}`,

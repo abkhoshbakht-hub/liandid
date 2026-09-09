@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { NEWSPAPER_SEEDS } from '@/lib/newspapers/seed';
+import { NEWSPAPER_SEEDS, KAYHAN_SOURCE } from '@/lib/newspapers/seed';
 
 // وضعیت راه‌اندازی ماژول روزنامه‌ها
 export async function GET() {
@@ -56,14 +56,28 @@ export async function POST() {
       const existing = await prisma.newspaper.findUnique({ where: { slug: s.slug } });
       if (!existing) {
         await prisma.newspaper.create({
-          data: { name: s.name, slug: s.slug, category: s.category, displayOrder: s.displayOrder, active: true },
+          data: { name: s.name, slug: s.slug, category: s.category, displayOrder: s.displayOrder, website: (s as any).website || null, active: true },
         });
         seeded++;
+      } else if ((s as any).website && !existing.website) {
+        await prisma.newspaper.update({ where: { slug: s.slug }, data: { website: (s as any).website } });
+      }
+    }
+    // سورس خودکار تأییدشده کیهان (فقط یک بار)
+    const kayhan = await prisma.newspaper.findUnique({ where: { slug: KAYHAN_SOURCE.slug } });
+    let kayhanSource = false;
+    if (kayhan) {
+      const ex = await prisma.newspaperSource.findFirst({ where: { newspaperId: kayhan.id, type: 'official' } });
+      if (!ex) {
+        await prisma.newspaperSource.create({
+          data: { newspaperId: kayhan.id, name: KAYHAN_SOURCE.name, type: KAYHAN_SOURCE.type, url: KAYHAN_SOURCE.url, priority: KAYHAN_SOURCE.priority, active: true, configuration: KAYHAN_SOURCE.configuration },
+        });
+        kayhanSource = true;
       }
     }
 
     const papers = await prisma.newspaper.count();
-    return NextResponse.json({ success: true, data: { tables: true, seeded, papers } });
+    return NextResponse.json({ success: true, data: { tables: true, seeded, papers, kayhanSource } });
   } catch (e) {
     console.error('Newspaper init error:', e);
     return NextResponse.json({ success: false, message: 'خطا در راه‌اندازی جداول' }, { status: 500 });
