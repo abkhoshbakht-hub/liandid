@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { fetchPaperDay, fetchAllPapers } from '@/lib/newspapers/fetcher';
 import { ensureDefaultSources } from '@/lib/newspapers/ensure';
 import { tehranToday } from '@/lib/newspapers/date';
-import { getAdapter, downloadCandidate } from '@/lib/newspapers/adapters';
+import { getAdapter, downloadCandidate, debugTelegramPage } from '@/lib/newspapers/adapters';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -47,10 +47,14 @@ export async function GET(req: Request) {
   }
   const sourceId = new URL(req.url).searchParams.get('testSource');
   if (!sourceId) return NextResponse.json({ success: false, message: 'testSource لازم است' }, { status: 400 });
+  let debug: any = null;
   try {
     const src = await prisma.newspaperSource.findUnique({ where: { id: sourceId }, include: { newspaper: true } });
     if (!src) return NextResponse.json({ success: false, message: 'سورس یافت نشد' }, { status: 404 });
     const t0 = Date.now();
+    if (src.type === 'telegram') {
+      debug = await debugTelegramPage(src as any);
+    }
     const adapter = getAdapter(src.type);
     const candidate = await adapter.fetchCandidate(src as any, src.newspaper as any, tehranToday());
     let dims: { width: number; height: number } | null = null;
@@ -60,14 +64,14 @@ export async function GET(req: Request) {
     } catch (e: any) {
       return NextResponse.json({
         success: true,
-        data: { ok: false, stage: 'download', imageUrl: candidate.imageUrl, error: String(e?.message || e), ms: Date.now() - t0 },
+        data: { ok: false, stage: 'download', imageUrl: candidate.imageUrl, error: String(e?.message || e), debug, ms: Date.now() - t0 },
       });
     }
     return NextResponse.json({
       success: true,
-      data: { ok: true, imageUrl: candidate.imageUrl, pageUrl: candidate.pageUrl, title: candidate.title, evidence: candidate.evidence, dims, ms: Date.now() - t0 },
+      data: { ok: true, imageUrl: candidate.imageUrl, pageUrl: candidate.pageUrl, title: candidate.title, evidence: candidate.evidence, dims, debug, ms: Date.now() - t0 },
     });
   } catch (e: any) {
-    return NextResponse.json({ success: true, data: { ok: false, stage: 'discover', error: String(e?.message || e).slice(0, 300) } });
+    return NextResponse.json({ success: true, data: { ok: false, stage: 'discover', error: String(e?.message || e).slice(0, 300), debug } });
   }
 }

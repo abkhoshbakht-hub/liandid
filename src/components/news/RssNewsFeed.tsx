@@ -58,8 +58,9 @@ export default function RssNewsFeed() {
 
   const MOBILE_INITIAL = 8;
 
+  // هر تب دنیای خودش: «همه» فقط خبرگزاری‌ها (بوشهر + سراسری)، روزنامه‌ها فقط در تب خودشان
   const filteredNews = !news ? [] : (activeTab === 'all'
-    ? news
+    ? news.filter(n => n.category !== 'روزنامه')
     : news.filter(n => n.category === activeTab)
   );
 

@@ -87,6 +87,12 @@ function DashTab() {
     setBusyId(null);
     load();
   }
+  async function publishOne(issueId: string) {
+    setBusyId(issueId);
+    await api(`/api/admin/newspapers/issues/${issueId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'publish' }) });
+    setBusyId(null);
+    load();
+  }
   async function seedSources() {
     if (!confirm('سورس‌های خودکار (کیهان + ۹ کانال تلگرام) برای روزنامه‌های بدون سورس ساخته شود؟')) return;
     const d = await api('/api/admin/newspapers/init', { method: 'POST' });
@@ -135,7 +141,10 @@ function DashTab() {
                 <span>{p.name}</span>
                 <span className="flex items-center gap-2">
                   <span className={p.todayStatus === 'PUBLISHED' ? 'text-green-600' : p.todayStatus === 'NEEDS_REVIEW' ? 'text-amber-600' : 'text-red-500'}>{p.todayStatus ? STATUS_FA[p.todayStatus] : '— بدون جلد'}</span>
-                  {p.todayStatus !== 'PUBLISHED' && (
+                  {p.todayStatus === 'NEEDS_REVIEW' && p.todayIssueId && (
+                    <button onClick={() => publishOne(p.todayIssueId)} disabled={busyId === p.todayIssueId || running} className="text-xs bg-green-600 text-white px-2 py-0.5 rounded font-bold disabled:opacity-50">{busyId === p.todayIssueId ? '...' : 'انتشار'}</button>
+                  )}
+                  {p.todayStatus !== 'PUBLISHED' && p.todayStatus !== 'NEEDS_REVIEW' && (
                     <button onClick={() => runOne(p.id)} disabled={busyId === p.id || running} className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded disabled:opacity-50">{busyId === p.id ? '...' : 'دریافت'}</button>
                   )}
                 </span>
@@ -260,6 +269,7 @@ function PapersTab() {
             {testRes && (
               <div className={`text-xs rounded-lg p-2 mb-2 ${testRes.ok ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
                 {testRes.ok ? <>✓ تصویر پیدا شد ({testRes.dims?.width}×{testRes.dims?.height}) — <span dir="ltr">{testRes.imageUrl?.slice(0, 80)}...</span></> : <>✗ {testRes.stage}: {testRes.error}</>}
+                {testRes.debug && <div className="mt-1 pt-1 border-t border-black/10" dir="ltr">ch:{testRes.debug.channel} html:{testRes.debug.htmlLen} blocks:{testRes.debug.blocks} photos:{testRes.debug.photoBlocks} nf:{String(testRes.debug.notFound)} err:{testRes.debug.fetchError || '-'}</div>}
               </div>
             )}
             <div className="border-t pt-2 grid grid-cols-2 gap-1 text-sm">

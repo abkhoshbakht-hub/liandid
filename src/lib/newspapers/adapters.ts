@@ -174,6 +174,35 @@ export class TelegramAdapter implements BaseAdapter {
 }
 
 // --- دستی: فقط از مسیر آپلود ادمین (در موتور خودکار استفاده نمی‌شود) ---
+// تشخیص عیب صفحه کانال تلگرام (برای دکمه تست پنل)
+export async function debugTelegramPage(src: SourceLike): Promise<any> {
+  const cfg = (() => { try { return src.configuration ? JSON.parse(src.configuration) : {}; } catch { return {}; } })();
+  const channel: string | undefined = cfg.telegram_channel || (src.url ? src.url.split('t.me/')[1]?.split(/[/?]/)[0] : undefined);
+  if (!channel) return { channel: null };
+  const pageUrl = `https://t.me/s/${channel}`;
+  const dbg: any = { channel, pageUrl };
+  try {
+    const html = await fetchText(pageUrl);
+    dbg.htmlLen = html.length;
+    dbg.notFound = /tgme_page_title/.test(html) && /does not exist|not found/i.test(html);
+    const blocks = html.split('tgme_widget_message_wrap').slice(1);
+    dbg.blocks = blocks.length;
+    let photos = 0;
+    const dts = new Set<string>();
+    for (const b of blocks) {
+      if (/cdn\d*\.telegram\.org\/file\//.test(b)) photos++;
+      const m = b.match(/datetime="([^"]+)"/);
+      if (m) dts.add(m[1].slice(0, 13));
+    }
+    dbg.photoBlocks = photos;
+    dbg.sampleHours = [...dts].slice(-8);
+    return dbg;
+  } catch (e: any) {
+    dbg.fetchError = String(e?.message || e).slice(0, 120);
+    return dbg;
+  }
+}
+
 export class ManualAdapter implements BaseAdapter {
   async fetchCandidate(): Promise<CoverCandidate> {
     throw new Error('manual-only');

@@ -14,13 +14,13 @@ export async function GET() {
     const day = tehranToday();
     const [papers, todayIssues, archiveTotal, lastCron, recentFails] = await Promise.all([
       prisma.newspaper.findMany({ where: { active: true }, orderBy: { displayOrder: 'asc' }, select: { id: true, name: true, slug: true } }),
-      prisma.newspaperIssue.findMany({ where: { date: day.utcMidnight }, select: { newspaperId: true, status: true, confidence: true } }),
+      prisma.newspaperIssue.findMany({ where: { date: day.utcMidnight }, select: { id: true, newspaperId: true, status: true, confidence: true } }),
       prisma.newspaperIssue.count(),
       prisma.siteSetting.findUnique({ where: { key: 'newspapers:lastCron' } }).catch(() => null),
       prisma.newspaperFetchLog.findMany({ where: { status: 'FAILED' }, orderBy: { createdAt: 'desc' }, take: 10 }),
     ]);
 
-    const byId: Record<string, string> = Object.fromEntries(todayIssues.map((i) => [i.newspaperId, i.status]));
+    const byId: Record<string, { status: string; id: string }> = Object.fromEntries(todayIssues.map((i) => [i.newspaperId, { status: i.status, id: i.id }]));
     const missing = papers.filter((p) => !byId[p.id]).map((p) => p.name);
     const ok = todayIssues.filter((i) => i.status === 'PUBLISHED').length;
     const review = todayIssues.filter((i) => i.status === 'NEEDS_REVIEW').length;
@@ -40,7 +40,7 @@ export async function GET() {
         missing,
         archiveTotal,
         lastCron: lastCron?.value || null,
-        papers: papers.map((p) => ({ ...p, todayStatus: byId[p.id] || null })),
+        papers: papers.map((p) => ({ ...p, todayStatus: byId[p.id]?.status || null, todayIssueId: byId[p.id]?.id || null })),
         recentFails: recentFails.map((l) => ({ id: l.id, paperName: l.newspaperId ? names[l.newspaperId] : '—', error: l.errorMessage, at: l.createdAt })),
       },
     });
