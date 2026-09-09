@@ -82,7 +82,6 @@ const sections: SidebarSection[] = [
     { href: '/dashboard/media', label: 'رسانه' },
     { href: '/dashboard/image-settings', label: 'تنظیم عکس' },
     { href: '/dashboard/shortlinks', label: 'کوتاه‌کننده لینک' },
-    { href: '/dashboard/frontpages', label: 'جلد روزنامه‌ها' },
     { href: '/dashboard/newspapers', label: 'صفحه اول روزنامه‌ها' },
   ]},
   { title: 'فوتر', preview: 'footer', icon: (
