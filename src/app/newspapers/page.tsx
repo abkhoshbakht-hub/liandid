@@ -20,11 +20,20 @@ export default async function NewspapersPage() {
   try {
     papers = await prisma.newspaper.findMany({ where: { active: true }, orderBy: { displayOrder: 'asc' } });
     const today = await prisma.newspaperIssue.findMany({
-      where: { date: day.utcMidnight, status: 'PUBLISHED' },
-      select: { newspaperId: true, imageUrl: true, thumbnailUrl: true, persianDate: true, issueNumber: true },
+      where: { status: 'PUBLISHED', newspaper: { active: true } },
+      select: { newspaperId: true, imageUrl: true, thumbnailUrl: true, persianDate: true, issueNumber: true, date: true },
+      orderBy: { createdAt: 'desc' },
     });
-    todayMap = Object.fromEntries(today.map((t) => [t.newspaperId, t]));
-  } catch {}
+    const seen = new Set<string>();
+    for (const t of today) {
+      if (!seen.has(t.newspaperId)) {
+        todayMap[t.newspaperId] = t;
+        seen.add(t.newspaperId);
+      }
+    }
+  } catch (e: any) {
+    console.error('Newspapers page error:', e?.message || e);
+  }
 
   const breadcrumb = {
     '@context': 'https://schema.org',
