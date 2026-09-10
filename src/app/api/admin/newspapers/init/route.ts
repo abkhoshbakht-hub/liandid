@@ -74,6 +74,13 @@ export async function POST() {
         await prisma.newspaper.update({ where: { slug: s.slug }, data: { website: (s as any).website } });
       }
     }
+    // خودترمیم فعال‌بودن ردیف‌های قدیمی (active ‏NULL‏/false)
+    try {
+      await prisma.newspaper.updateMany({
+        where: { slug: { in: NEWSPAPER_SEEDS.map((s) => s.slug) }, NOT: { active: true } },
+        data: { active: true },
+      });
+    } catch {}
     // سورس خودکار تأییدشده کیهان (فقط یک بار)
     const kayhan = await prisma.newspaper.findUnique({ where: { slug: KAYHAN_SOURCE.slug } });
     let kayhanSource = false;
