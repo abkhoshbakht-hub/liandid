@@ -39,6 +39,22 @@ function parseConfig(src: SourceLike): Record<string, any> {
   }
 }
 
+// کانفیگ سورس رسمی (آرشیو یا صفحه مستقیم) — همه اختیاری تا سورس‌های قدیمی نشکنند
+export interface OfficialCfg {
+  pageUrl?: string;
+  archiveUrl?: string;
+  linkText?: string;
+  itemPattern?: string;
+  idPattern?: string;
+  ogImage?: boolean;
+  imgPattern?: string;
+  imgPatternList?: string[];
+  datePath?: boolean;
+  preferLargestWidth?: boolean;
+  imgSwap?: [string, string];
+  keywords?: string[];
+}
+
 function absolutize(src: string, base: string): string {
   try {
     return new URL(src, base).toString();
@@ -115,7 +131,7 @@ export class OfficialWebsiteAdapter implements BaseAdapter {
   }
 
   // فهرست آرشیو → جدیدترین شماره → تصویر جلد (بدون هیچ URL حدسی؛ همه از HTML خوانده می‌شود)
-  private async fetchFromArchive(src: SourceLike, paper: PaperLike, day: TehranDay, cfg: Record<string, any>): Promise<CoverCandidate> {
+  private async fetchFromArchive(src: SourceLike, paper: PaperLike, day: TehranDay, cfg: OfficialCfg): Promise<CoverCandidate> {
     const listUrl = cfg.archiveUrl || cfg.pageUrl || src.url || paper.website;
     if (!listUrl) throw new Error('no-page-url');
     const listHtml = await fetchText(listUrl);
@@ -199,7 +215,9 @@ export class OfficialWebsiteAdapter implements BaseAdapter {
       try {
         const swapped = imageUrl.replace(new RegExp(cfg.imgSwap[0]), cfg.imgSwap[1]);
         if (swapped !== imageUrl) imageUrl = swapped;
-      } catch {}
+      } catch {
+        // نادیده گرفتن الگوی نامعتبر
+      }
     }
     const titleM = issueHtml.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)
       || issueHtml.match(/<title[^>]*>([^<]{0,300})<\/title>/i);
