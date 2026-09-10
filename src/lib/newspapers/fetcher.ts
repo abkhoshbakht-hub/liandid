@@ -163,8 +163,8 @@ export async function fetchPaperDay(
       const issue = await saveIssue(lowQuality.candidate, lowQuality.img, lowQuality.srcId, true);
       await logAttempt({ newspaperId: paper.id, sourceId: lowQuality.srcId, status: 'SUCCESS', errorMessage: 'low-quality-fallback', discoveredImageUrl: lowQuality.candidate.imageUrl });
       return { newspaperId: paper.id, name: paper.name, ok: true, status: issue.status, issueId: issue.id, confidence: issue.confidence };
-    } catch (e: any) {
-      lastError = String(e?.message || e).slice(0, 300);
+    } catch {
+      lastError = 'fallback-save-failed';
     }
   }
   return { newspaperId: paper.id, name: paper.name, ok: false, status: 'FAILED', error: lastError };
