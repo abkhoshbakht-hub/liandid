@@ -77,7 +77,7 @@ export async function downloadImage(url: string, timeoutMs = 10000): Promise<Dow
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const ct = res.headers.get('content-type') || '';
     if (!ct.startsWith('image/') && !ct.startsWith('application/octet-stream')) {
-      throw new Error(`not-image: ${ct}`);
+      throw new Error(`not-image: ${ct} url:${url.slice(0, 130)}`);
     }
     const ab = await res.arrayBuffer();
     if (ab.byteLength < 10 * 1024) throw new Error('too-small');
