@@ -126,11 +126,16 @@ export class TelegramAdapter implements BaseAdapter {
     // بلوک‌های پیام — همه پست‌های عکس‌دار امروز را جمع کن، بعد امتیاز بده
     const blocks = html.split('tgme_widget_message_wrap').slice(1);
     const todays: { img: string; caption: string; dt: string; score: number }[] = [];
+    let photoBlocks = 0;
+    const seenHours = new Set<string>();
     for (const b of blocks) {
       const imgM =
         b.match(/background-image:url\(['"]?(https:\/\/cdn\d*\.telegram\.org\/[^'")]+)['"]?\)/) ||
         b.match(/(https:\/\/cdn\d*\.telegram\.org\/file\/[A-Za-z0-9_-]+)/);
+      const dtM0 = b.match(/datetime="([^"]+)"/);
+      if (dtM0?.[1]) seenHours.add(dtM0[1].slice(0, 13));
       if (!imgM) continue;
+      photoBlocks++;
       const txtM = b.match(/tgme_widget_message_text[^>]*>([\s\S]{0,2000}?)(<\/div>)/);
       const rawTxt = txtM ? txtM[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '';
       const dtM = b.match(/datetime="([^"]+)"/);
@@ -142,7 +147,10 @@ export class TelegramAdapter implements BaseAdapter {
       if (/روزنامه/.test(rawTxt)) score += 10;
       todays.push({ img: imgM[1].replace(/&amp;/g, '&'), caption: rawTxt.slice(0, 300), dt, score });
     }
-    if (todays.length === 0) throw new Error('no-posts-today');
+    if (todays.length === 0) {
+      const hours = [...seenHours].slice(-6).join(',');
+      throw new Error(`no-posts-today(photos:${photoBlocks} blocks:${blocks.length} html:${html.length} hours:[${hours}])`);
+    }
     // بهترین کپشن؛ مساوی → قدیمی‌ترین امروز (جلد معمولاً اول صبح است)
     todays.sort((a, b) => b.score - a.score);
     const top = todays[0]; // سورت پایدار: مساوی‌ها قدیمی‌ترین (اول صبح) اول می‌ماند
