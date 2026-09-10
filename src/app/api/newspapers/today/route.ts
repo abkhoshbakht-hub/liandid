@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { tehranToday } from '@/lib/newspapers/date';
 
 // جلدهای منتشرشده امروز
+export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const day = tehranToday();

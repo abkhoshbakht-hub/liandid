@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { tehranToday } from '@/lib/newspapers/date';
 
 // صفحه یک روزنامه: مشخصات + جلد امروز + ۱۲ شماره اخیر
+export const dynamic = 'force-dynamic';
 export async function GET(_: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;

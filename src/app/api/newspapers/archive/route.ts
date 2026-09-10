@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 // آرشیو: ?date=YYYY-MM-DD&paper=<slug|id>&category=national|bushehr|sports&page=
+export const dynamic = 'force-dynamic';
 export async function GET(req: Request) {
   try {
     const q = new URL(req.url).searchParams;
