@@ -91,11 +91,12 @@ export async function fetchPaperDay(
     const confidence = capped ? Math.min(scoreCandidate(candidate, img, paper.name), 69) : scoreCandidate(candidate, img, paper.name);
     const status = confidence >= 90 ? 'PUBLISHED' : 'NEEDS_REVIEW';
     const issue = await prisma.newspaperIssue.create({
-      data: {
-        newspaperId: paper.id,
-        date: day.utcMidnight,
-        persianDate: day.persian,
-        title: candidate.title?.slice(0, 300),
+          data: {
+            newspaperId: paper.id,
+            date: day.utcMidnight,
+            persianDate: day.persian,
+            title: candidate.title?.slice(0, 300),
+            issueNumber: candidate.issueNumber?.slice(0, 50) || undefined,
         originalUrl: candidate.pageUrl.slice(0, 1000),
         imageUrl: coverUrl,
         thumbnailUrl: coverUrl,

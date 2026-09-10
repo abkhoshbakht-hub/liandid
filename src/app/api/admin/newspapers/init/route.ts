@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { NEWSPAPER_SEEDS, OFFICIAL_SOURCES, TELEGRAM_SOURCES } from '@/lib/newspapers/seed';
+import { NEWSPAPER_SEEDS, OFFICIAL_SOURCES, EXTRA_SOURCES, TELEGRAM_SOURCES } from '@/lib/newspapers/seed';
 
 // وضعیت راه‌اندازی ماژول روزنامه‌ها
 export async function GET() {
@@ -95,26 +95,42 @@ export async function POST() {
       }
     }
 
-    // سورس‌های تلگرام اعلام‌شده توسط مدیر (فقط یک بار برای هر روزنامه)
+    // سورس‌های تلگرام اعلام‌شده توسط مدیر (فقط یک بار برای هر روزنامه + به‌روزرسانی الگو)
     let telegramSeeded = 0;
     for (const t of TELEGRAM_SOURCES) {
       const paper = await prisma.newspaper.findUnique({ where: { slug: t.slug } });
       if (!paper) continue;
+      const url = `https://t.me/${t.channel}`;
+      const cfg = JSON.stringify(t.patterns ? { telegram_channel: t.channel, coverPatterns: t.patterns } : { telegram_channel: t.channel });
       const ex = await prisma.newspaperSource.findFirst({ where: { newspaperId: paper.id, type: 'telegram' } });
       if (!ex) {
         await prisma.newspaperSource.create({
-          data: {
-            newspaperId: paper.id, name: t.name, type: 'telegram',
-            url: `https://t.me/${t.channel}`, priority: 0, active: true,
-            configuration: JSON.stringify({ telegram_channel: t.channel }),
-          },
+          data: { newspaperId: paper.id, name: t.name, type: 'telegram', url, priority: 0, active: true, configuration: cfg },
         });
         telegramSeeded++;
+      } else if (t.patterns) {
+        try {
+          const curCfg = ex.configuration ? JSON.parse(ex.configuration) : {};
+          if (!curCfg.coverPatterns) {
+            await prisma.newspaperSource.update({ where: { id: ex.id }, data: { configuration: cfg, name: t.name, url } });
+          }
+        } catch {}
       }
     }
 
+    // سورس‌های تکمیلی (خراسان، پیشخوان، تسنیم) — dedup با URL
+    let extraSeeded = 0;
+    for (const e of EXTRA_SOURCES) {
+      const paper = await prisma.newspaper.findUnique({ where: { slug: e.slug }, include: { sources: { where: { active: true }, select: { url: true } } } });
+      if (!paper || paper.sources.some((s) => (s.url || '') === e.url)) continue;
+      await prisma.newspaperSource.create({
+        data: { newspaperId: paper.id, name: e.name, type: e.type, url: e.url, priority: e.priority, active: true, configuration: e.configuration },
+      });
+      extraSeeded++;
+    }
+
     const papers = await prisma.newspaper.count();
-    return NextResponse.json({ success: true, data: { tables: true, seeded, papers, kayhanSource, telegramSeeded } });
+    return NextResponse.json({ success: true, data: { tables: true, seeded, papers, kayhanSource, telegramSeeded, extraSeeded } });
   } catch (e: any) {
     console.error('Newspaper init error:', e);
     return NextResponse.json({ success: false, message: 'ERR: ' + String(e?.message || e).slice(0, 400) }, { status: 500 });

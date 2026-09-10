@@ -28,6 +28,9 @@ const ALLOWED_HOSTS: RegExp[] = [
   /^([a-z0-9-]+\.)?abrarnews\.com$/,
   /^([a-z0-9-]+\.)?payameasalooye\.ir$/,
   /^([a-z0-9-]+\.)?khorasannews\.com$/,
+  /^([a-z0-9-]+\.)?khorasanonline\.ir$/,
+  /^([a-z0-9-]+\.)?tasnimnews\.ir$/,
+  /^([a-z0-9-]+\.)?pishkhan\.com$/,
   /^t\.me$/,
   /^cdn\d*\.telegram\.org$/,
 ];

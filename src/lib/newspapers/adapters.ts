@@ -7,12 +7,36 @@ export interface CoverCandidate {
   pageUrl: string;
   title?: string;
   discoveredDate?: string;
+  issueNumber?: string;
   evidence: {
     dateMatch: boolean;
     nameMatch: boolean;
     official: boolean;
     caption?: string;
   };
+}
+
+// نرمالایز برای تطبیق الگو: حذف نیم‌فاصله/فاصله (هم‌میهن = هم میهن = هممیهن)
+export function normFa(s: string): string {
+  return (s || '').replace(/[\u200C\u200B\s]+/g, '');
+}
+
+const FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
+export function faToEnDigits(s: string): string {
+  return (s || '').replace(/[۰-۹]/g, (d) => String(FA_DIGITS.indexOf(d)));
+}
+
+// استخراج شماره روزنامه از کپشن (مثل «شماره ۵۴۷۱»)
+export function extractIssueNumber(text: string): string | undefined {
+  const m = (text || '').match(/شماره\s*([۰-۹0-9][۰-۹0-9.,]*)/);
+  if (!m) return undefined;
+  const num = faToEnDigits(m[1]).replace(/[.,]/g, '');
+  return num || undefined;
+}
+
+// آدرس واقعاً تصویری است؟ (pages/لینک‌های HTML رد می‌شوند)
+export function looksLikeImageUrl(u: string): boolean {
+  return /cdn\d*\.telegram\.org\/file\//i.test(u) || /\.(jpe?g|png|webp)(\?|$)/i.test(u);
 }
 
 export interface SourceLike {
@@ -243,44 +267,49 @@ export class TelegramAdapter implements BaseAdapter {
     const html = await fetchText(pageUrl);
     if (html.includes('tgme_page_title') && /not found|does not exist/i.test(html)) throw new Error('channel-not-found');
 
-    // بلوک‌های پیام — همه پست‌های عکس‌دار امروز را جمع کن، بعد امتیاز بده
+    // بلوک‌های پیام — فقط پست امروز + فقط جلد (الگوی اختصاصی کانال) + فقط URL تصویری
     const blocks = html.split('tgme_widget_message_wrap').slice(1);
-    const todays: { img: string; caption: string; dt: string; score: number }[] = [];
+    const coverPatterns: string[] | undefined = Array.isArray(cfg.coverPatterns) ? cfg.coverPatterns : undefined;
+    const todays: { img: string; caption: string; dt: string; score: number; num?: string }[] = [];
     let photoBlocks = 0;
+    let skippedNonImage = 0;
     const seenHours = new Set<string>();
     for (const b of blocks) {
-      // استخراج تلورانس‌دار عکس: هر background-image (با/بدون فاصله)، بعد img تگ، بعد الگوی قدیمی
-      let imgUrl: string | null = null;
-      const bgAll = [...b.matchAll(/background-image\s*:\s*url\(\s*['"]?([^'")\s]+)['"]?\s*\)/gi)].map((m) => m[1]);
-      imgUrl = bgAll.find((u) => /telegram\.org|t\.me/i.test(u)) || bgAll[0] || null;
-      if (!imgUrl) {
-        const im = b.match(/<img[^>]+src=["']([^"']+)["']/i);
-        if (im && !/emoji|sticker|avatar|logo/i.test(im[1])) imgUrl = im[1];
-      }
-      if (!imgUrl) {
-        const fm = b.match(/(https:\/\/cdn\d*\.telegram\.org\/file\/[A-Za-z0-9_-]+)/);
-        if (fm) imgUrl = fm[1];
-      }
       const dtM0 = b.match(/datetime="([^"]+)"/);
       if (dtM0?.[1]) seenHours.add(dtM0[1].slice(0, 13));
-      if (!imgUrl) continue;
-      if (imgUrl.startsWith('/')) imgUrl = `https://t.me${imgUrl}`;
-      photoBlocks++;
-      const imgM = [imgUrl, imgUrl.replace(/&amp;/g, '&')];
-      const txtM = b.match(/tgme_widget_message_text[^>]*>([\s\S]{0,2000}?)(<\/div>)/);
-      const rawTxt = txtM ? txtM[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '';
       const dtM = b.match(/datetime="([^"]+)"/);
       const dt = dtM?.[1] || '';
       if (!this.isToday(dt, day)) continue;
+      const txtM = b.match(/tgme_widget_message_text[^>]*>([\s\S]{0,2000}?)(<\/div>)/);
+      const rawTxt = txtM ? txtM[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '';
+      const nTxt = normFa(rawTxt);
+      // الگوی اختصاصی کانال (اگر تعریف شده): حتماً باید بخورد — وگرنه عکس خبری عادی است
+      if (coverPatterns && coverPatterns.length > 0) {
+        const hit = coverPatterns.some((p) => nTxt.includes(normFa(p)));
+        if (!hit) continue;
+      }
+      // استخراج عکس — فقط آدرس واقعاً تصویری قبول است (صفحه HTML هرگز)
+      const cands: string[] = [];
+      for (const m of b.matchAll(/background-image\s*:\s*url\(\s*['"]?([^'")\s]+)['"]?\s*\)/gi)) cands.push(m[1]);
+      const im = b.match(/<img[^>]+src=["']([^"']+)["']/i);
+      if (im && !/emoji|sticker|avatar|logo/i.test(im[1])) cands.push(im[1]);
+      const fm = b.match(/(https:\/\/cdn\d*\.telegram\.org\/file\/[A-Za-z0-9_-]+)/);
+      if (fm) cands.push(fm[1]);
+      const imgUrl = cands
+        .map((u) => (u.startsWith('/') ? `https://t.me${u}` : u.replace(/&amp;/g, '&')))
+        .find((u) => looksLikeImageUrl(u));
+      if (!imgUrl) { skippedNonImage++; continue; }
+      photoBlocks++;
       let score = 0;
       if (COVER_WORDS.test(rawTxt)) score += 50;
-      if (rawTxt.includes(paper.name)) score += 25;
+      if (coverPatterns && coverPatterns.some((p) => nTxt.includes(normFa(p)))) score += 40;
+      if (rawTxt.includes(paper.name) || nTxt.includes(normFa(paper.name))) score += 25;
       if (/روزنامه/.test(rawTxt)) score += 10;
-      todays.push({ img: imgM[1], caption: rawTxt.slice(0, 300), dt, score });
+      todays.push({ img: imgUrl, caption: rawTxt.slice(0, 300), dt, score, num: extractIssueNumber(rawTxt) });
     }
     if (todays.length === 0) {
       const hours = [...seenHours].slice(-6).join(',');
-      throw new Error(`no-posts-today(photos:${photoBlocks} blocks:${blocks.length} html:${html.length} hours:[${hours}])`);
+      throw new Error(`no-posts-today(photos:${photoBlocks} skippedHtml:${skippedNonImage} blocks:${blocks.length} html:${html.length} hours:[${hours}])`);
     }
     // بهترین کپشن؛ مساوی → قدیمی‌ترین امروز (جلد معمولاً اول صبح است)
     todays.sort((a, b) => b.score - a.score);
@@ -290,6 +319,7 @@ export class TelegramAdapter implements BaseAdapter {
       pageUrl,
       title: top.caption || undefined,
       discoveredDate: top.dt,
+      issueNumber: top.num,
       evidence: {
         dateMatch: true,
         nameMatch: top.score >= 25,
@@ -342,6 +372,58 @@ export async function debugTelegramPage(src: SourceLike): Promise<any> {
   }
 }
 
+// --- تسنیم (پیشخوان مطبوعات): فقط fallback، تطبیق سخت‌گیرانه نام+تاریخ، هرگز انتشار خودکار ---
+export class TasnimAdapter implements BaseAdapter {
+  async fetchCandidate(src: SourceLike, paper: PaperLike, day: TehranDay): Promise<CoverCandidate> {
+    const cfg = parseConfig(src);
+    const listUrl = cfg.keywordUrl || src.url || 'https://www.tasnimnews.ir/fa/keyword/2297/';
+    const listHtml = await fetchText(listUrl);
+    // جدیدترین مطلب «صفحه اول مطبوعات»
+    const aRe = /<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]{0,200}?)<\/a>/gi;
+    let articleHref = '';
+    let am: RegExpExecArray | null;
+    while ((am = aRe.exec(listHtml))) {
+      const txt = am[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+      if (/صفحه اول مطبوعات|پیشخوان مطبوعات/.test(txt)) { articleHref = am[1]; break; }
+    }
+    if (!articleHref) throw new Error('tasnim-no-article');
+    const articleUrl = absolutize(articleHref, listUrl);
+    const html = await fetchText(articleUrl);
+    const needles = todayNeedles(day);
+    if (!needles.some((n) => html.includes(n))) throw new Error('tasnim-stale-article');
+    // همه تصاویر + متن اطرافشان؛ فقط عکسی که نام روزنامه کنارش باشد
+    const nName = normFa(paper.name);
+    const cands: { url: string; ctx: string }[] = [];
+    const og = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+    if (og) cands.push({ url: og[1], ctx: (html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)?.[1] || '') });
+    const imgRe = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi;
+    let im: RegExpExecArray | null;
+    while ((im = imgRe.exec(html))) {
+      const tag = im[0];
+      const url = im[1];
+      if (url.startsWith('data:') || url.endsWith('.svg')) continue;
+      if (/logo|icon|avatar|banner|ads|emoji/i.test(url)) continue;
+      const alt = tag.match(/alt=["']([^"']*)["']/i)?.[1] || '';
+      const start = Math.max(0, (im.index || 0) - 400);
+      const ctx = `${alt} ${html.slice(start, (im.index || 0) + 400).replace(/<[^>]+>/g, ' ')}`;
+      cands.push({ url, ctx });
+    }
+    const match = cands.find((c) => normFa(c.ctx).includes(nName));
+    if (!match) throw new Error('tasnim-no-match');
+    const imageUrl = absolutize(match.url, articleUrl);
+    if (!looksLikeImageUrl(imageUrl) && !/tasnimnews\.ir/i.test(imageUrl)) throw new Error('tasnim-no-match');
+    const titleM = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i);
+    const title = titleM?.[1]?.replace(/\s+/g, ' ').trim();
+    return {
+      imageUrl,
+      pageUrl: articleUrl,
+      title,
+      issueNumber: extractIssueNumber(`${title || ''} ${match.ctx}`),
+      evidence: { dateMatch: true, nameMatch: true, official: false },
+    };
+  }
+}
+
 export class ManualAdapter implements BaseAdapter {
   async fetchCandidate(): Promise<CoverCandidate> {
     throw new Error('manual-only');
@@ -350,6 +432,7 @@ export class ManualAdapter implements BaseAdapter {
 
 export function getAdapter(type: string): BaseAdapter {
   if (type === 'telegram') return new TelegramAdapter();
+  if (type === 'tasnim') return new TasnimAdapter();
   if (type === 'manual') return new ManualAdapter();
   return new OfficialWebsiteAdapter(); // official | news_agency | other
 }

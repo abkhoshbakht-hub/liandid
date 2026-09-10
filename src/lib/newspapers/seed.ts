@@ -34,10 +34,12 @@ export const NEWSPAPER_SEEDS: NewspaperSeed[] = [
 ];
 
 // کانال‌های تلگرام اعلام‌شده توسط مدیر سایت (نه حدسی)
+// patterns: الگوی اختصاصی کپشن جلد (نرمالایزشده تطبیق داده می‌شود)؛ اگر باشد حتماً باید بخورد
 export interface TelegramSeed {
   slug: string;
   name: string;
   channel: string;
+  patterns?: string[];
 }
 
 export const TELEGRAM_SOURCES: TelegramSeed[] = [
@@ -46,10 +48,15 @@ export const TELEGRAM_SOURCES: TelegramSeed[] = [
   { slug: 'donya-e-eqtesad', name: 'کانال تلگرام دنیای اقتصاد', channel: 'den_ir' },
   { slug: 'javan', name: 'کانال تلگرام جوان', channel: 'newsjavan' },
   { slug: 'vatan-emrooz', name: 'کانال تلگرام وطن امروز', channel: 'vatanemrooz' },
-  { slug: 'farhikhtegan', name: 'کانال تلگرام فرهیختگان', channel: 'farhikhteganonline' },
+  { slug: 'farhikhtegan', name: 'کانال تلگرام فرهیختگان', channel: 'farhikhteganonline', patterns: ['صفحه اول روزنامه فرهیختگان', 'صفحه نخست', 'جلد روزنامه', '#جلد'] },
   { slug: 'bamdad-jonoob', name: 'کانال تلگرام بامداد جنوب', channel: 'bamdadjonub' },
-  { slug: 'payam-asaluyeh', name: 'کانال تلگرام پیام عسلویه', channel: 'payameasalooye' },
+  { slug: 'payam-asaluyeh', name: 'کانال تلگرام پیام عسلویه', channel: 'payameasalooye', patterns: ['روزنامه پیام عسلویه', 'صفحه اول', 'جلد'] },
   { slug: 'goal', name: 'کانال تلگرام گل', channel: 'TVGoalnewspaper' },
+  // تأییدشده توسط مدیر (ممیزی دوم)
+  { slug: 'hamshahri', name: 'کانال رسمی همشهری', channel: 'hamshahrinews', patterns: ['صفحه اول روزنامه همشهری', 'صفحه یک روزنامه همشهری', 'جلد روزنامه همشهری'] },
+  { slug: 'hammihan', name: 'کانال رسمی هم‌میهن', channel: 'hammihanonline', patterns: ['صفحه اول روزنامه هم‌میهن', 'صفحه نخست', 'جلد روزنامه'] },
+  { slug: 'abrar-varzeshi', name: 'کانال رسمی ابرار ورزشی', channel: 'AbrarVarzeshiNews', patterns: ['#جلد_روزنامه', 'جلد روزنامه', 'ابرار ورزشی'] },
+  { slug: 'khorasan', name: 'کانال رسمی خراسان', channel: 'khorasanonlinenews', patterns: ['روزنامه خراسان', 'صفحه اول', 'جلد'] },
 ];
 
 // تنها سورس خودکار تأییدشده: جلد روزانه کیهان از سایت رسمی
@@ -236,4 +243,49 @@ export const OFFICIAL_SOURCES: OfficialSeed[] = [
   DONYA_SOURCE,
   GOAL_SOURCE,
   BAMDAD_SOURCE,
+];
+
+// سورس‌های تکمیلی تأییدشده توسط مدیر (ممیزی دوم): تلاش سایت خراسان، پیشخوان پیام عسلویه، تسنیم
+export interface ExtraSeed {
+  slug: string;
+  name: string;
+  type: string;
+  url: string;
+  priority: number;
+  configuration: string;
+}
+
+const TASNIM_URL = 'https://www.tasnimnews.ir/fa/keyword/2297/';
+const tasnim = (slug: string): ExtraSeed => ({
+  slug,
+  name: 'پیشخوان مطبوعات تسنیم',
+  type: 'tasnim',
+  url: TASNIM_URL,
+  priority: 2,
+  configuration: JSON.stringify({ keywordUrl: TASNIM_URL }),
+});
+
+export const EXTRA_SOURCES: ExtraSeed[] = [
+  {
+    slug: 'khorasan',
+    name: 'سایت رسمی خراسان',
+    type: 'official',
+    url: 'https://khorasanonline.ir/',
+    priority: -1,
+    configuration: JSON.stringify({ pageUrl: 'https://khorasanonline.ir/', keywords: ['خراسان', 'صفحه اول', 'جلد'] }),
+  },
+  {
+    slug: 'payam-asaluyeh',
+    name: 'پیشخوان پیام عسلویه',
+    type: 'other',
+    url: 'https://www.pishkhan.com/rooznameh/PayameAsalooye',
+    priority: 1,
+    configuration: JSON.stringify({ pageUrl: 'https://www.pishkhan.com/rooznameh/PayameAsalooye', keywords: ['پیام عسلویه', 'صفحه اول', 'جلد'] }),
+  },
+  tasnim('hamshahri'),
+  tasnim('hammihan'),
+  tasnim('farhikhtegan'),
+  tasnim('abrar-varzeshi'),
+  tasnim('payam-asaluyeh'),
+  tasnim('khorasan'),
 ];
