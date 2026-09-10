@@ -8,6 +8,13 @@ export async function ensureDefaultSources(): Promise<{ papers: number; sources:
   try {
     await prisma.$executeRawUnsafe(`ALTER TABLE "NewspaperSource" ADD COLUMN IF NOT EXISTS "lastError" TEXT`);
   } catch {}
+  // خودترمیم فعال‌بودن: ردیف‌های قدیمی که active آنها NULL/false مانده را فعال کن
+  try {
+    await prisma.newspaper.updateMany({
+      where: { slug: { in: NEWSPAPER_SEEDS.map((s) => s.slug) }, NOT: { active: true } },
+      data: { active: true },
+    });
+  } catch {}
   let papers = 0;
   let sources = 0;
   const existing = await prisma.newspaper.findMany({
