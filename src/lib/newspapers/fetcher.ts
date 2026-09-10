@@ -4,9 +4,11 @@ import { downloadCandidate, getAdapter, type CoverCandidate } from './adapters';
 import { processCover, sleep, type DownloadedImage } from './image';
 import { getCoverStorage } from './storage';
 
-const MAX_ATTEMPTS = 2;
+const MAX_ATTEMPTS = 3;
 const RETRY_DELAY_MS = 3000;
 const BETWEEN_PAPERS_MS = 1000;
+// حداقل عرض قابل‌قبول برای ذخیره فوری؛ کمتر از این فقط اگر سورس دیگری جواب نداد ذخیره می‌شود
+const MIN_GOOD_WIDTH = 600;
 
 export interface FetchOutcome {
   newspaperId: string;
@@ -81,6 +83,32 @@ export async function fetchPaperDay(
   }
 
   let lastError = 'unknown';
+  let lowQuality: { candidate: CoverCandidate; img: DownloadedImage; srcId: string } | null = null;
+  const saveIssue = async (candidate: CoverCandidate, img: DownloadedImage, srcId: string, capped: boolean) => {
+    await processCover(img.buffer);
+    const storage = getCoverStorage();
+    const coverUrl = await storage.save(img.buffer, { paperSlug: paper.slug, date: day.key, kind: 'original', mime: img.mime });
+    const confidence = capped ? Math.min(scoreCandidate(candidate, img, paper.name), 69) : scoreCandidate(candidate, img, paper.name);
+    const status = confidence >= 90 ? 'PUBLISHED' : 'NEEDS_REVIEW';
+    const issue = await prisma.newspaperIssue.create({
+      data: {
+        newspaperId: paper.id,
+        date: day.utcMidnight,
+        persianDate: day.persian,
+        title: candidate.title?.slice(0, 300),
+        originalUrl: candidate.pageUrl.slice(0, 1000),
+        imageUrl: coverUrl,
+        thumbnailUrl: coverUrl,
+        sourceId: srcId,
+        imageHash: img.hash,
+        confidence,
+        status,
+        publishedAt: status === 'PUBLISHED' ? new Date() : null,
+      },
+    });
+    await prisma.newspaperSource.update({ where: { id: srcId }, data: { lastSuccessAt: new Date() } }).catch(() => {});
+    return issue;
+  };
   for (const src of sources) {
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       const t0 = Date.now();
@@ -88,7 +116,15 @@ export async function fetchPaperDay(
         const adapter = getAdapter(src.type);
         const candidate = await adapter.fetchCandidate(src as any, paper as any, day);
         const img = await downloadCandidate(candidate);
-
+        // کیفیت پایین؟ سورس بعدی را امتحان کن؛ اگر هیچ سورس خوبی نبود همین ذخیره می‌شود
+        if (img.width < MIN_GOOD_WIDTH) {
+          if (!lowQuality || img.width > lowQuality.img.width) {
+            lowQuality = { candidate, img, srcId: src.id };
+          }
+          await logAttempt({ newspaperId: paper.id, sourceId: src.id, status: 'FAILED', errorMessage: `attempt${attempt}: low-quality(${img.width}x${img.height})`, responseTimeMs: Date.now() - t0 });
+          lastError = `کیفیت پایین (${img.width}×${img.height})`;
+          break; // سورس بعدی
+        }
         // تکراری؟ (هش با شماره‌های قبلی همین روزنامه)
         const dup = await prisma.newspaperIssue.findFirst({
           where: { newspaperId: paper.id, imageHash: img.hash },
@@ -100,35 +136,9 @@ export async function fetchPaperDay(
           break; // سورس بعدی
         }
 
-        const confidence = scoreCandidate(candidate, img, paper.name);
-        const status = confidence >= 90 ? 'PUBLISHED' : 'NEEDS_REVIEW';
-
-        await processCover(img.buffer);
-        const storage = getCoverStorage();
-        const datePath = day.key;
-        const coverUrl = await storage.save(img.buffer, { paperSlug: paper.slug, date: datePath, kind: 'original', mime: img.mime });
-        const webUrl = coverUrl;
-        const thumbUrl = coverUrl;
-
-        const issue = await prisma.newspaperIssue.create({
-          data: {
-            newspaperId: paper.id,
-            date: day.utcMidnight,
-            persianDate: day.persian,
-            title: candidate.title?.slice(0, 300),
-            originalUrl: candidate.pageUrl.slice(0, 1000),
-            imageUrl: webUrl,
-            thumbnailUrl: thumbUrl,
-            sourceId: src.id,
-            imageHash: img.hash,
-            confidence,
-            status,
-            publishedAt: status === 'PUBLISHED' ? new Date() : null,
-          },
-        });
-        await prisma.newspaperSource.update({ where: { id: src.id }, data: { lastSuccessAt: new Date() } });
+        const issue = await saveIssue(candidate, img, src.id, false);
         await logAttempt({ newspaperId: paper.id, sourceId: src.id, status: 'SUCCESS', discoveredImageUrl: candidate.imageUrl, discoveredDate: candidate.discoveredDate, responseTimeMs: Date.now() - t0 });
-        return { newspaperId: paper.id, name: paper.name, ok: true, status, issueId: issue.id, confidence };
+        return { newspaperId: paper.id, name: paper.name, ok: true, status: issue.status, issueId: issue.id, confidence: issue.confidence };
       } catch (e: any) {
         lastError = String(e?.message || e).slice(0, 300);
         const httpStatus = /HTTP (\d+)/.exec(lastError)?.[1];
@@ -138,8 +148,23 @@ export async function fetchPaperDay(
           httpStatus: httpStatus ? Number(httpStatus) : undefined,
           errorMessage: `attempt${attempt}: ${lastError}`, responseTimeMs: Date.now() - t0,
         });
-        if (attempt < MAX_ATTEMPTS) await sleep(RETRY_DELAY_MS);
+        if (attempt < MAX_ATTEMPTS) await sleep(RETRY_DELAY_MS * attempt);
       }
+    }
+  }
+  // هیچ سورس باکیفیتی جواب نداد ولی یک تصویر کم‌کیفیت داریم → همان را با سقف امتیاز ذخیره کن
+  if (lowQuality) {
+    try {
+      const dupFb = await prisma.newspaperIssue.findFirst({
+        where: { newspaperId: paper.id, imageHash: lowQuality.img.hash },
+        select: { id: true },
+      });
+      if (dupFb) return { newspaperId: paper.id, name: paper.name, ok: false, status: 'FAILED', error: 'تصویر تکراری است' };
+      const issue = await saveIssue(lowQuality.candidate, lowQuality.img, lowQuality.srcId, true);
+      await logAttempt({ newspaperId: paper.id, sourceId: lowQuality.srcId, status: 'SUCCESS', errorMessage: 'low-quality-fallback', discoveredImageUrl: lowQuality.candidate.imageUrl });
+      return { newspaperId: paper.id, name: paper.name, ok: true, status: issue.status, issueId: issue.id, confidence: issue.confidence };
+    } catch (e: any) {
+      lastError = String(e?.message || e).slice(0, 300);
     }
   }
   return { newspaperId: paper.id, name: paper.name, ok: false, status: 'FAILED', error: lastError };

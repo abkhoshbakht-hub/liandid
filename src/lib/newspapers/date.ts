@@ -12,6 +12,25 @@ export function toFaDigits(s: string | number): string {
   return String(s).replace(/[0-9]/g, (d) => faDigits[Number(d)]);
 }
 
+// نام روز هفته شمسی برای یک تاریخ میلادی (به وقت تهران)
+export function weekdayFa(d: Date): string {
+  try {
+    return new Intl.DateTimeFormat('fa-IR', { timeZone: 'Asia/Tehran', weekday: 'long' }).format(d);
+  } catch {
+    return '';
+  }
+}
+
+// قالب کامل: «پنجشنبه ۱۹ شهریور ۱۴۰۵» از persianDate به شکل YYYY/MM/DD + تاریخ میلادی
+export function fullPersianDate(persianDate: string, gregorian?: Date | string): string {
+  const m = persianDate.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
+  if (!m) return toFaDigits(persianDate);
+  const faMonths = ['', 'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+  const body = `${Number(m[3])} ${faMonths[Number(m[2])] || ''} ${m[1]}`;
+  const wd = gregorian ? weekdayFa(new Date(gregorian)) : '';
+  return toFaDigits(wd ? `${wd} ${body}` : body);
+}
+
 function tehranParts(d: Date, cal: 'gregory' | 'persian'): { y: number; m: number; day: number } {
   const fmt = new Intl.DateTimeFormat(`en-u-ca-${cal}-nu-latn`, {
     timeZone: 'Asia/Tehran',

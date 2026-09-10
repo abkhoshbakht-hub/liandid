@@ -18,8 +18,16 @@ interface CoverPaper {
   id: string;
   name: string;
   slug: string;
+  category: string;
   today: { imageUrl: string; thumbnailUrl: string | null; persianDate: string } | null;
 }
+
+const COVER_CATS = [
+  { id: 'all', label: 'همه' },
+  { id: 'national', label: 'سراسری' },
+  { id: 'sports', label: 'ورزشی' },
+  { id: 'bushehr', label: 'بوشهر' },
+];
 
 const COVERS_SHOWN = 4;
 
@@ -32,6 +40,8 @@ export default function RssNewsFeed() {
   const [isMobile, setIsMobile] = useState(false);
   const [covers, setCovers] = useState<CoverPaper[]>([]);
   const [coversLoading, setCoversLoading] = useState(false);
+  const [coverCat, setCoverCat] = useState('all');
+  const filteredCovers = coverCat === 'all' ? covers : covers.filter((c) => c.category === coverCat);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -133,7 +143,7 @@ export default function RssNewsFeed() {
             { key: 'all' as const, label: 'همه' },
             { key: 'بوشهر' as const, label: 'خبر بوشهر' },
             { key: 'ملی' as const, label: 'خبرگزاری‌های سراسری' },
-            { key: 'روزنامه' as const, label: 'صفحه اول روزنامه‌های کشور' },
+            { key: 'روزنامه' as const, label: 'پیشخوان روزنامه‌ها' },
           ].map(tab => (
             <button
               key={tab.key}
@@ -160,11 +170,19 @@ export default function RssNewsFeed() {
             </div>
           ) : covers.length === 0 ? (
             <div className="p-12 text-center text-gray-400">
-              <p className="text-sm">هنوز جلدی ثبت نشده است</p>
+              <p className="text-sm">در انتظار دریافت صفحه اول</p>
             </div>
           ) : (
-            <div className="p-3 space-y-4">
-              {covers.slice(0, COVERS_SHOWN).map((p) => (
+            <div className="p-3">
+              <p className="text-[11px] text-gray-400 text-center mb-1">صفحه اول روزنامه‌های امروز ایران، ورزشی و بوشهر</p>
+              <div className="flex gap-1.5 justify-center mb-3 flex-wrap">
+                {COVER_CATS.map((c) => (
+                  <button key={c.id} onClick={() => setCoverCat(c.id)} aria-pressed={coverCat === c.id} className={`px-3 py-1 rounded-full text-[11px] font-bold transition-colors ${coverCat === c.id ? 'bg-[#1B365D] text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>{c.label}</button>
+                ))}
+              </div>
+              {filteredCovers.length === 0 && <p className="text-center text-gray-400 text-xs py-6">صفحه امروز هنوز منتشر نشده است</p>}
+              <div className="space-y-4">
+              {filteredCovers.slice(0, COVERS_SHOWN).map((p) => (
                 <a key={p.id} href={`/newspapers/${p.slug}`} className="block group">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -176,11 +194,12 @@ export default function RssNewsFeed() {
                   <div className="text-center text-xs font-bold text-[#1B365D] mt-1.5">{p.name}</div>
                 </a>
               ))}
-              {covers.length > COVERS_SHOWN && (
+              {filteredCovers.length > COVERS_SHOWN && (
                 <a href="/newspapers" className="block w-full py-2.5 text-sm font-bold text-white bg-[#1B365D] hover:bg-[#0f2d52] transition-colors rounded-xl text-center">
                   بیشتر
                 </a>
               )}
+              </div>
             </div>
           )
         ) : loading ? (

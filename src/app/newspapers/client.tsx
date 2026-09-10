@@ -38,7 +38,8 @@ export default function NewspapersClient() {
     <main className="max-w-7xl mx-auto px-3 md:px-6 py-6" dir="rtl">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <div className="text-center mb-6">
-        <h1 className="text-2xl md:text-3xl font-black text-[#1B365D]">صفحه اول روزنامه‌های امروز</h1>
+        <h1 className="text-2xl md:text-3xl font-black text-[#1B365D]">پیشخوان روزنامه‌ها</h1>
+        <p className="text-gray-500 mt-1 text-sm">صفحه اول روزنامه‌های امروز ایران، ورزشی و بوشهر</p>
         <p className="text-gray-500 mt-1 text-sm">{date ? toFaDigits(date.replaceAll('/', ' / ')) : '...'}</p>
         <Link href="/newspapers/archive" className="inline-block mt-3 text-sm font-bold text-[#1B365D] border border-[#1B365D] rounded-full px-5 py-1.5 hover:bg-[#1B365D] hover:text-white transition-colors">مشاهده آرشیو</Link>
       </div>

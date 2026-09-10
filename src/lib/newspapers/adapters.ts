@@ -55,6 +55,10 @@ export interface BaseAdapter {
 export class OfficialWebsiteAdapter implements BaseAdapter {
   async fetchCandidate(src: SourceLike, paper: PaperLike, day: TehranDay): Promise<CoverCandidate> {
     const cfg = parseConfig(src);
+    // حالت آرشیو رسمی: صفحه فهرست → جدیدترین شماره (بزرگ‌ترین شناسه) → og:image یا الگوی عکس
+    if (cfg.archiveUrl || cfg.linkText) {
+      return this.fetchFromArchive(src, paper, day, cfg);
+    }
     const pageUrl = cfg.pageUrl || src.url || paper.website;
     if (!pageUrl) throw new Error('no-page-url');
     const html = await fetchText(pageUrl);
@@ -107,6 +111,104 @@ export class OfficialWebsiteAdapter implements BaseAdapter {
       pageUrl,
       title: best.alt || undefined,
       evidence: { dateMatch: dateOnPage, nameMatch: best.score >= 30, official: src.type === 'official' },
+    };
+  }
+
+  // فهرست آرشیو → جدیدترین شماره → تصویر جلد (بدون هیچ URL حدسی؛ همه از HTML خوانده می‌شود)
+  private async fetchFromArchive(src: SourceLike, paper: PaperLike, day: TehranDay, cfg: Record<string, any>): Promise<CoverCandidate> {
+    const listUrl = cfg.archiveUrl || cfg.pageUrl || src.url || paper.website;
+    if (!listUrl) throw new Error('no-page-url');
+    const listHtml = await fetchText(listUrl);
+    let issueHref = '';
+    if (cfg.linkText) {
+      // اولین لینکی که متنش حاوی عبارت مشخص است (مثل «نسخه کامل شماره امروز»)
+      const aRe = /<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]{0,300}?)<\/a>/gi;
+      let am: RegExpExecArray | null;
+      while ((am = aRe.exec(listHtml))) {
+        const txt = am[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+        if (txt.includes(cfg.linkText)) { issueHref = am[1]; break; }
+      }
+      if (!issueHref) throw new Error('no-issue-link');
+    } else if (cfg.itemPattern) {
+      // جدیدترین شماره = لینکی که بزرگ‌ترین شناسه عددی (۴+ رقم) را دارد؛ شناسه‌ها صعودی‌اند
+      const hrefRe = /href=(["'])([^"']+)\1/gi;
+      const itemRe = new RegExp(cfg.itemPattern, 'i');
+      const idRe = cfg.idPattern ? new RegExp(cfg.idPattern, 'i') : null;
+      let bestId = 0;
+      let hm: RegExpExecArray | null;
+      while ((hm = hrefRe.exec(listHtml))) {
+        const href = hm[2];
+        if (!itemRe.test(href)) continue;
+        let id = 0;
+        if (idRe) {
+          const im = href.match(idRe);
+          if (im) id = Number(im[1] || im[0].replace(/\D/g, ''));
+        } else {
+          const ids = href.match(/\d{4,}/g);
+          if (ids) id = Math.max(...ids.map(Number));
+        }
+        if (id > bestId) { bestId = id; issueHref = href; }
+      }
+      if (!issueHref) throw new Error('no-issue-link');
+    } else {
+      throw new Error('no-issue-selector');
+    }
+    const issueUrl = absolutize(issueHref, listUrl);
+    const issueHtml = await fetchText(issueUrl);
+    const needles = todayNeedles(day);
+    const dateOnPage = needles.some((n) => issueHtml.includes(n));
+
+    let imageUrl = '';
+    if (cfg.ogImage) {
+      const og = issueHtml.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+        || issueHtml.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i);
+      if (!og) throw new Error('no-og-image');
+      imageUrl = absolutize(og[1], issueUrl);
+    } else {
+      const patterns: string[] = cfg.imgPatternList || (cfg.imgPattern ? [cfg.imgPattern] : []);
+      if (patterns.length === 0) throw new Error('no-img-selector');
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const datePath = `/${day.jy}/${pad(day.jm)}/${pad(day.jd)}/`;
+      for (const p of patterns) {
+        const re = new RegExp(p, 'gi');
+        const hits: string[] = [];
+        let hm: RegExpExecArray | null;
+        while ((hm = re.exec(issueHtml))) {
+          const u = hm[1] || hm[0];
+          if (u.startsWith('data:') || u.endsWith('.svg')) continue;
+          if (/logo|icon|avatar|banner|ads/i.test(u)) continue;
+          if (cfg.datePath && !u.includes(datePath)) continue;
+          hits.push(u);
+        }
+        if (hits.length === 0) continue;
+        let pick = hits[0];
+        if (cfg.preferLargestWidth) {
+          let bestW = -1;
+          for (const h of hits) {
+            const wm = h.match(/[?&]width=(\d+)/i);
+            const w = wm ? Number(wm[1]) : 0;
+            if (w > bestW) { bestW = w; pick = h; }
+          }
+        }
+        imageUrl = absolutize(pick, issueUrl);
+        break;
+      }
+      if (!imageUrl) throw new Error('no-candidate');
+    }
+    if (cfg.imgSwap && Array.isArray(cfg.imgSwap) && cfg.imgSwap.length === 2) {
+      try {
+        const swapped = imageUrl.replace(new RegExp(cfg.imgSwap[0]), cfg.imgSwap[1]);
+        if (swapped !== imageUrl) imageUrl = swapped;
+      } catch {}
+    }
+    const titleM = issueHtml.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)
+      || issueHtml.match(/<title[^>]*>([^<]{0,300})<\/title>/i);
+    const title = titleM?.[1]?.replace(/\s+/g, ' ').trim();
+    return {
+      imageUrl,
+      pageUrl: issueUrl,
+      title,
+      evidence: { dateMatch: dateOnPage, nameMatch: !!title && title.includes(paper.name), official: true },
     };
   }
 }

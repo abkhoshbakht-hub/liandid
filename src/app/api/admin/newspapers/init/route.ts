@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { NEWSPAPER_SEEDS, KAYHAN_SOURCE, TELEGRAM_SOURCES } from '@/lib/newspapers/seed';
+import { NEWSPAPER_SEEDS, OFFICIAL_SOURCES, TELEGRAM_SOURCES } from '@/lib/newspapers/seed';
 
 // وضعیت راه‌اندازی ماژول روزنامه‌ها
 export async function GET() {
@@ -81,16 +81,17 @@ export async function POST() {
         data: { active: true },
       });
     } catch {}
-    // سورس خودکار تأییدشده کیهان (فقط یک بار)
-    const kayhan = await prisma.newspaper.findUnique({ where: { slug: KAYHAN_SOURCE.slug } });
+    // سورس‌های رسمی تأییدشده (فقط یک بار برای هر روزنامه)
     let kayhanSource = false;
-    if (kayhan) {
-      const ex = await prisma.newspaperSource.findFirst({ where: { newspaperId: kayhan.id, type: 'official' } });
+    for (const o of OFFICIAL_SOURCES) {
+      const paper = await prisma.newspaper.findUnique({ where: { slug: o.slug } });
+      if (!paper) continue;
+      const ex = await prisma.newspaperSource.findFirst({ where: { newspaperId: paper.id, type: 'official' } });
       if (!ex) {
         await prisma.newspaperSource.create({
-          data: { newspaperId: kayhan.id, name: KAYHAN_SOURCE.name, type: KAYHAN_SOURCE.type, url: KAYHAN_SOURCE.url, priority: KAYHAN_SOURCE.priority, active: true, configuration: KAYHAN_SOURCE.configuration },
+          data: { newspaperId: paper.id, name: o.name, type: o.type, url: o.url, priority: o.priority, active: true, configuration: o.configuration },
         });
-        kayhanSource = true;
+        if (o.slug === 'kayhan') kayhanSource = true;
       }
     }
 

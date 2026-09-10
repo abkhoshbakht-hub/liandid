@@ -26,6 +26,11 @@ export const NEWSPAPER_SEEDS: NewspaperSeed[] = [
   // ورزشی
   { name: 'ابرار ورزشی', slug: 'abrar-varzeshi', category: 'sports', displayOrder: 13, website: 'https://abrarvarzeshi.ir' },
   { name: 'گل', slug: 'goal', category: 'sports', displayOrder: 14, website: 'https://goaldaily.ir' },
+  // افزوده‌شده (پرامپت پیشخوان)
+  { name: 'اطلاعات', slug: 'ettelaat', category: 'national', displayOrder: 15, website: 'https://www.ettelaat.com' },
+  { name: 'جام جم', slug: 'jamjam', category: 'national', displayOrder: 16, website: 'https://jamejamdaily.ir' },
+  { name: 'هم‌میهن', slug: 'hammihan', category: 'national', displayOrder: 17, website: 'https://hammihanonline.ir' },
+  { name: 'ایران ورزشی', slug: 'iran-varzeshi', category: 'sports', displayOrder: 18, website: 'https://newspaper.inn.ir' },
 ];
 
 // کانال‌های تلگرام اعلام‌شده توسط مدیر سایت (نه حدسی)
@@ -60,3 +65,175 @@ export const KAYHAN_SOURCE = {
     keywords: ['کیهان', 'صفحه اول'],
   }),
 };
+
+// سورس‌های رسمی تأییدشده با مشاهده مستقیم HTML (ممیزی ۱۴۰۵/۰۶/۱۹) — هیچ URL حدسی نیست
+export interface OfficialSeed {
+  slug: string;
+  name: string;
+  type: string;
+  url: string;
+  priority: number;
+  configuration: string;
+}
+
+const SHARGH_SOURCE: OfficialSeed = {
+  slug: 'shargh',
+  name: 'آرشیو رسمی شرق',
+  type: 'official',
+  url: 'https://www.sharghdaily.com/بخش-پی-دی-اف-روزنامه-245',
+  priority: -1,
+  configuration: JSON.stringify({
+    archiveUrl: 'https://www.sharghdaily.com/بخش-پی-دی-اف-روزنامه-245',
+    itemPattern: '245\\/\\d+-',
+    ogImage: true,
+  }),
+};
+
+const IRAN_SOURCE: OfficialSeed = {
+  slug: 'iran',
+  name: 'آرشیو رسمی ایران',
+  type: 'official',
+  url: 'https://irannewspaper.ir/archive/main',
+  priority: -1,
+  configuration: JSON.stringify({
+    archiveUrl: 'https://irannewspaper.ir/archive/main',
+    itemPattern: '/\\d+"',
+    imgPatternList: ['media\\.irannewspaper\\.ir[^"\'\\s]+?-l\\.jpg', 'media\\.irannewspaper\\.ir[^"\'\\s]+?\\.(?:jpg|jpeg|png)'],
+    imgSwap: ['-[sm](\\.jpg)$', '-l$1'],
+  }),
+};
+
+const IRANVARZESHI_SOURCE: OfficialSeed = {
+  slug: 'iran-varzeshi',
+  name: 'آرشیو رسمی ایران ورزشی',
+  type: 'official',
+  url: 'https://newspaper.inn.ir/archive/main',
+  priority: -1,
+  configuration: JSON.stringify({
+    archiveUrl: 'https://newspaper.inn.ir/archive/main',
+    itemPattern: '/\\d+"',
+    imgPatternList: ['cdn-newspaper\\.inn\\.ir[^"\'\\s]+?-l\\.jpg', 'cdn-newspaper\\.inn\\.ir[^"\'\\s]+?\\.(?:jpg|jpeg|png)'],
+    imgSwap: ['-[sm](\\.jpg)$', '-l$1'],
+  }),
+};
+
+const ETTELAAT_SOURCE: OfficialSeed = {
+  slug: 'ettelaat',
+  name: 'نسخه روز اطلاعات',
+  type: 'official',
+  url: 'https://www.ettelaat.com/issue/latest',
+  priority: -1,
+  configuration: JSON.stringify({
+    pageUrl: 'https://www.ettelaat.com/issue/latest',
+    imgPattern: 'media\\.ettelaat\\.com[^"\'\\s]+?\\.jpg',
+    keywords: ['اطلاعات', 'صفحه اول'],
+  }),
+};
+
+const JAMJAM_SOURCE: OfficialSeed = {
+  slug: 'jamjam',
+  name: 'آرشیو رسمی جام جم',
+  type: 'official',
+  url: 'https://jamejamdaily.ir/Newspaper/Archivepage?Type=0',
+  priority: -1,
+  configuration: JSON.stringify({
+    archiveUrl: 'https://jamejamdaily.ir/Newspaper/Archivepage?Type=0',
+    itemPattern: 'nid=(\\d+)',
+    imgPatternList: ['newspaperimgl_\\d+_1\\.jpg[^"\'\\s]*'],
+    preferLargestWidth: true,
+  }),
+};
+
+const JAVAN_SOURCE: OfficialSeed = {
+  slug: 'javan',
+  name: 'آرشیو رسمی جوان',
+  type: 'official',
+  url: 'https://javanonline.ir/fa/publication',
+  priority: -1,
+  configuration: JSON.stringify({
+    archiveUrl: 'https://javanonline.ir/fa/publication',
+    itemPattern: '/fa/publication/(?!issue/)(\\d+)',
+    imgPatternList: ['/pages/[^"\'\\s]+?\\.jpg', 'cover_\\d+\\.png'],
+  }),
+};
+
+const VATAN_SOURCE: OfficialSeed = {
+  slug: 'vatan-emrooz',
+  name: 'آرشیو رسمی وطن امروز',
+  type: 'official',
+  url: 'https://vatanemrooz.ir/fa/publication',
+  priority: -1,
+  configuration: JSON.stringify({
+    archiveUrl: 'https://vatanemrooz.ir/fa/publication',
+    itemPattern: '/fa/publication/(?!issue/)(\\d+)',
+    imgPatternList: ['/pages/[^"\'\\s]+?\\.jpg', 'cover_\\d+\\.jpg'],
+  }),
+};
+
+const ETEMAD_SOURCE: OfficialSeed = {
+  slug: 'etemad',
+  name: 'نسخه روز اعتماد',
+  type: 'official',
+  url: 'https://etemadnewspaper.ir/',
+  priority: -1,
+  configuration: JSON.stringify({
+    pageUrl: 'https://etemadnewspaper.ir/',
+    imgPattern: 'Main/JPG/[^"\'\\s]+?\\.jpg',
+    datePath: true,
+    keywords: ['اعتماد', 'صفحه اول'],
+  }),
+};
+
+const DONYA_SOURCE: OfficialSeed = {
+  slug: 'donya-e-eqtesad',
+  name: 'نسخه روز دنیای اقتصاد',
+  type: 'official',
+  url: 'https://donya-e-eqtesad.com/',
+  priority: -1,
+  configuration: JSON.stringify({
+    pageUrl: 'https://donya-e-eqtesad.com/',
+    linkText: 'نسخه کامل شماره امروز',
+    imgPattern: 'cdn\\.donya-e-eqtesad\\.com[^"\'\\s]+?\\.jpg',
+  }),
+};
+
+const GOAL_SOURCE: OfficialSeed = {
+  slug: 'goal',
+  name: 'کیوسک رسمی گل',
+  type: 'official',
+  url: 'https://goaldaily.ir/',
+  priority: -1,
+  configuration: JSON.stringify({
+    archiveUrl: 'https://goaldaily.ir/',
+    itemPattern: 'newspaper/view/(\\d+)/',
+    imgPatternList: ['main_pic/[^"\'\\s]+?_p01\\.jpg'],
+  }),
+};
+
+const BAMDAD_SOURCE: OfficialSeed = {
+  slug: 'bamdad-jonoob',
+  name: 'آرشیو رسمی بامداد جنوب',
+  type: 'official',
+  url: 'https://bamdadjonub.ir/issues',
+  priority: -1,
+  configuration: JSON.stringify({
+    archiveUrl: 'https://bamdadjonub.ir/issues',
+    itemPattern: '/issues/(\\d+)/',
+    imgPatternList: ['-scaled\\.webp', '400x571\\.webp'],
+  }),
+};
+
+export const OFFICIAL_SOURCES: OfficialSeed[] = [
+  { ...KAYHAN_SOURCE },
+  SHARGH_SOURCE,
+  IRAN_SOURCE,
+  IRANVARZESHI_SOURCE,
+  ETTELAAT_SOURCE,
+  JAMJAM_SOURCE,
+  JAVAN_SOURCE,
+  VATAN_SOURCE,
+  ETEMAD_SOURCE,
+  DONYA_SOURCE,
+  GOAL_SOURCE,
+  BAMDAD_SOURCE,
+];

@@ -5,6 +5,59 @@ export const FETCH_UA =
 
 const MAX_BYTES = 15 * 1024 * 1024;
 
+// --- محافظت SSRF: فقط دامنه‌های مجاز (سایت‌های رسمی روزنامه‌ها + CDNها + تلگرام) ---
+// سورس‌های دستی ادمین (تأیید صریح مدیر) از این فهرست مستثنا هستند.
+const ALLOWED_HOSTS: RegExp[] = [
+  /^kayhan\.ir$/,
+  /^([a-z0-9-]+\.)?sharghdaily\.com$/,
+  /^([a-z0-9-]+\.)?irannewspaper\.ir$/,
+  /^([a-z0-9-]+\.)?inn\.ir$/,
+  /^([a-z0-9-]+\.)?ettelaat\.com$/,
+  /^([a-z0-9-]+\.)?jamejamdaily\.ir$/,
+  /^([a-z0-9-]+\.)?javanonline\.ir$/,
+  /^javann\.ir$/,
+  /^([a-z0-9-]+\.)?vatanemrooz\.ir$/,
+  /^([a-z0-9-]+\.)?etemadnewspaper\.ir$/,
+  /^([a-z0-9-]+\.)?donya-e-eqtesad\.com$/,
+  /^([a-z0-9-]+\.)?goaldaily\.ir$/,
+  /^([a-z0-9-]+\.)?bamdadjonub\.ir$/,
+  /^([a-z0-9-]+\.)?hamshahrionline\.ir$/,
+  /^([a-z0-9-]+\.)?hammihanonline\.ir$/,
+  /^([a-z0-9-]+\.)?farhikhteganonline\.ir$/,
+  /^([a-z0-9-]+\.)?abrarvarzeshi\.ir$/,
+  /^([a-z0-9-]+\.)?abrarnews\.com$/,
+  /^([a-z0-9-]+\.)?payameasalooye\.ir$/,
+  /^([a-z0-9-]+\.)?khorasannews\.com$/,
+  /^t\.me$/,
+  /^cdn\d*\.telegram\.org$/,
+];
+
+function hostBlocked(host: string): boolean {
+  const h = host.toLowerCase().replace(/\.$/, '');
+  if (h === 'localhost' || h === '::1' || h === '[::1]') return true;
+  if (/^(127\.|10\.|192\.168\.|169\.254\.)/.test(h)) return true;
+  if (/^172\.(1[6-9]|2\d|3[01])\./.test(h)) return true;
+  if (/metadata\.google|metadata\.azure|instance-data/.test(h)) return true;
+  return false;
+}
+
+export function assertFetchable(rawUrl: string): string {
+  let u: URL;
+  try {
+    u = new URL(rawUrl);
+  } catch {
+    throw new Error('bad-url');
+  }
+  if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error('bad-protocol');
+  if (hostBlocked(u.hostname)) throw new Error('blocked-host');
+  if (!ALLOWED_HOSTS.some((re) => re.test(u.hostname.toLowerCase()))) throw new Error('host-not-allowed');
+  return u.toString();
+}
+
+export function assertRedirectSafe(finalUrl: string): void {
+  assertFetchable(finalUrl);
+}
+
 export interface DownloadedImage {
   buffer: Buffer;
   mime: string;
@@ -69,12 +122,14 @@ export async function downloadImage(url: string, timeoutMs = 10000): Promise<Dow
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
+    assertFetchable(url);
     const res = await fetch(url, {
       signal: ctrl.signal,
       headers: { 'User-Agent': FETCH_UA, Accept: 'image/*,*/*' },
       redirect: 'follow',
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    try { assertRedirectSafe(res.url); } catch { throw new Error('redirect-blocked'); }
     const ct = res.headers.get('content-type') || '';
     if (!ct.startsWith('image/') && !ct.startsWith('application/octet-stream')) {
       throw new Error(`not-image: ${ct} url:${url.slice(0, 130)}`);
@@ -96,12 +151,14 @@ export async function fetchText(url: string, timeoutMs = 8000): Promise<string> 
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
+    assertFetchable(url);
     const res = await fetch(url, {
       signal: ctrl.signal,
       headers: { 'User-Agent': FETCH_UA, Accept: 'text/html,*/*' },
       redirect: 'follow',
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    try { assertRedirectSafe(res.url); } catch { throw new Error('redirect-blocked'); }
     return await res.text();
   } finally {
     clearTimeout(t);

@@ -14,6 +14,7 @@ export interface CoverItem {
 export default function CoverViewer({ items, index, onClose, onIndex }: { items: CoverItem[]; index: number; onClose: () => void; onIndex: (i: number) => void }) {
   const [zoom, setZoom] = useState(1);
   const boxRef = useRef<HTMLDivElement>(null);
+  const touchX = useRef<number | null>(null);
   const cur = items[index];
 
   const prev = useCallback(() => { setZoom(1); onIndex((index - 1 + items.length) % items.length); }, [index, items.length, onIndex]);
@@ -37,30 +38,41 @@ export default function CoverViewer({ items, index, onClose, onIndex }: { items:
 
   if (!cur) return null;
   return (
-    <div className="fixed inset-0 z-[100] bg-black/95 flex flex-col" dir="rtl">
+    <div className="fixed inset-0 z-[100] bg-black/95 flex flex-col" dir="rtl" role="dialog" aria-modal="true" aria-label={`صفحه اول ${cur.paperName}`}>
       <div className="flex items-center justify-between px-3 py-2 text-white shrink-0">
         <div className="text-sm font-bold truncate">{cur.paperName} — {cur.persianDate}{cur.issueNumber ? ` — شماره ${cur.issueNumber}` : ''}</div>
         <div className="flex items-center gap-1.5">
-          <button onClick={() => setZoom((z) => Math.max(0.5, +(z - 0.25).toFixed(2)))} className="w-9 h-9 rounded-lg bg-white/10 text-xl font-bold">−</button>
-          <button onClick={() => setZoom(1)} className="h-9 px-2 rounded-lg bg-white/10 text-xs">۱۰۰٪</button>
-          <button onClick={() => setZoom((z) => Math.min(4, +(z + 0.25).toFixed(2)))} className="w-9 h-9 rounded-lg bg-white/10 text-xl font-bold">+</button>
-          <button onClick={fullscreen} className="w-9 h-9 rounded-lg bg-white/10" title="تمام‌صفحه">
+          <button onClick={() => setZoom((z) => Math.max(0.5, +(z - 0.25).toFixed(2)))} aria-label="کوچک‌نمایی" className="w-9 h-9 rounded-lg bg-white/10 text-xl font-bold">−</button>
+          <button onClick={() => setZoom(1)} aria-label="اندازه واقعی" className="h-9 px-2 rounded-lg bg-white/10 text-xs">۱۰۰٪</button>
+          <button onClick={() => setZoom((z) => Math.min(4, +(z + 0.25).toFixed(2)))} aria-label="بزرگ‌نمایی" className="w-9 h-9 rounded-lg bg-white/10 text-xl font-bold">+</button>
+          <button onClick={fullscreen} aria-label="تمام‌صفحه" className="w-9 h-9 rounded-lg bg-white/10" title="تمام‌صفحه">
             <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4h4M20 8V4h-4m4 12v4h-4M4 16v4h4" /></svg>
           </button>
-          <button onClick={onClose} className="w-9 h-9 rounded-lg bg-red-600 font-bold">✕</button>
+          <button onClick={onClose} aria-label="بستن" className="w-9 h-9 rounded-lg bg-red-600 font-bold">✕</button>
         </div>
       </div>
-      <div ref={boxRef} className="flex-1 overflow-auto flex items-center justify-center relative bg-black">
+      <div
+        ref={boxRef}
+        className="flex-1 overflow-auto flex items-center justify-center relative bg-black"
+        onTouchStart={(e) => { touchX.current = e.touches[0].clientX; }}
+        onTouchEnd={(e) => {
+          if (touchX.current === null || zoom !== 1 || items.length < 2) return;
+          const dx = e.changedTouches[0].clientX - touchX.current;
+          touchX.current = null;
+          if (dx < -50) next(); // سوایپ به چپ = بعدی (RTL)
+          else if (dx > 50) prev();
+        }}
+      >
         {items.length > 1 && (
           <>
-            <button onClick={prev} className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-white/15 text-white text-2xl">‹</button>
-            <button onClick={next} className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-white/15 text-white text-2xl">›</button>
+            <button onClick={prev} aria-label="قبلی" className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-white/15 text-white text-2xl">‹</button>
+            <button onClick={next} aria-label="بعدی" className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-white/15 text-white text-2xl">›</button>
           </>
         )}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={cur.imageUrl}
-          alt={`صفحه اول ${cur.paperName}`}
+          alt={`صفحه اول روزنامه ${cur.paperName} - ${cur.persianDate}`}
           className="m-auto transition-all"
           style={zoom === 1 ? { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } : { width: `${zoom * 90}%`, maxWidth: 'none' }}
           draggable={false}

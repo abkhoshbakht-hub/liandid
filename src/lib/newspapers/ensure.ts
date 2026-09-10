@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { NEWSPAPER_SEEDS, KAYHAN_SOURCE, TELEGRAM_SOURCES } from './seed';
+import { NEWSPAPER_SEEDS, OFFICIAL_SOURCES, TELEGRAM_SOURCES } from './seed';
 
 // خودترمیم: روزنامه‌ها و سورس‌های پیش‌فرض گمشده را می‌سازد (idempotent).
 // در ابتدای هر دریافت (دستی و کرون) صدا زده می‌شود تا هیچ‌وقت «بدون سورس» نمانیم.
@@ -35,13 +35,15 @@ export async function ensureDefaultSources(): Promise<{ papers: number; sources:
     bySlug[s.slug] = bySlug[s.slug] || { id, types: [] };
   }
 
-  // سورس رسمی کیهان
-  const kayhanId = bySlug[KAYHAN_SOURCE.slug]?.id;
-  if (kayhanId && !bySlug[KAYHAN_SOURCE.slug].types.includes('official')) {
-    await prisma.newspaperSource.create({
-      data: { newspaperId: kayhanId, name: KAYHAN_SOURCE.name, type: KAYHAN_SOURCE.type, url: KAYHAN_SOURCE.url, priority: KAYHAN_SOURCE.priority, active: true, configuration: KAYHAN_SOURCE.configuration },
-    });
-    sources++;
+  // سورس‌های رسمی تأییدشده (کیهان، شرق، ایران، ...)
+  for (const o of OFFICIAL_SOURCES) {
+    const oid = bySlug[o.slug]?.id;
+    if (oid && !bySlug[o.slug].types.includes('official')) {
+      await prisma.newspaperSource.create({
+        data: { newspaperId: oid, name: o.name, type: o.type, url: o.url, priority: o.priority, active: true, configuration: o.configuration },
+      });
+      sources++;
+    }
   }
 
   // کانال‌های تلگرام اعلام‌شده توسط مدیر
