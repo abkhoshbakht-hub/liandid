@@ -129,13 +129,24 @@ export class TelegramAdapter implements BaseAdapter {
     let photoBlocks = 0;
     const seenHours = new Set<string>();
     for (const b of blocks) {
-      const imgM =
-        b.match(/background-image:url\(['"]?(https:\/\/cdn\d*\.telegram\.org\/[^'")]+)['"]?\)/) ||
-        b.match(/(https:\/\/cdn\d*\.telegram\.org\/file\/[A-Za-z0-9_-]+)/);
+      // استخراج تلورانس‌دار عکس: هر background-image (با/بدون فاصله)، بعد img تگ، بعد الگوی قدیمی
+      let imgUrl: string | null = null;
+      const bgAll = [...b.matchAll(/background-image\s*:\s*url\(\s*['"]?([^'")\s]+)['"]?\s*\)/gi)].map((m) => m[1]);
+      imgUrl = bgAll.find((u) => /telegram\.org|t\.me/i.test(u)) || bgAll[0] || null;
+      if (!imgUrl) {
+        const im = b.match(/<img[^>]+src=["']([^"']+)["']/i);
+        if (im && !/emoji|sticker|avatar|logo/i.test(im[1])) imgUrl = im[1];
+      }
+      if (!imgUrl) {
+        const fm = b.match(/(https:\/\/cdn\d*\.telegram\.org\/file\/[A-Za-z0-9_-]+)/);
+        if (fm) imgUrl = fm[1];
+      }
       const dtM0 = b.match(/datetime="([^"]+)"/);
       if (dtM0?.[1]) seenHours.add(dtM0[1].slice(0, 13));
-      if (!imgM) continue;
+      if (!imgUrl) continue;
+      if (imgUrl.startsWith('/')) imgUrl = `https://t.me${imgUrl}`;
       photoBlocks++;
+      const imgM = [imgUrl, imgUrl.replace(/&amp;/g, '&')];
       const txtM = b.match(/tgme_widget_message_text[^>]*>([\s\S]{0,2000}?)(<\/div>)/);
       const rawTxt = txtM ? txtM[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '';
       const dtM = b.match(/datetime="([^"]+)"/);
@@ -145,7 +156,7 @@ export class TelegramAdapter implements BaseAdapter {
       if (COVER_WORDS.test(rawTxt)) score += 50;
       if (rawTxt.includes(paper.name)) score += 25;
       if (/روزنامه/.test(rawTxt)) score += 10;
-      todays.push({ img: imgM[1].replace(/&amp;/g, '&'), caption: rawTxt.slice(0, 300), dt, score });
+      todays.push({ img: imgM[1], caption: rawTxt.slice(0, 300), dt, score });
     }
     if (todays.length === 0) {
       const hours = [...seenHours].slice(-6).join(',');
@@ -198,7 +209,7 @@ export async function debugTelegramPage(src: SourceLike): Promise<any> {
     let photos = 0;
     const dts = new Set<string>();
     for (const b of blocks) {
-      if (/cdn\d*\.telegram\.org\/file\//.test(b)) photos++;
+      if (/background-image\s*:\s*url\(/i.test(b) || /<img[^>]+src=/i.test(b) || /cdn\d*\.telegram\.org\/file\//.test(b)) photos++;
       const m = b.match(/datetime="([^"]+)"/);
       if (m) dts.add(m[1].slice(0, 13));
     }
