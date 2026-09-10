@@ -6,6 +6,7 @@ import LatestNews from '@/components/news/LatestNews';
 import AnalysisSection from '@/components/news/AnalysisSection';
 import RssNewsFeed from '@/components/news/RssNewsFeed';
 import SubmitBanner from '@/components/home/SubmitBanner';
+import NewspapersStrip from '@/components/home/NewspapersStrip';
 import { Metadata } from 'next';
 
 // پشتیبان: حداکثر هر ۵ دقیقه بازسازی (به‌روزرسانی اصلی با انتشار خبر انجام می‌شود)
@@ -192,6 +193,9 @@ export default async function HomePage() {
       <main className="bg-gray-50 min-h-screen">
         <div className="site-container pt-4">
           <HeroSection main={data.heroMain} side1={data.heroSide1} side2={data.heroSide2} />
+
+          {/* صفحه اول روزنامه‌ها */}
+          <NewspapersStrip />
 
           {/* Latest News + RSS */}
           <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
