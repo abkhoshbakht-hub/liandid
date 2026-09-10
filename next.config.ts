@@ -41,6 +41,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '*.tasnimnews.ir' },
       { protocol: 'https', hostname: 'www.pishkhan.com' },
       { protocol: 'https', hostname: 'khorasanonline.ir' },
+      { protocol: 'https', hostname: '*.khorasanonline.ir' },
     ],
   },
 };

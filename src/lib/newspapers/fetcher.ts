@@ -30,6 +30,8 @@ function scoreCandidate(c: CoverCandidate, img: DownloadedImage, paperName: stri
   else if (img.width >= 300) s += 4;
   const ratio = img.width / img.height;
   if (ratio >= 0.5 && ratio <= 1.1) s += 5; // پرتره مثل جلد واقعی
+  // تصویر افقی (مثل پیش‌نمایش دوصفحه‌ای) هرگز جلد قطعی نیست → سقف نیاز به بررسی
+  if (ratio > 1.1) return Math.min(s, 69);
   return Math.min(100, s);
 }
 

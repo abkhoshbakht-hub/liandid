@@ -104,8 +104,8 @@ const IRAN_SOURCE: OfficialSeed = {
   priority: -1,
   configuration: JSON.stringify({
     archiveUrl: 'https://irannewspaper.ir/archive/main',
-    itemPattern: '/\\d+"',
-    imgPatternList: ['media\\.irannewspaper\\.ir[^"\'\\s]+?-l\\.jpg', 'media\\.irannewspaper\\.ir[^"\'\\s]+?\\.(?:jpg|jpeg|png)'],
+    itemPattern: '^/\\d+$',
+    imgPatternList: ['((?:https?:)?//media\\.irannewspaper\\.ir/[^"\'\\s)]+?-l\\.jpg)', '((?:https?:)?//media\\.irannewspaper\\.ir/[^"\'\\s)]+?\\.(?:jpg|jpeg|png))'],
     imgSwap: ['-[sm](\\.jpg)$', '-l$1'],
   }),
 };
@@ -118,8 +118,8 @@ const IRANVARZESHI_SOURCE: OfficialSeed = {
   priority: -1,
   configuration: JSON.stringify({
     archiveUrl: 'https://newspaper.inn.ir/archive/main',
-    itemPattern: '/\\d+"',
-    imgPatternList: ['cdn-newspaper\\.inn\\.ir[^"\'\\s]+?-l\\.jpg', 'cdn-newspaper\\.inn\\.ir[^"\'\\s]+?\\.(?:jpg|jpeg|png)'],
+    itemPattern: '^/\\d+$',
+    imgPatternList: ['((?:https?:)?//cdn-newspaper\\.inn\\.ir/[^"\'\\s)]+?-l\\.jpg)', '((?:https?:)?//cdn-newspaper\\.inn\\.ir/[^"\'\\s)]+?\\.(?:jpg|jpeg|png))'],
     imgSwap: ['-[sm](\\.jpg)$', '-l$1'],
   }),
 };
@@ -132,7 +132,7 @@ const ETTELAAT_SOURCE: OfficialSeed = {
   priority: -1,
   configuration: JSON.stringify({
     pageUrl: 'https://www.ettelaat.com/issue/latest',
-    imgPattern: 'media\\.ettelaat\\.com[^"\'\\s]+?\\.jpg',
+    imgPattern: '((?:https?:)?//media\\.ettelaat\\.com/[^"\'\\s)]+?\\.jpg)',
     keywords: ['اطلاعات', 'صفحه اول'],
   }),
 };
@@ -146,8 +146,9 @@ const JAMJAM_SOURCE: OfficialSeed = {
   configuration: JSON.stringify({
     archiveUrl: 'https://jamejamdaily.ir/Newspaper/Archivepage?Type=0',
     itemPattern: 'nid=(\\d+)',
-    imgPatternList: ['newspaperimgl_\\d+_1\\.jpg[^"\'\\s]*'],
+    imgPatternList: ['(/content/newspaper/[^"\'\\s)]+?newspaperimgl_\\d+_1\\.jpg[^"\'\\s)]*)'],
     preferLargestWidth: true,
+    preferFirstPage: true,
   }),
 };
 
@@ -160,7 +161,7 @@ const JAVAN_SOURCE: OfficialSeed = {
   configuration: JSON.stringify({
     archiveUrl: 'https://javanonline.ir/fa/publication',
     itemPattern: '/fa/publication/(?!issue/)(\\d+)',
-    imgPatternList: ['/pages/[^"\'\\s]+?\\.jpg', 'cover_\\d+\\.png'],
+    imgPatternList: ['(/files/[^"\'\\s)]*?/pages/[^"\'\\s)]+?\\.jpg)', '(/files/[^"\'\\s)]*?cover_\\d+\\.png)'],
   }),
 };
 
@@ -172,8 +173,10 @@ const VATAN_SOURCE: OfficialSeed = {
   priority: -1,
   configuration: JSON.stringify({
     archiveUrl: 'https://vatanemrooz.ir/fa/publication',
-    itemPattern: '/fa/publication/(?!issue/)(\\d+)',
-    imgPatternList: ['/pages/[^"\'\\s]+?\\.jpg', 'cover_\\d+\\.jpg'],
+    itemPattern: '/fa/publication/issue/(\\d+)/',
+    idPattern: '/issue/(\\d+)/',
+    preferFirstPage: true,
+    imgPatternList: ['(/files/[^"\'\\s)]*?/pages/[^"\'\\s)]+?\\.jpg)', '(/files/[^"\'\\s)]*?cover_\\d+\\.jpg)'],
   }),
 };
 
@@ -185,7 +188,7 @@ const ETEMAD_SOURCE: OfficialSeed = {
   priority: -1,
   configuration: JSON.stringify({
     pageUrl: 'https://etemadnewspaper.ir/',
-    imgPattern: 'Main/JPG/[^"\'\\s]+?\\.jpg',
+    imgPattern: '(https?://www\\.etemadnewspaper\\.ir/\\d{4}/\\d{2}/\\d{2}/Main/JPG/[^"\'\\s)]+?\\.jpg)',
     datePath: true,
     keywords: ['اعتماد', 'صفحه اول'],
   }),
@@ -200,7 +203,7 @@ const DONYA_SOURCE: OfficialSeed = {
   configuration: JSON.stringify({
     pageUrl: 'https://donya-e-eqtesad.com/',
     linkText: 'نسخه کامل شماره امروز',
-    imgPattern: 'cdn\\.donya-e-eqtesad\\.com[^"\'\\s]+?\\.jpg',
+    imgPattern: '((?:https?:)?//cdn\\.donya-e-eqtesad\\.com/[^"\'\\s)]+?\\.jpg)',
   }),
 };
 
@@ -213,7 +216,7 @@ const GOAL_SOURCE: OfficialSeed = {
   configuration: JSON.stringify({
     archiveUrl: 'https://goaldaily.ir/',
     itemPattern: 'newspaper/view/(\\d+)/',
-    imgPatternList: ['main_pic/[^"\'\\s]+?_p01\\.jpg'],
+    imgPatternList: ['(/cache/[^"\'\\s)]*?main_pic/[^"\'\\s)]+?_p01\\.jpg)'],
   }),
 };
 
@@ -226,7 +229,7 @@ const BAMDAD_SOURCE: OfficialSeed = {
   configuration: JSON.stringify({
     archiveUrl: 'https://bamdadjonub.ir/issues',
     itemPattern: '/issues/(\\d+)/',
-    imgPatternList: ['-scaled\\.webp', '400x571\\.webp'],
+    imgPatternList: ['(/[^\\s"\']*?-scaled\\.webp)', '(/[^\\s"\']*?400x571\\.webp)'],
   }),
 };
 
@@ -267,12 +270,19 @@ const tasnim = (slug: string): ExtraSeed => ({
 
 export const EXTRA_SOURCES: ExtraSeed[] = [
   {
+    // PRIMARY تأییدشده با مشاهده مستقیم HTML صفحه امروز (شماره 22138 — 1405/6/19)
     slug: 'khorasan',
-    name: 'سایت رسمی خراسان',
+    name: 'آرشیو رسمی خراسان',
     type: 'official',
     url: 'https://khorasanonline.ir/',
     priority: -1,
-    configuration: JSON.stringify({ pageUrl: 'https://khorasanonline.ir/', keywords: ['خراسان', 'صفحه اول', 'جلد'] }),
+    configuration: JSON.stringify({
+      archiveUrl: 'https://khorasanonline.ir/',
+      itemPattern: 'nid=(\\d+)',
+      imgPatternList: ['(/content/newspaper/[^"\'\\s)]+?newspaperimgl_\\d+_1\\.jpg[^"\'\\s)]*)'],
+      preferLargestWidth: true,
+      preferFirstPage: true,
+    }),
   },
   {
     slug: 'payam-asaluyeh',

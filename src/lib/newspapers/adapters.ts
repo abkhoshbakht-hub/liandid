@@ -26,9 +26,9 @@ export function faToEnDigits(s: string): string {
   return (s || '').replace(/[۰-۹]/g, (d) => String(FA_DIGITS.indexOf(d)));
 }
 
-// استخراج شماره روزنامه از کپشن (مثل «شماره ۵۴۷۱»)
+// استخراج شماره روزنامه از کپشن (مثل «شماره ۵۴۷۱» یا «شماره :22138»)
 export function extractIssueNumber(text: string): string | undefined {
-  const m = (text || '').match(/شماره\s*([۰-۹0-9][۰-۹0-9.,]*)/);
+  const m = (text || '').match(/شماره\s*:?\s*([۰-۹0-9][۰-۹0-9.,]*)/);
   if (!m) return undefined;
   const num = faToEnDigits(m[1]).replace(/[.,]/g, '');
   return num || undefined;
@@ -70,6 +70,7 @@ export interface OfficialCfg {
   linkText?: string;
   itemPattern?: string;
   idPattern?: string;
+  preferFirstPage?: boolean;
   ogImage?: boolean;
   imgPattern?: string;
   imgPatternList?: string[];
@@ -81,7 +82,10 @@ export interface OfficialCfg {
 
 function absolutize(src: string, base: string): string {
   try {
-    return new URL(src, base).toString();
+    const s = (src || '').trim().replace(/&amp;/g, '&');
+    if (/^\/\//.test(s)) return 'https:' + s; // protocol-relative
+    if (/^[a-z0-9-]+(\.[a-z0-9-]+)+\//i.test(s)) return 'https://' + s; // هاست بدون اسکیم
+    return new URL(s, base).toString();
   } catch {
     return src;
   }
@@ -160,13 +164,14 @@ export class OfficialWebsiteAdapter implements BaseAdapter {
     if (!listUrl) throw new Error('no-page-url');
     const listHtml = await fetchText(listUrl);
     let issueHref = '';
+    let bestId = 0;
     if (cfg.linkText) {
       // اولین لینکی که متنش حاوی عبارت مشخص است (مثل «نسخه کامل شماره امروز»)
       const aRe = /<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]{0,300}?)<\/a>/gi;
       let am: RegExpExecArray | null;
       while ((am = aRe.exec(listHtml))) {
         const txt = am[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
-        if (txt.includes(cfg.linkText)) { issueHref = am[1]; break; }
+        if (txt.includes(cfg.linkText)) { issueHref = am[1].replace(/&amp;/g, '&'); break; }
       }
       if (!issueHref) throw new Error('no-issue-link');
     } else if (cfg.itemPattern) {
@@ -174,22 +179,27 @@ export class OfficialWebsiteAdapter implements BaseAdapter {
       const hrefRe = /href=(["'])([^"']+)\1/gi;
       const itemRe = new RegExp(cfg.itemPattern, 'i');
       const idRe = cfg.idPattern ? new RegExp(cfg.idPattern, 'i') : null;
-      let bestId = 0;
-      let hm: RegExpExecArray | null;
-      while ((hm = hrefRe.exec(listHtml))) {
-        const href = hm[2];
-        if (!itemRe.test(href)) continue;
-        let id = 0;
+      const idOf = (href: string): number => {
         if (idRe) {
           const im = href.match(idRe);
-          if (im) id = Number(im[1] || im[0].replace(/\D/g, ''));
-        } else {
-          const ids = href.match(/\d{4,}/g);
-          if (ids) id = Math.max(...ids.map(Number));
+          return im ? Number(im[1] || im[0].replace(/\D/g, '')) : 0;
         }
-        if (id > bestId) { bestId = id; issueHref = href; }
+        const ids = href.match(/\d{4,}/g);
+        return ids ? Math.max(...ids.map(Number)) : 0;
+      };
+      const cands: string[] = [];
+      let hm: RegExpExecArray | null;
+      while ((hm = hrefRe.exec(listHtml))) {
+        const href = hm[2].replace(/&amp;/g, '&');
+        if (!itemRe.test(href)) continue;
+        const id = idOf(href);
+        if (id <= 0) continue;
+        if (id > bestId) { bestId = id; cands.length = 0; cands.push(href); }
+        else if (id === bestId) cands.push(href);
       }
-      if (!issueHref) throw new Error('no-issue-link');
+      if (cands.length === 0) throw new Error('no-issue-link');
+      // ترجیح صفحه اول شماره (…/ID/1 یا pid=1) تا صفحه داخلی انتخاب نشود
+      issueHref = (cfg.preferFirstPage && (cands.find((h) => /[?&#/]pid=1([?&#/]|$)/.test(h)) || cands.find((h) => new RegExp(`/${bestId}/1/?([?#]|$)`).test(h)))) || cands[0];
     } else {
       throw new Error('no-issue-selector');
     }
@@ -214,17 +224,21 @@ export class OfficialWebsiteAdapter implements BaseAdapter {
         const hits: string[] = [];
         let hm: RegExpExecArray | null;
         while ((hm = re.exec(issueHtml))) {
-          const u = hm[1] || hm[0];
+          const u = (hm[1] || hm[0]).replace(/&amp;/g, '&');
           if (u.startsWith('data:') || u.endsWith('.svg')) continue;
           if (/logo|icon|avatar|banner|ads/i.test(u)) continue;
+          if (/[?&]crop=/i.test(u)) continue; // برش زوم جزئیات — جلد کامل نیست
           if (cfg.datePath && !u.includes(datePath)) continue;
           hits.push(u);
         }
         if (hits.length === 0) continue;
-        let pick = hits[0];
+        // اول فقط تصاویر همین شماره (جلوگیری از انتخاب جلد شماره قدیمی‌تر)
+        const idHits = bestId > 0 ? hits.filter((h) => h.includes(String(bestId))) : [];
+        const pool = idHits.length > 0 ? idHits : hits;
+        let pick = pool[0];
         if (cfg.preferLargestWidth) {
           let bestW = -1;
-          for (const h of hits) {
+          for (const h of pool) {
             const wm = h.match(/[?&]width=(\d+)/i);
             const w = wm ? Number(wm[1]) : 0;
             if (w > bestW) { bestW = w; pick = h; }
@@ -246,10 +260,12 @@ export class OfficialWebsiteAdapter implements BaseAdapter {
     const titleM = issueHtml.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)
       || issueHtml.match(/<title[^>]*>([^<]{0,300})<\/title>/i);
     const title = titleM?.[1]?.replace(/\s+/g, ' ').trim();
+    const nidM = issueUrl.match(/[?&]nid=(\d+)/);
     return {
       imageUrl,
       pageUrl: issueUrl,
       title,
+      issueNumber: extractIssueNumber(title || '') || nidM?.[1],
       evidence: { dateMatch: dateOnPage, nameMatch: !!title && title.includes(paper.name), official: true },
     };
   }
@@ -290,7 +306,9 @@ export class TelegramAdapter implements BaseAdapter {
       }
       // استخراج عکس — فقط آدرس واقعاً تصویری قبول است (صفحه HTML هرگز)
       const cands: string[] = [];
-      for (const m of b.matchAll(/background-image\s*:\s*url\(\s*['"]?([^'")\s]+)['"]?\s*\)/gi)) cands.push(m[1]);
+      for (const m of b.matchAll(/background-image\s*:\s*url\(\s*['"]?([^'")\s]+)['"]?\s*\)/gi)) {
+        if (!/emoji|sticker|avatar|logo/i.test(m[1])) cands.push(m[1]);
+      }
       const im = b.match(/<img[^>]+src=["']([^"']+)["']/i);
       if (im && !/emoji|sticker|avatar|logo/i.test(im[1])) cands.push(im[1]);
       const fm = b.match(/(https:\/\/cdn\d*\.telegram\.org\/file\/[A-Za-z0-9_-]+)/);

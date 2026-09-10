@@ -33,6 +33,7 @@ const ALLOWED_HOSTS: RegExp[] = [
   /^([a-z0-9-]+\.)?pishkhan\.com$/,
   /^t\.me$/,
   /^cdn\d*\.telegram\.org$/,
+  /^([a-z0-9-]+\.)?telegram\.org$/,
 ];
 
 function hostBlocked(host: string): boolean {
@@ -44,6 +45,14 @@ function hostBlocked(host: string): boolean {
   return false;
 }
 
+export function hostOf(rawUrl: string): string {
+  try {
+    return new URL(rawUrl).hostname.toLowerCase();
+  } catch {
+    return '?';
+  }
+}
+
 export function assertFetchable(rawUrl: string): string {
   let u: URL;
   try {
@@ -52,13 +61,17 @@ export function assertFetchable(rawUrl: string): string {
     throw new Error('bad-url');
   }
   if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error('bad-protocol');
-  if (hostBlocked(u.hostname)) throw new Error('blocked-host');
-  if (!ALLOWED_HOSTS.some((re) => re.test(u.hostname.toLowerCase()))) throw new Error('host-not-allowed');
+  if (hostBlocked(u.hostname)) throw new Error(`blocked-host:${u.hostname.toLowerCase()}`);
+  if (!ALLOWED_HOSTS.some((re) => re.test(u.hostname.toLowerCase()))) throw new Error(`host-not-allowed:${u.hostname.toLowerCase()}`);
   return u.toString();
 }
 
 export function assertRedirectSafe(finalUrl: string): void {
-  assertFetchable(finalUrl);
+  try {
+    assertFetchable(finalUrl);
+  } catch {
+    throw new Error(`redirect-blocked:${hostOf(finalUrl)}`);
+  }
 }
 
 export interface DownloadedImage {
@@ -160,8 +173,8 @@ export async function fetchText(url: string, timeoutMs = 8000): Promise<string> 
       headers: { 'User-Agent': FETCH_UA, Accept: 'text/html,*/*' },
       redirect: 'follow',
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    try { assertRedirectSafe(res.url); } catch { throw new Error('redirect-blocked'); }
+    if (!res.ok) throw new Error(`HTTP ${res.status} ${hostOf(url)}`);
+    try { assertRedirectSafe(res.url); } catch { throw new Error(`redirect-blocked:${hostOf(res.url)}`); }
     return await res.text();
   } finally {
     clearTimeout(t);
