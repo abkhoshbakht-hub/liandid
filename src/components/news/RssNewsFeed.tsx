@@ -14,6 +14,15 @@ interface RssNews {
   publishedAt: string | null;
 }
 
+interface CoverPaper {
+  id: string;
+  name: string;
+  slug: string;
+  today: { imageUrl: string; thumbnailUrl: string | null; persianDate: string } | null;
+}
+
+const COVERS_SHOWN = 4;
+
 export default function RssNewsFeed() {
   const [news, setNews] = useState<RssNews[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,6 +30,8 @@ export default function RssNewsFeed() {
   const [refreshing, setRefreshing] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [covers, setCovers] = useState<CoverPaper[]>([]);
+  const [coversLoading, setCoversLoading] = useState(false);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -48,7 +59,18 @@ export default function RssNewsFeed() {
   };
 
   useEffect(() => {
-    fetchNews(activeTab);
+    if (activeTab === 'روزنامه') {
+      setCoversLoading(true);
+      fetch('/api/newspapers')
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.success) setCovers((d.data.papers || []).filter((p: CoverPaper) => p.today));
+        })
+        .catch(() => {})
+        .finally(() => setCoversLoading(false));
+    } else {
+      fetchNews(activeTab);
+    }
   }, [activeTab]);
 
   const handleRefresh = async () => {
@@ -128,15 +150,40 @@ export default function RssNewsFeed() {
         </div>
       </div>
 
-      {activeTab === 'روزنامه' && (
-        <a href="/kiosk" className="block mx-4 mt-3 px-4 py-2.5 bg-[#1B365D] text-white text-center text-[13px] font-extrabold rounded-xl hover:bg-[#0f2d52] transition-colors">
-          مشاهده تصویر صفحه اول روزنامه‌ها
-        </a>
-      )}
-
       {/* لیست اخبار */}
       <div className="flex-1 min-h-0 overflow-y-auto">
-        {loading ? (
+        {activeTab === 'روزنامه' ? (
+          coversLoading ? (
+            <div className="p-12 text-center">
+              <div className="w-8 h-8 border-2 border-[#C9A96E] border-t-[#1B365D] rounded-full animate-spin mx-auto" />
+              <p className="text-sm text-gray-400 mt-4">در حال دریافت جلدها...</p>
+            </div>
+          ) : covers.length === 0 ? (
+            <div className="p-12 text-center text-gray-400">
+              <p className="text-sm">هنوز جلدی ثبت نشده است</p>
+            </div>
+          ) : (
+            <div className="p-3 space-y-4">
+              {covers.slice(0, COVERS_SHOWN).map((p) => (
+                <a key={p.id} href={`/newspapers/${p.slug}`} className="block group">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={p.today!.thumbnailUrl || p.today!.imageUrl}
+                    alt={`صفحه اول روزنامه ${p.name}`}
+                    className="w-full rounded-xl border border-gray-100 shadow-sm group-hover:shadow-md transition-shadow"
+                    loading="lazy"
+                  />
+                  <div className="text-center text-xs font-bold text-[#1B365D] mt-1.5">{p.name}</div>
+                </a>
+              ))}
+              {covers.length > COVERS_SHOWN && (
+                <a href="/newspapers" className="block w-full py-2.5 text-sm font-bold text-white bg-[#1B365D] hover:bg-[#0f2d52] transition-colors rounded-xl text-center">
+                  بیشتر
+                </a>
+              )}
+            </div>
+          )
+        ) : loading ? (
           <div className="p-12 text-center">
             <div className="w-8 h-8 border-2 border-[#C9A96E] border-t-[#1B365D] rounded-full animate-spin mx-auto" />
             <p className="text-sm text-gray-400 mt-4">در حال دریافت اخبار...</p>
