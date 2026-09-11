@@ -34,6 +34,7 @@ const ALLOWED_HOSTS: RegExp[] = [
   /^t\.me$/,
   /^cdn\d*\.telegram\.org$/,
   /^([a-z0-9-]+\.)?telegram\.org$/,
+  /^cdn\d*\.telesco\.pe$/,
 ];
 
 function hostBlocked(host: string): boolean {

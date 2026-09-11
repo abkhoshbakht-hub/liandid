@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { NEWSPAPER_SEEDS, OFFICIAL_SOURCES, EXTRA_SOURCES, TELEGRAM_SOURCES } from '@/lib/newspapers/seed';
 
 // وضعیت راه‌اندازی ماژول روزنامه‌ها
 export async function GET() {
@@ -62,75 +61,12 @@ export async function POST() {
       await prisma.$executeRawUnsafe(`ALTER TABLE "NewspaperIssue" ADD CONSTRAINT "NewspaperIssue_newspaperId_fkey" FOREIGN KEY ("newspaperId") REFERENCES "Newspaper"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
     } catch {}
 
-    let seeded = 0;
-    for (const s of NEWSPAPER_SEEDS) {
-      const existing = await prisma.newspaper.findUnique({ where: { slug: s.slug } });
-      if (!existing) {
-        await prisma.newspaper.create({
-          data: { name: s.name, slug: s.slug, category: s.category, displayOrder: s.displayOrder, website: (s as any).website || null, active: true },
-        });
-        seeded++;
-      } else if ((s as any).website && !existing.website) {
-        await prisma.newspaper.update({ where: { slug: s.slug }, data: { website: (s as any).website } });
-      }
-    }
-    // خودترمیم فعال‌بودن ردیف‌های قدیمی (active ‏NULL‏/false)
-    try {
-      await prisma.newspaper.updateMany({
-        where: { slug: { in: NEWSPAPER_SEEDS.map((s) => s.slug) }, NOT: { active: true } },
-        data: { active: true },
-      });
-    } catch {}
-    // سورس‌های رسمی تأییدشده (فقط یک بار برای هر روزنامه)
-    let kayhanSource = false;
-    for (const o of OFFICIAL_SOURCES) {
-      const paper = await prisma.newspaper.findUnique({ where: { slug: o.slug } });
-      if (!paper) continue;
-      const ex = await prisma.newspaperSource.findFirst({ where: { newspaperId: paper.id, type: 'official' } });
-      if (!ex) {
-        await prisma.newspaperSource.create({
-          data: { newspaperId: paper.id, name: o.name, type: o.type, url: o.url, priority: o.priority, active: true, configuration: o.configuration },
-        });
-        if (o.slug === 'kayhan') kayhanSource = true;
-      }
-    }
-
-    // سورس‌های تلگرام اعلام‌شده توسط مدیر (فقط یک بار برای هر روزنامه + به‌روزرسانی الگو)
-    let telegramSeeded = 0;
-    for (const t of TELEGRAM_SOURCES) {
-      const paper = await prisma.newspaper.findUnique({ where: { slug: t.slug } });
-      if (!paper) continue;
-      const url = `https://t.me/${t.channel}`;
-      const cfg = JSON.stringify(t.patterns ? { telegram_channel: t.channel, coverPatterns: t.patterns } : { telegram_channel: t.channel });
-      const ex = await prisma.newspaperSource.findFirst({ where: { newspaperId: paper.id, type: 'telegram' } });
-      if (!ex) {
-        await prisma.newspaperSource.create({
-          data: { newspaperId: paper.id, name: t.name, type: 'telegram', url, priority: 0, active: true, configuration: cfg },
-        });
-        telegramSeeded++;
-      } else if (t.patterns) {
-        try {
-          const curCfg = ex.configuration ? JSON.parse(ex.configuration) : {};
-          if (!curCfg.coverPatterns) {
-            await prisma.newspaperSource.update({ where: { id: ex.id }, data: { configuration: cfg, name: t.name, url } });
-          }
-        } catch {}
-      }
-    }
-
-    // سورس‌های تکمیلی (خراسان، پیشخوان، تسنیم) — dedup با URL
-    let extraSeeded = 0;
-    for (const e of EXTRA_SOURCES) {
-      const paper = await prisma.newspaper.findUnique({ where: { slug: e.slug }, include: { sources: { where: { active: true }, select: { url: true } } } });
-      if (!paper || paper.sources.some((s) => (s.url || '') === e.url)) continue;
-      await prisma.newspaperSource.create({
-        data: { newspaperId: paper.id, name: e.name, type: e.type, url: e.url, priority: e.priority, active: true, configuration: e.configuration },
-      });
-      extraSeeded++;
-    }
+    // سید و resync یکپارچه از طریق ensure (تک‌منبع حقیقت — جلوگیری از drift)
+    const { ensureDefaultSources } = await import('@/lib/newspapers/ensure');
+    const r = await ensureDefaultSources();
 
     const papers = await prisma.newspaper.count();
-    return NextResponse.json({ success: true, data: { tables: true, seeded, papers, kayhanSource, telegramSeeded, extraSeeded } });
+    return NextResponse.json({ success: true, data: { tables: true, seeded: r.papers, papers, sources: r.sources, synced: r.synced, kayhanSource: true, telegramSeeded: r.sources, extraSeeded: 0 } });
   } catch (e: any) {
     console.error('Newspaper init error:', e);
     return NextResponse.json({ success: false, message: 'ERR: ' + String(e?.message || e).slice(0, 400) }, { status: 500 });

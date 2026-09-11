@@ -85,6 +85,9 @@ export async function fetchPaperDay(
   }
 
   let lastError = 'unknown';
+  // خطای دسترسی (منبع پایین است) در برابر منبعِ در دسترسِ بدون جلد امروز
+  const ACCESS_ERR = /HTTP \d+|timeout|abort|blocked|not-allowed|fetch failed|ECONN|ENOTFOUND|ETIMEDOUT|404|502|503|network/i;
+  let anyReachable = false;
   let lowQuality: { candidate: CoverCandidate; img: DownloadedImage; srcId: string } | null = null;
   const saveIssue = async (candidate: CoverCandidate, img: DownloadedImage, srcId: string, capped: boolean) => {
     await processCover(img.buffer);
@@ -121,6 +124,7 @@ export async function fetchPaperDay(
         const img = await downloadCandidate(candidate);
         // کیفیت پایین؟ سورس بعدی را امتحان کن؛ اگر هیچ سورس خوبی نبود همین ذخیره می‌شود
         if (img.width < MIN_GOOD_WIDTH) {
+          anyReachable = true;
           if (!lowQuality || img.width > lowQuality.img.width) {
             lowQuality = { candidate, img, srcId: src.id };
           }
@@ -134,6 +138,7 @@ export async function fetchPaperDay(
           select: { id: true },
         });
         if (dup) {
+          anyReachable = true;
           await logAttempt({ newspaperId: paper.id, sourceId: src.id, status: 'DUPLICATE', discoveredImageUrl: candidate.imageUrl, responseTimeMs: Date.now() - t0 });
           lastError = 'تصویر تکراری است';
           break; // سورس بعدی
@@ -144,6 +149,7 @@ export async function fetchPaperDay(
         return { newspaperId: paper.id, name: paper.name, ok: true, status: issue.status, issueId: issue.id, confidence: issue.confidence };
       } catch (e: any) {
         lastError = String(e?.message || e).slice(0, 300);
+        if (!ACCESS_ERR.test(lastError)) anyReachable = true; // منبع جواب داد ولی جلد امروز را نداشت
         const httpStatus = /HTTP (\d+)/.exec(lastError)?.[1];
         await prisma.newspaperSource.update({ where: { id: src.id }, data: { lastFailureAt: new Date() } }).catch(() => {});
         await logAttempt({
@@ -162,7 +168,7 @@ export async function fetchPaperDay(
         where: { newspaperId: paper.id, imageHash: lowQuality.img.hash },
         select: { id: true },
       });
-      if (dupFb) return { newspaperId: paper.id, name: paper.name, ok: false, status: 'FAILED', error: 'تصویر تکراری است' };
+      if (dupFb) return { newspaperId: paper.id, name: paper.name, ok: false, status: 'NOT_PUBLISHED', error: 'تصویر تکراری است' };
       const issue = await saveIssue(lowQuality.candidate, lowQuality.img, lowQuality.srcId, true);
       await logAttempt({ newspaperId: paper.id, sourceId: lowQuality.srcId, status: 'SUCCESS', errorMessage: 'low-quality-fallback', discoveredImageUrl: lowQuality.candidate.imageUrl });
       return { newspaperId: paper.id, name: paper.name, ok: true, status: issue.status, issueId: issue.id, confidence: issue.confidence };
@@ -170,7 +176,9 @@ export async function fetchPaperDay(
       lastError = 'fallback-save-failed';
     }
   }
-  return { newspaperId: paper.id, name: paper.name, ok: false, status: 'FAILED', error: lastError };
+  // همه سورس‌ها ناموفق: منبع در دسترس ولی بدون جلد امروز → NOT_PUBLISHED؛
+  // هیچ منبعی در دسترس نبود → SOURCE_UNAVAILABLE (نه قضاوت درباره انتشار)
+  return { newspaperId: paper.id, name: paper.name, ok: false, status: anyReachable ? 'NOT_PUBLISHED' : 'SOURCE_UNAVAILABLE', error: lastError };
 }
 
 export async function fetchAllPapers(day: TehranDay = tehranToday(), concurrency = 4): Promise<FetchOutcome[]> {

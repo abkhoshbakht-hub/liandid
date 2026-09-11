@@ -149,6 +149,7 @@ const JAMJAM_SOURCE: OfficialSeed = {
     imgPatternList: ['(/content/newspaper/[^"\'\\s)]+?newspaperimgl_\\d+_1\\.jpg[^"\'\\s)]*)'],
     preferLargestWidth: true,
     preferFirstPage: true,
+    requireIssueId: true,
   }),
 };
 
@@ -258,15 +259,10 @@ export interface ExtraSeed {
   configuration: string;
 }
 
-const TASNIM_URL = 'https://www.tasnimnews.ir/fa/keyword/2297/';
-const tasnim = (slug: string): ExtraSeed => ({
-  slug,
-  name: 'پیشخوان مطبوعات تسنیم',
-  type: 'tasnim',
-  url: TASNIM_URL,
-  priority: 2,
-  configuration: JSON.stringify({ keywordUrl: TASNIM_URL }),
-});
+// URL کلید تسنیم برای محافظت از بازفعال‌سازی خودکار (ردیف‌های DB غیرفعال می‌مانند تا تصمیم بعدی)
+export const TASNIM_URL = 'https://www.tasnimnews.ir/fa/keyword/2297/';
+// NOTE: سورس‌های tasnim فعلاً غیرفعال‌اند (404 از Vercel) — ردیف‌های DB حفظ می‌شوند تا بعداً فعال شوند.
+// به همین دلیل ورودی tasnim در EXTRA_SOURCES وجود ندارد و ensure آن‌ها را بازسازی نمی‌کند.
 
 export const EXTRA_SOURCES: ExtraSeed[] = [
   {
@@ -282,6 +278,7 @@ export const EXTRA_SOURCES: ExtraSeed[] = [
       imgPatternList: ['(/content/newspaper/[^"\'\\s)]+?newspaperimgl_\\d+_1\\.jpg[^"\'\\s)]*)'],
       preferLargestWidth: true,
       preferFirstPage: true,
+      requireIssueId: true,
     }),
   },
   {
@@ -292,10 +289,4 @@ export const EXTRA_SOURCES: ExtraSeed[] = [
     priority: 1,
     configuration: JSON.stringify({ pageUrl: 'https://www.pishkhan.com/rooznameh/PayameAsalooye', keywords: ['پیام عسلویه', 'صفحه اول', 'جلد'] }),
   },
-  tasnim('hamshahri'),
-  tasnim('hammihan'),
-  tasnim('farhikhtegan'),
-  tasnim('abrar-varzeshi'),
-  tasnim('payam-asaluyeh'),
-  tasnim('khorasan'),
 ];

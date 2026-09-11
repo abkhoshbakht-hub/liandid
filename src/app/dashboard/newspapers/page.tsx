@@ -7,7 +7,7 @@ const TABS = [
   { id: 'issues', label: 'شماره‌ها' },
   { id: 'errors', label: 'خطاها' },
 ];
-const STATUS_FA: Record<string, string> = { PUBLISHED: 'منتشرشده', NEEDS_REVIEW: 'نیاز به بررسی', PENDING: 'در انتظار', PROCESSING: 'در حال پردازش', FAILED: 'ناموفق', REJECTED: 'ردشده' };
+const STATUS_FA: Record<string, string> = { PUBLISHED: 'منتشرشده', NEEDS_REVIEW: 'نیاز به بررسی', PENDING: 'در انتظار', PROCESSING: 'در حال پردازش', FAILED: 'ناموفق', REJECTED: 'ردشده', NOT_PUBLISHED: 'امروز منتشر نشده', SOURCE_UNAVAILABLE: 'منبع در دسترس نیست', NO_SOURCE: 'بدون سورس' };
 const TYPE_FA: Record<string, string> = { official: 'سایت رسمی', telegram: 'تلگرام', news_agency: 'خبرگزاری', other: 'سایر', manual: 'دستی' };
 
 function toFa(n: any): string {

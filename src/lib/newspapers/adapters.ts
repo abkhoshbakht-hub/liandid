@@ -71,6 +71,7 @@ export interface OfficialCfg {
   itemPattern?: string;
   idPattern?: string;
   preferFirstPage?: boolean;
+  requireIssueId?: boolean;
   ogImage?: boolean;
   imgPattern?: string;
   imgPatternList?: string[];
@@ -198,8 +199,28 @@ export class OfficialWebsiteAdapter implements BaseAdapter {
         else if (id === bestId) cands.push(href);
       }
       if (cands.length === 0) throw new Error('no-issue-link');
-      // ترجیح صفحه اول شماره (…/ID/1 یا pid=1) تا صفحه داخلی انتخاب نشود
-      issueHref = (cfg.preferFirstPage && (cands.find((h) => /[?&#/]pid=1([?&#/]|$)/.test(h)) || cands.find((h) => new RegExp(`/${bestId}/1/?([?#]|$)`).test(h)))) || cands[0];
+      // ترجیح صفحه اول شماره تا صفحه داخلی انتخاب نشود: pid=1، بعد کوچک‌ترین pid، بعد …/ID/1
+      if (cfg.preferFirstPage) {
+        const pidOf = (h: string): number => {
+          const m = h.match(/[?&#/]pid=(\d+)/);
+          return m ? Number(m[1]) : 0;
+        };
+        // نمای بدون pid یعنی صفحه اول پیش‌فرض؛ بعد pid=1؛ بعد …/ID/1؛ بعد کوچک‌ترین pid
+        const p1 = cands.find((h) => pidOf(h) === 0)
+          || cands.find((h) => pidOf(h) === 1)
+          || cands.find((h) => new RegExp(`/${bestId}/1/?([?#]|$)`).test(h));
+        if (p1) issueHref = p1;
+        else {
+          const sorted = [...cands].sort((a, b) => {
+            const pa = pidOf(a), pb = pidOf(b);
+            if (pa > 0 && pb > 0) return pa - pb;
+            return 0;
+          });
+          issueHref = sorted[0];
+        }
+      } else {
+        issueHref = cands[0];
+      }
     } else {
       throw new Error('no-issue-selector');
     }
@@ -232,9 +253,15 @@ export class OfficialWebsiteAdapter implements BaseAdapter {
           hits.push(u);
         }
         if (hits.length === 0) continue;
-        // اول فقط تصاویر همین شماره (جلوگیری از انتخاب جلد شماره قدیمی‌تر)
+        // اول فقط تصویر «صفحه اول همین شماره» (Page1 + شناسه)، بعد تصاویر همین شماره
+        // اگر requireIssueId باشد و هیچ تصویری شناسه شماره را نداشته باشد → این الگو رد می‌شود
+        // (هرگز جلد شماره دیگر به‌عنوان جلد امروز انتخاب نشود)
         const idHits = bestId > 0 ? hits.filter((h) => h.includes(String(bestId))) : [];
-        const pool = idHits.length > 0 ? idHits : hits;
+        if (cfg.requireIssueId && bestId > 0 && idHits.length === 0) continue;
+        const pageOne = bestId > 0
+          ? idHits.filter((h) => /\/Page1\//i.test(h) && new RegExp(`_${bestId}_1\\.`).test(h))
+          : [];
+        const pool = pageOne.length > 0 ? pageOne : (idHits.length > 0 ? idHits : hits);
         let pick = pool[0];
         if (cfg.preferLargestWidth) {
           let bestW = -1;
