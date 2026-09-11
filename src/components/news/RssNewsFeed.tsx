@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { filterDisplayable } from '@/lib/newspapers/display';
 
 interface RssNews {
   id: string;
@@ -41,7 +42,9 @@ export default function RssNewsFeed() {
   const [covers, setCovers] = useState<CoverPaper[]>([]);
   const [coversLoading, setCoversLoading] = useState(false);
   const [coverCat, setCoverCat] = useState('all');
-  const filteredCovers = coverCat === 'all' ? covers : covers.filter((c) => c.category === coverCat);
+  // Dynamic Slot Filling: فقط جلدهای معتبر؛ بدون Slot خالی
+  const displayableCovers = useMemo(() => filterDisplayable(covers), [covers]);
+  const filteredCovers = coverCat === 'all' ? displayableCovers : displayableCovers.filter((c) => c.category === coverCat);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -168,9 +171,9 @@ export default function RssNewsFeed() {
               <div className="w-8 h-8 border-2 border-[#C9A96E] border-t-[#1B365D] rounded-full animate-spin mx-auto" />
               <p className="text-sm text-gray-400 mt-4">در حال دریافت جلدها...</p>
             </div>
-          ) : covers.length === 0 ? (
+          ) : displayableCovers.length === 0 ? (
             <div className="p-12 text-center text-gray-400">
-              <p className="text-sm">در انتظار دریافت صفحه اول</p>
+              <p className="text-sm">در حال دریافت صفحات اول روزنامه‌ها...</p>
             </div>
           ) : (
             <div className="p-3">

@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { fullPersianDate, toFaDigits } from '@/lib/newspapers/date';
+import { filterDisplayable } from '@/lib/newspapers/display';
 import CoverViewer, { type CoverItem } from './CoverViewer';
 
 export interface BoardPaper {
@@ -31,7 +32,10 @@ export default function Board({ papers, date }: { papers: BoardPaper[]; date: st
   const [tab, setTab] = useState('all');
   const [vi, setVi] = useState<number | null>(null);
 
-  const filtered = useMemo(() => (tab === 'all' ? papers : papers.filter((p) => p.category === tab)), [papers, tab]);
+  // Dynamic Slot Filling: فقط جلدهای معتبر وارد Grid می‌شوند؛ بدون کارت خالی و بدون رزرو Slot.
+  // ترتیب configured (displayOrder از API) حفظ می‌شود.
+  const displayable = useMemo(() => filterDisplayable(papers), [papers]);
+  const filtered = useMemo(() => (tab === 'all' ? displayable : displayable.filter((p) => p.category === tab)), [displayable, tab]);
   const viewItems: CoverItem[] = useMemo(
     () => filtered.filter((p) => p.today).map((p) => ({ id: p.id, imageUrl: p.today!.imageUrl, paperName: p.name, persianDate: p.today!.persianDate, issueNumber: p.today!.issueNumber, slug: p.slug })),
     [filtered]
@@ -44,7 +48,7 @@ export default function Board({ papers, date }: { papers: BoardPaper[]; date: st
           <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={`px-5 py-2 rounded-full text-sm font-bold transition-colors ${tab === t.id ? 'bg-[#1B365D] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{t.label}</button>
         ))}
       </div>
-      {filtered.length === 0 && <p className="text-center text-gray-400 py-10">در انتظار دریافت صفحه اول</p>}
+      {filtered.length === 0 && <p className="text-center text-gray-400 py-10">در حال دریافت صفحات اول روزنامه‌ها...</p>}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
         {filtered.map((p) => {
           const vIdx = viewItems.findIndex((v) => v.id === p.id);
