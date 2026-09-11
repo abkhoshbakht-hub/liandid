@@ -14,10 +14,10 @@ export async function runRssFetch(): Promise<number> {
 
   try {
     console.log('[RSS Scheduler] شروع دریافت اخبار...');
-    const count = await fetchAllRssFeeds();
+    const summary = await fetchAllRssFeeds();
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-    console.log(`[RSS Scheduler] ${count} خبر جدید در ${elapsed} ثانیه`);
-    return count;
+    console.log(`[RSS Scheduler] ${summary.newItems} خبر جدید در ${elapsed} ثانیه`);
+    return summary.newItems;
   } catch (error) {
     console.error('[RSS Scheduler] خطا:', error);
     return 0;

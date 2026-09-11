@@ -1,0 +1,36 @@
+# دریافت خودکار اخبار لحظه‌ای — هر ۱۵ دقیقه
+# Secret موردنیاز (GitHub Repository Secrets): CRON_SECRET
+# مقدار آن باید دقیقاً برابر CRON_SECRET در Vercel Environment Variables باشد.
+name: RSS Refresh
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+# جلوگیری از اجرای همزمان: اجرای جدید جایگزین قبلیِ در حال اجرا می‌شود.
+# (لایه اصلی حفاظت همان Lock دیتابیس در خود endpoint است.)
+concurrency:
+  group: rss-refresh
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger RSS refresh
+        run: |
+          HTTP_CODE=$(curl -s -o /tmp/rss-refresh.json -w "%{http_code}" \
+            -X POST "https://liandid.ir/api/rss/refresh" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            --max-time 240)
+          echo "HTTP status: $HTTP_CODE"
+          cat /tmp/rss-refresh.json
+          if [ "${HTTP_CODE:0:1}" != "2" ]; then
+            echo "RSS refresh failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}

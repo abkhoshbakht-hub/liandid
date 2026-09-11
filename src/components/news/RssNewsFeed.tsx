@@ -36,7 +36,6 @@ export default function RssNewsFeed() {
   const [news, setNews] = useState<RssNews[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'all' | 'ملی' | 'بوشهر' | 'روزنامه'>('all');
-  const [refreshing, setRefreshing] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [covers, setCovers] = useState<CoverPaper[]>([]);
@@ -67,7 +66,6 @@ export default function RssNewsFeed() {
       console.error('Error fetching RSS:', error);
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   };
 
@@ -86,10 +84,7 @@ export default function RssNewsFeed() {
     }
   }, [activeTab]);
 
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    fetch('/api/rss?refresh=true').then(() => fetchNews(activeTab)).catch(() => setRefreshing(false));
-  };
+
 
   const MOBILE_INITIAL = 8;
 
@@ -127,16 +122,6 @@ export default function RssNewsFeed() {
           </div>
           <h2 className="text-base font-extrabold text-white">اخبار لحظه‌ای خبرگزاری‌ها</h2>
         </div>
-        <button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="text-xs text-white/70 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 disabled:opacity-50"
-        >
-          <svg className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-          {refreshing ? 'بروزرسانی...' : 'بروزرسانی'}
-        </button>
       </div>
 
       {/* تب‌ها */}
@@ -213,8 +198,8 @@ export default function RssNewsFeed() {
         ) : filteredNews.length === 0 ? (
           <div className="p-12 text-center text-gray-400">
             <p className="text-sm">خبری یافت نشد</p>
-            <button onClick={handleRefresh} className="text-xs text-[#1B365D] hover:text-[#C9A96E] mt-2 font-bold">
-              بروزرسانی
+            <button onClick={() => fetchNews(activeTab)} className="text-xs text-[#1B365D] hover:text-[#C9A96E] mt-2 font-bold">
+              تلاش مجدد
             </button>
           </div>
         ) : (

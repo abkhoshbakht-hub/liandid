@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -33,6 +33,21 @@ export default function ExternalNewsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const PAGE_SIZE = 20;
+  // مانیتورینگ Sync
+  interface SyncSummary {
+    startedAt: string; finishedAt: string | null; durationMs: number | null; status: string;
+    totalSources: number; successSources: number; failedSources: number;
+    newItems: number; updatedItems: number; errorSummary: string | null; triggerType: string;
+  }
+  const [lastSync, setLastSync] = useState<SyncSummary | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMsg, setSyncMsg] = useState('');
+  // فیلترهای تکمیلی
+  const [sourceSel, setSourceSel] = useState('');
+  const [sources, setSources] = useState<string[]>([]);
+  const [hasImage, setHasImage] = useState(false);
+  const [olderThan, setOlderThan] = useState('');
+  const [dateStr, setDateStr] = useState('');
 
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || !isAdmin)) {
@@ -55,6 +70,10 @@ export default function ExternalNewsPage() {
       } else if (filter !== 'all') {
         params.set('status', filter);
       }
+      if (sourceSel) params.set('source', sourceSel);
+      if (hasImage) params.set('hasImage', 'true');
+      if (olderThan) params.set('olderThan', olderThan);
+      if (dateStr) params.set('date', dateStr);
       const res = await fetch(`/api/admin/external-news?${params}`);
       const data = await res.json();
       if (data.success) {
@@ -63,6 +82,8 @@ export default function ExternalNewsPage() {
         setTotalPages(data.pagination?.totalPages || 1);
         setTotal(data.pagination?.total || 0);
         setSelected([]);
+        if (data.lastSync) setLastSync(data.lastSync);
+        if (Array.isArray(data.sources)) setSources(data.sources);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -83,7 +104,71 @@ export default function ExternalNewsPage() {
       setSelected([]);
       fetchNews(1);
     }
-  }, [filter]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter, sourceSel, hasImage, olderThan, dateStr]);
+
+  const runSyncNow = async () => {
+    setSyncing(true);
+    setSyncMsg('');
+    try {
+      const res = await fetch('/api/rss/refresh', { method: 'POST' });
+      const data = await res.json();
+      if (data.success && data.data && !data.data.skipped) {
+        const d = data.data;
+        setSyncMsg(`دریافت شد: ${d.newItems || 0} جدید، ${d.updatedItems || 0} به‌روزرسانی، ${d.successSources || 0}/${d.totalSources || 0} منبع موفق`);
+        fetchNews(1);
+      } else if (data?.data?.skipped) {
+        setSyncMsg('یک دریافت دیگر در حال اجراست؛ چند دقیقه بعد تلاش کنید');
+      } else {
+        setSyncMsg(data.message || 'خطا در دریافت');
+      }
+    } catch {
+      setSyncMsg('خطا در دریافت');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selected.length === 0) return;
+    if (!confirm(`${selected.length} خبر حذف شود؟`)) return;
+    setActionLoading(true);
+    try {
+      const res = await fetch('/api/admin/external-news', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selected }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSelected([]);
+        fetchNews();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const relFa = (iso: string | null | undefined) => {
+    if (!iso) return '—';
+    const diff = Date.now() - new Date(iso).getTime();
+    if (Number.isNaN(diff) || diff < 0) return '—';
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return 'لحظاتی قبل';
+    if (m < 60) return `${m} دقیقه قبل`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h} ساعت قبل`;
+    return `${Math.floor(h / 24)} روز قبل`;
+  };
+
+  const isSyncStale = useMemo(() => {
+    if (!lastSync) return false;
+    const ref = lastSync.finishedAt || lastSync.startedAt;
+    if (!ref || lastSync.status === 'RUNNING') return false;
+    return Date.now() - new Date(ref).getTime() > 30 * 60000;
+  }, [lastSync]);
 
   const handleStatus = async (ids: string[], status: string) => {
     setActionLoading(true);
@@ -189,10 +274,32 @@ export default function ExternalNewsPage() {
               </span>
             )}
           </div>
+          <button
+            onClick={runSyncNow}
+            disabled={syncing}
+            className="bg-[#C9A96E] text-[#0f1d35] text-sm font-bold px-4 py-2 rounded-lg hover:brightness-110 disabled:opacity-50"
+          >
+            {syncing ? 'در حال دریافت...' : 'دریافت هم‌اکنون'}
+          </button>
         </div>
       </div>
 
       <div className="site-container py-6">
+        {/* مانیتورینگ Sync */}
+        <div className="bg-white rounded-xl border border-gray-100 p-4 mb-4 text-sm">
+          {lastSync ? (
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+              <span className="text-gray-500">آخرین دریافت: <b className="text-gray-800">{relFa(lastSync.finishedAt || lastSync.startedAt)}</b></span>
+              <span className="text-gray-500">وضعیت: <b className={lastSync.status === 'SUCCESS' ? 'text-green-700' : lastSync.status === 'PARTIAL' ? 'text-yellow-700' : 'text-red-600'}>{lastSync.status === 'SUCCESS' ? 'موفق' : lastSync.status === 'PARTIAL' ? 'ناقص' : lastSync.status === 'RUNNING' ? 'در حال اجرا' : 'ناموفق'}</b></span>
+              <span className="text-gray-500">خبر جدید: <b className="text-gray-800">{lastSync.newItems ?? 0}</b></span>
+              <span className="text-gray-500">منابع: <b className="text-gray-800">{lastSync.successSources ?? 0}/{lastSync.totalSources ?? 0} موفق</b></span>
+              {isSyncStale && <span className="text-red-600 font-bold">سیستم دریافت اخبار به‌موقع اجرا نشده است</span>}
+            </div>
+          ) : (
+            <span className="text-gray-400">هنوز هیچ دریافتی ثبت نشده است</span>
+          )}
+          {syncMsg && <div className="text-xs text-gray-500 mt-2">{syncMsg}</div>}
+        </div>
         {/* فیلترها */}
         <div className="flex gap-2 mb-4 flex-wrap">
           {([
@@ -216,9 +323,30 @@ export default function ExternalNewsPage() {
           ))}
         </div>
 
+        {/* فیلترهای تکمیلی */}
+        <div className="flex gap-2 mb-4 flex-wrap items-center bg-white border border-gray-100 rounded-xl p-3">
+          <select value={sourceSel} onChange={(e) => setSourceSel(e.target.value)} className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm">
+            <option value="">همه منابع</option>
+            {sources.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <input type="date" value={dateStr} onChange={(e) => setDateStr(e.target.value)} className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm" />
+          <label className="flex items-center gap-1.5 text-sm text-gray-600">
+            <input type="checkbox" checked={hasImage} onChange={(e) => setHasImage(e.target.checked)} className="w-4 h-4 rounded" />
+            فقط دارای تصویر
+          </label>
+          <label className="flex items-center gap-1.5 text-sm text-gray-600">
+            قدیمی‌تر از
+            <input type="number" min="1" max="365" value={olderThan} onChange={(e) => setOlderThan(e.target.value)} className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm w-20" placeholder="روز" />
+            روز
+          </label>
+          {(sourceSel || hasImage || olderThan || dateStr) && (
+            <button onClick={() => { setSourceSel(''); setHasImage(false); setOlderThan(''); setDateStr(''); }} className="text-xs text-gray-500 hover:text-red-600">حذف فیلترها</button>
+          )}
+        </div>
+
         {/* دکمه‌های عملیات گروهی */}
         {selected.length > 0 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 flex items-center gap-3">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 flex items-center gap-3 flex-wrap">
             <span className="text-sm text-blue-800">{selected.length} مورد انتخاب شده</span>
             <button
               onClick={() => handleStatus(selected, 'APPROVED')}
@@ -233,6 +361,13 @@ export default function ExternalNewsPage() {
               className="px-4 py-1.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50"
             >
               رد همه
+            </button>
+            <button
+              onClick={handleBulkDelete}
+              disabled={actionLoading}
+              className="px-4 py-1.5 bg-gray-700 text-white rounded-lg text-sm font-medium hover:bg-gray-800 disabled:opacity-50"
+            >
+              حذف همه
             </button>
             <button
               onClick={() => setSelected([])}

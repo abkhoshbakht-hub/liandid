@@ -167,6 +167,42 @@ model SiteSetting {
   updatedAt DateTime @updatedAt
 }
 
+// ===== لاگ اجراهای دریافت اخبار لحظه‌ای (RSS) =====
+model RssFetchLog {
+  id             String   @id @default(cuid())
+  startedAt      DateTime @default(now())
+  finishedAt     DateTime?
+  durationMs     Int?
+  status         String   @default("RUNNING") // RUNNING SUCCESS PARTIAL FAILED SKIPPED_LOCKED
+  totalSources   Int      @default(0)
+  successSources Int      @default(0)
+  failedSources  Int      @default(0)
+  newItems       Int      @default(0)
+  updatedItems   Int      @default(0)
+  errorSummary   String?
+  triggerType    String   @default("manual") // cron admin manual external maintenance
+  sources        RssFetchSourceLog[]
+  createdAt      DateTime @default(now())
+  @@index([createdAt])
+  @@index([status])
+}
+
+model RssFetchSourceLog {
+  id           String      @id @default(cuid())
+  fetchLogId   String
+  fetchLog     RssFetchLog @relation(fields: [fetchLogId], references: [id], onDelete: Cascade)
+  source       String
+  status       String      @default("PENDING") // SUCCESS FAILED TIMEOUT NO_NEW_ITEMS
+  startedAt    DateTime    @default(now())
+  finishedAt   DateTime?
+  durationMs   Int?
+  fetchedCount Int         @default(0)
+  newCount     Int         @default(0)
+  error        String?
+  retryCount   Int         @default(0)
+  @@index([fetchLogId])
+}
+
 // ===== ماژول صفحه اول روزنامه‌ها =====
 model Newspaper {
   id           String   @id @default(cuid())
