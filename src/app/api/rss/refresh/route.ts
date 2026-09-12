@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { fetchAllRssFeeds, runRssMaintenance } from '@/lib/rss-fetcher';
 import { checkRefreshAuth } from '@/lib/rss-auth';
 import { acquireRssLock, releaseRssLock } from '@/lib/rss-lock';
@@ -6,17 +6,40 @@ import { acquireRssLock, releaseRssLock } from '@/lib/rss-lock';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+async function runFetchInBackground(triggerType: string, runId: string): Promise<void> {
+  try {
+    const summary = await fetchAllRssFeeds({ triggerType });
+    if (summary.newItems > 0) {
+      try {
+        const { revalidatePath } = await import('next/cache');
+        revalidatePath('/');
+      } catch {}
+    }
+  } catch {}
+  finally {
+    await releaseRssLock(runId).catch(() => {});
+  }
+}
+
 // POST /api/rss/refresh — اجرای Fetch (فقط ادمین یا secret کرون)
-// body: { maintenance?: boolean } — نگهداری مستقل از مسیر Fetch
+// body/query: { maintenance?: boolean, background?: boolean }
+// حالت background برای schedulerهایی با timeout کوتاه (مثل ۳۰ ثانیه):
+// بلافاصله 200 برمی‌گرداند و Fetch در پس‌زمینه با همان Lock اجرا می‌شود.
+// نتیجه واقعی در RssFetchLog و نوار مانیتورینگ داشبورد قابل مشاهده است.
 export async function POST(req: Request) {
   const actor = await checkRefreshAuth(req);
   if (actor === 'none') {
     return NextResponse.json({ success: false, message: 'غیرمجاز' }, { status: 401 });
   }
   let maintenance = false;
+  let background = false;
   try {
     const body = await req.json().catch(() => ({}));
     maintenance = body?.maintenance === true;
+    background = body?.background === true;
+  } catch {}
+  try {
+    background = background || new URL(req.url).searchParams.get('background') === 'true';
   } catch {}
   if (maintenance) {
     const r = await runRssMaintenance().catch(() => ({ fixed: 0 }));
@@ -26,8 +49,18 @@ export async function POST(req: Request) {
   if (!lock.acquired) {
     return NextResponse.json({ success: true, data: { skipped: true, reason: 'locked', staleRecovered: lock.staleRecovered } });
   }
+  const triggerType = actor === 'admin' ? 'admin' : 'cron';
+  if (background) {
+    try {
+      after(() => runFetchInBackground(triggerType, lock.runId));
+    } catch {
+      await releaseRssLock(lock.runId).catch(() => {});
+      return NextResponse.json({ success: false, message: 'خطا در شروع پس‌زمینه' }, { status: 500 });
+    }
+    return NextResponse.json({ success: true, data: { started: true, runId: lock.runId } });
+  }
   try {
-    const summary = await fetchAllRssFeeds({ triggerType: actor === 'admin' ? 'admin' : 'cron' });
+    const summary = await fetchAllRssFeeds({ triggerType });
     if (summary.newItems > 0) {
       try {
         const { revalidatePath } = await import('next/cache');
