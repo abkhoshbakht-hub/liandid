@@ -32,15 +32,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, message: 'غیرمجاز' }, { status: 401 });
   }
   let maintenance = false;
-  let background = false;
+  let background: boolean | undefined;
   try {
     const body = await req.json().catch(() => ({}));
     maintenance = body?.maintenance === true;
-    background = body?.background === true;
+    if (typeof body?.background === 'boolean') background = body.background;
   } catch {}
   try {
-    background = background || new URL(req.url).searchParams.get('background') === 'true';
+    const q = new URL(req.url).searchParams.get('background');
+    if (q === 'true') background = true;
+    else if (q === 'false') background = false;
   } catch {}
+  // پیش‌فرض: schedulerها (غیرادمین) پاسخ فوری می‌گیرند تا به timeout نخورند؛
+  // ادمین داشبورد نتیجه کامل می‌خواهد پس sync می‌ماند. نتیجه واقعی همیشه در لاگ است.
+  if (background === undefined) background = actor !== 'admin';
   if (maintenance) {
     const r = await runRssMaintenance().catch(() => ({ fixed: 0 }));
     return NextResponse.json({ success: true, data: { maintenance: true, ...r } });
