@@ -359,7 +359,7 @@ export default function MarketTicker({ breakingItems = [], onMenuToggle }: { bre
             <div className="w-6 h-6 rounded-md bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md shadow-blue-500/20">
               <span className="text-[10px] font-bold text-white">M</span>
             </div>
-            <div className="text-[11px] font-bold text-blue-300">{formatGregorian(selDate)}</div>
+            <div className="text-[11px] font-bold text-blue-300" dir="ltr">{formatGregorian(selDate)}</div>
           </div>
 
           <div className={`w-px h-6 bg-white/10 shrink-0 ${events.length === 0 && breakingItems.length === 0 ? 'hidden' : 'hidden md:block'}`} />
