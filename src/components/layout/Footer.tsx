@@ -148,7 +148,7 @@ export default function Footer() {
 
         <div className="border-t border-white/10 pt-3 pb-1 flex flex-col md:flex-row justify-between items-center gap-2">
           <p className="text-white/50 text-sm">
-            © {new Date().getFullYear()} {settings.footerCopyright || 'لیان دید. تمامی حقوق محفوظ است.'}
+            © {new Date().getFullYear()} {settings.footerCopyright || 'تمامی حقوق مطالب برای «پایگاه خبری تحلیلی لیان دید» محفوظ است و هرگونه کپی‌برداری بدون ذکر منبع ممنوع می‌باشد.'}
           </p>
           <a href="https://liandesign.ir" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-white/50 hover:text-[#C9A96E] transition-colors text-sm">
             <Image src="/liandesign.logo.png" alt="لیان دیزاین" width={40} height={40} className="rounded-sm" />
