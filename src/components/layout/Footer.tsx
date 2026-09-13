@@ -60,7 +60,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-12 gap-4 lg:gap-3 mb-3">
           {/* ستون ۱: لوگو و توضیحات — ۳ ستون */}
           <div className="col-span-2 md:col-span-12 lg:col-span-3 flex flex-col items-center lg:items-start text-center lg:text-right">
-            <div className="mb-1.5">
+            <div className="-mb-2">
               <div id="div_eRasanehTrustseal_96227" className="bg-white rounded p-0.5 inline-block scale-[0.5] origin-center lg:origin-right" />
             </div>
             <p className="text-white/65 text-xs leading-5 whitespace-pre-line max-w-[260px] lg:max-w-none">{description}</p>
