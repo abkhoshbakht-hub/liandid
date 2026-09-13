@@ -187,6 +187,25 @@ export async function processCover(buffer: Buffer): Promise<{ original: Buffer; 
   return { original: buffer, web: buffer, thumb: buffer };
 }
 
+// بندانگشتی سبک برای گرید (jimp خالص، بدون ماژول native).
+// ورودی هر فرمت معتبر (jpeg/png/webp/gif)؛ خروجی همیشه JPEG کوچک.
+// در صورت هر خطا null برمی‌گرداند تا fetch هرگز خراب نشود.
+export async function makeThumbnail(buffer: Buffer, maxWidth = 384, quality = 70): Promise<Buffer | null> {
+  try {
+    if (!buffer || buffer.length < 100) return null;
+    const { default: Jimp } = await import('jimp');
+    const image = await Jimp.read(buffer);
+    if (!image || !image.bitmap || !image.bitmap.width) return null;
+    if (image.bitmap.width > maxWidth) image.resize(maxWidth, Jimp.AUTO);
+    image.quality(quality);
+    const out = await image.getBufferAsync(Jimp.MIME_JPEG);
+    if (!out || out.length === 0 || out.length >= buffer.length) return null;
+    return Buffer.from(out);
+  } catch {
+    return null;
+  }
+}
+
 export function hashBuffer(buf: Buffer): string {
   return crypto.createHash('sha256').update(buf).digest('hex');
 }

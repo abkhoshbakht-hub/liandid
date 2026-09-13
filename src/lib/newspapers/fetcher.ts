@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { tehranToday, type TehranDay } from './date';
 import { downloadCandidate, getAdapter, type CoverCandidate } from './adapters';
-import { processCover, sleep, type DownloadedImage } from './image';
+import { processCover, makeThumbnail, sleep, type DownloadedImage } from './image';
 import { getCoverStorage } from './storage';
 
 const MAX_ATTEMPTS = 3;
@@ -93,6 +93,14 @@ export async function fetchPaperDay(
     await processCover(img.buffer);
     const storage = getCoverStorage();
     const coverUrl = await storage.save(img.buffer, { paperSlug: paper.slug, date: day.key, kind: 'original', mime: img.mime });
+    // بندانگشتی گرید؛ هر خطایی → همان تصویر اصلی (fetch هرگز خراب نمی‌شود)
+    let thumbUrl = coverUrl;
+    try {
+      const thumb = await makeThumbnail(img.buffer);
+      if (thumb) {
+        thumbUrl = await storage.save(thumb, { paperSlug: paper.slug, date: day.key, kind: 'thumb', mime: 'image/jpeg' });
+      }
+    } catch {}
     const confidence = capped ? Math.min(scoreCandidate(candidate, img, paper.name), 69) : scoreCandidate(candidate, img, paper.name);
     const status = confidence >= 90 ? 'PUBLISHED' : 'NEEDS_REVIEW';
     const issue = await prisma.newspaperIssue.create({
@@ -104,7 +112,7 @@ export async function fetchPaperDay(
             issueNumber: candidate.issueNumber?.slice(0, 50) || undefined,
         originalUrl: candidate.pageUrl.slice(0, 1000),
         imageUrl: coverUrl,
-        thumbnailUrl: coverUrl,
+        thumbnailUrl: thumbUrl,
         sourceId: srcId,
         imageHash: img.hash,
         confidence,

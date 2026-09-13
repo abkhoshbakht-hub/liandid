@@ -12,7 +12,6 @@ export async function GET() {
       return NextResponse.json({ success: false, message: 'غیرمجاز' }, { status: 403 });
     }
     const day = tehranToday();
-    const initialized = (await prisma.newspaper.count()) > 0;
     const [papers, todayIssues, archiveTotal, lastCron, recentFails] = await Promise.all([
       prisma.newspaper.findMany({ where: { active: true }, orderBy: { displayOrder: 'asc' }, select: { id: true, name: true, slug: true } }),
       prisma.newspaperIssue.findMany({ where: { date: day.utcMidnight }, select: { id: true, newspaperId: true, status: true, confidence: true } }),
@@ -33,7 +32,6 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       data: {
-        initialized,
         date: day.persian,
         total: papers.length,
         ok,
