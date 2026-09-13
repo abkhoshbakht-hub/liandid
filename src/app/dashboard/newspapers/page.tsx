@@ -24,9 +24,13 @@ async function api(path: string, opts?: RequestInit) {
 export default function NewspapersAdminPage() {
   const [tab, setTab] = useState('dash');
   const [initState, setInitState] = useState<'loading' | 'ready' | 'no'>('loading');
+  const [dashData, setDashData] = useState<any>(null);
 
   useEffect(() => {
-    api('/api/admin/newspapers/init').then((d) => setInitState(d?.data?.initialized ? 'ready' : 'no')).catch(() => setInitState('no'));
+    api('/api/admin/newspapers/stats').then((d) => {
+      if (d?.data?.initialized) { setInitState('ready'); setDashData(d.data); }
+      else { setInitState('no'); }
+    }).catch(() => setInitState('no'));
   }, []);
 
   async function doInit() {
@@ -54,7 +58,7 @@ export default function NewspapersAdminPage() {
           <button key={t.id} onClick={() => setTab(t.id)} className={`px-4 py-2 rounded-lg text-sm font-bold ${tab === t.id ? 'bg-[#C9A96E] text-[#0f1d35]' : 'bg-white text-[#1B365D] hover:bg-gray-100'}`}>{t.label}</button>
         ))}
       </div>
-      {tab === 'dash' && <DashTab />}
+      {tab === 'dash' && <DashTab initialData={dashData} />}
       {tab === 'papers' && <PapersTab />}
       {tab === 'issues' && <IssuesTab />}
       {tab === 'errors' && <ErrorsTab />}
@@ -80,13 +84,13 @@ async function runOnePaper(newspaperId: string) {
   }
 }
 
-function DashTab() {
-  const [s, setS] = useState<any>(null);
+function DashTab({ initialData }: { initialData?: any }) {
+  const [s, setS] = useState<any>(initialData || null);
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
   const load = () => api('/api/admin/newspapers/stats').then((d) => d.success && setS(d.data));
-  useEffect(() => { load(); }, []);
+  useEffect(() => { if (!initialData) load(); }, []);
   async function runOne(id: string) {
     setBusyId(id);
     await runOnePaper(id);
