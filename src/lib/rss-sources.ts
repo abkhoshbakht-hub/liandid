@@ -13,6 +13,7 @@ export const rssSources: RssSource[] = [
   { name: 'کارانه بوشهر', url: 'https://karanehbushehr.ir/?feed=rss2', category: 'بوشهر' },
   { name: 'ندای استان', url: 'https://nedayostan.ir/?feed=rss2', category: 'بوشهر' },
   { name: 'سوک نیوز', url: 'https://sooknews.ir/?feed=rss2', category: 'بوشهر' },
+  { name: 'چغادک نیوز', url: 'https://choghadaknews.ir/rss', category: 'بوشهر' },
   
   // خبرگزاری‌های ملی
   { name: 'ایرنا', url: 'https://www.irna.ir/rss', category: 'ملی' },
