@@ -60,11 +60,9 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-12 gap-4 lg:gap-3 mb-3">
           {/* ستون ۱: لوگو و توضیحات — ۳ ستون */}
           <div className="col-span-2 md:col-span-12 lg:col-span-3 flex flex-col items-center lg:items-start text-center lg:text-right">
-            <Link href="/" className="inline-block mb-1.5">
-              <div className="h-[52px] w-[135px] relative">
-                <Image src="/logo.png" alt="لیان دید" fill className="object-contain object-center lg:object-right" sizes="135px" />
-              </div>
-            </Link>
+            <div className="mb-1.5">
+              <div id="div_eRasanehTrustseal_96227" className="bg-white rounded p-0.5 inline-block scale-[0.5] origin-center lg:origin-right" />
+            </div>
             <p className="text-white/65 text-xs leading-5 whitespace-pre-line max-w-[260px] lg:max-w-none">{description}</p>
             <div className="mt-2 flex flex-wrap items-center justify-center lg:justify-start gap-x-3 gap-y-1 text-[11px] leading-none text-white/45">
               <span className="inline-flex items-center gap-1">
