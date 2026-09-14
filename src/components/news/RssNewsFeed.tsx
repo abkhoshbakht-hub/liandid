@@ -129,8 +129,8 @@ export default function RssNewsFeed() {
         <div className="flex gap-0 justify-center md:justify-start">
           {[
             { key: 'all' as const, label: 'همه' },
-            { key: 'بوشهر' as const, label: 'خبر بوشهر' },
-            { key: 'ملی' as const, label: 'خبرگزاری‌های سراسری' },
+            { key: 'بوشهر' as const, label: 'اخبار استان' },
+            { key: 'ملی' as const, label: 'اخبار ایران و جهان' },
             { key: 'روزنامه' as const, label: 'پیشخوان روزنامه‌ها' },
           ].map(tab => (
             <button
