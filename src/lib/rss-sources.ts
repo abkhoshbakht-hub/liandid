@@ -17,6 +17,7 @@ export const rssSources: RssSource[] = [
   
   // خبرگزاری‌های ملی (بوشهر)
   { name: 'مهر بوشهر', url: 'https://www.mehrnews.com/rss/service/Provinces/Booshehr', category: 'بوشهر' },
+  { name: 'ایسنا بوشهر', url: 'https://www.isna.ir/rss/tp/225', category: 'بوشهر' },
 
   // خبرگزاری‌های ملی
   { name: 'ایرنا', url: 'https://www.irna.ir/rss', category: 'ملی' },
@@ -24,6 +25,8 @@ export const rssSources: RssSource[] = [
   { name: 'مهر', url: 'https://www.mehrnews.com/rss', category: 'ملی' },
   { name: 'فارس', url: 'https://www.farsnews.ir/rss', category: 'ملی' },
   { name: 'تسنیم', url: 'https://www.tasnimnews.com/rss', category: 'ملی' },
+  { name: 'انتخاب', url: 'https://www.entekhab.ir/fa/rss', category: 'ملی' },
+  { name: 'عصر ایران', url: 'https://www.asriran.com/fa/rss/allnews', category: 'ملی' },
 
   // روزنامه‌های کشور (تک‌تک تست شده)
   { name: 'همشهری', url: 'https://www.hamshahrionline.ir/rss', category: 'روزنامه' },
