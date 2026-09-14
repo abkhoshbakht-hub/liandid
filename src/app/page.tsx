@@ -119,15 +119,15 @@ async function getHomepageData() {
     const takeHeroPlaced = () => heroPlacedItems.find(i => !heroShownIds.has(i.id));
     const takePool = () => heroPool.find(i => !heroShownIds.has(i.id));
     const pickHero = (slotKey: string): Item | null => {
-      const r = resolve(findSlot(slotKey));
-      if (r && !heroShownIds.has(r.id)) {
-        heroShownIds.add(r.id);
-        return r;
-      }
       const placed = takeHeroPlaced();
       if (placed) {
         heroShownIds.add(placed.id);
         return placed;
+      }
+      const r = resolve(findSlot(slotKey));
+      if (r && !heroShownIds.has(r.id)) {
+        heroShownIds.add(r.id);
+        return r;
       }
       const f = takePool();
       if (f) {
