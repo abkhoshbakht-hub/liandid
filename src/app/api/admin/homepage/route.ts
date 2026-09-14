@@ -30,7 +30,7 @@ export async function GET() {
     let placedIndex = 0;
     const enrichedSlots = slots.map(s => {
       if (heroSlotKeys.includes(s.slotKey)) {
-        if (!s.externalNewsId && !s.customTitle && placedIndex < heroPlacedArticles.length) {
+        if (!s.externalNewsId && placedIndex < heroPlacedArticles.length) {
           const a = heroPlacedArticles[placedIndex++];
           return {
             ...s,
