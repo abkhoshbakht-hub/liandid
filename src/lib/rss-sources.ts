@@ -28,6 +28,7 @@ export const rssSources: RssSource[] = [
   { name: 'تسنیم', url: 'https://www.tasnimnews.com/rss', category: 'ملی' },
   { name: 'تسنیم بوشهر', url: 'https://www.tasnimnews.ir/fa/rss/feeds/53/0/13/1', category: 'بوشهر' },
 
+  { name: 'انتخاب', url: 'https://www.entekhab.ir/fa/rss/allnews', category: 'ملی' },
   { name: 'عصر ایران', url: 'https://www.asriran.com/fa/rss/allnews', category: 'ملی' },
 
   // روزنامه‌های کشور (تک‌تک تست شده)
