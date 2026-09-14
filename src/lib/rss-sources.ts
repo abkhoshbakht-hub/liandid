@@ -14,6 +14,7 @@ export const rssSources: RssSource[] = [
   { name: 'ندای استان', url: 'https://nedayostan.ir/?feed=rss2', category: 'بوشهر' },
   { name: 'سوک نیوز', url: 'https://sooknews.ir/?feed=rss2', category: 'بوشهر' },
   { name: 'چغادک نیوز', url: 'https://choghadaknews.ir/rss', category: 'بوشهر' },
+  { name: 'نصیر بوشهر', url: 'https://nasirbushehr.ir/feed/', category: 'بوشهر' },
   
   // خبرگزاری‌های ملی (بوشهر)
   { name: 'مهر بوشهر', url: 'https://www.mehrnews.com/rss/service/Provinces/Booshehr', category: 'بوشهر' },
