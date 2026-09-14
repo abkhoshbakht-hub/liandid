@@ -15,6 +15,9 @@ export const rssSources: RssSource[] = [
   { name: 'سوک نیوز', url: 'https://sooknews.ir/?feed=rss2', category: 'بوشهر' },
   { name: 'چغادک نیوز', url: 'https://choghadaknews.ir/rss', category: 'بوشهر' },
   
+  // خبرگزاری‌های ملی (بوشهر)
+  { name: 'مهر بوشهر', url: 'https://www.mehrnews.com/rss/service/Provinces/Booshehr', category: 'بوشهر' },
+
   // خبرگزاری‌های ملی
   { name: 'ایرنا', url: 'https://www.irna.ir/rss', category: 'ملی' },
   { name: 'ایسنا', url: 'https://www.isna.ir/rss', category: 'ملی' },
