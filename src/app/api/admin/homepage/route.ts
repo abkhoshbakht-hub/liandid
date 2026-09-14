@@ -35,6 +35,10 @@ export async function GET() {
           return {
             ...s,
             type: 'EXTERNAL',
+            customTitle: null,
+            customContent: null,
+            customImage: null,
+            customLink: null,
             externalNews: {
               id: a.id, title: a.title, sourceName: a.author?.name || 'لیان دید',
               category: a.category?.name || null, image: a.featuredImage, publishedAt: a.publishedAt?.toISOString() || null,
