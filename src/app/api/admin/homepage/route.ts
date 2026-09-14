@@ -19,7 +19,33 @@ export async function GET() {
       orderBy: { order: 'asc' },
     });
 
-    return NextResponse.json({ success: true, data: slots });
+    const heroPlacedArticles = await prisma.article.findMany({
+      where: { status: 'PUBLISHED', placement: 'hero' },
+      include: { category: { select: { name: true } }, author: { select: { name: true } } },
+      orderBy: { publishedAt: { sort: 'desc', nulls: 'last' } },
+      take: 3,
+    });
+
+    const heroSlotKeys = ['hero-main', 'hero-side-1', 'hero-side-2'];
+    let placedIndex = 0;
+    const enrichedSlots = slots.map(s => {
+      if (heroSlotKeys.includes(s.slotKey)) {
+        if (!s.externalNewsId && !s.customTitle && placedIndex < heroPlacedArticles.length) {
+          const a = heroPlacedArticles[placedIndex++];
+          return {
+            ...s,
+            type: 'EXTERNAL',
+            externalNews: {
+              id: a.id, title: a.title, sourceName: a.author?.name || 'لیان دید',
+              category: a.category?.name || null, image: a.featuredImage, publishedAt: a.publishedAt?.toISOString() || null,
+            },
+          };
+        }
+      }
+      return s;
+    });
+
+    return NextResponse.json({ success: true, data: enrichedSlots });
   } catch (error) {
     return NextResponse.json({ success: false, message: 'خطای داخلی سرور' }, { status: 500 });
   }
