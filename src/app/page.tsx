@@ -98,9 +98,9 @@ async function getHomepageData() {
     const heroPool = dedupe([...heroPlacedItems, ...allNewsItems]);
 
     const resolve = (s: { id: string; type: string; customTitle?: string | null; customLink?: string | null; customContent?: string | null; customImage?: string | null; category?: string | null; externalNews?: typeof approvedNews[0] | null } | null, fallbackItem?: Item): Item | null => {
-      if (s?.type === 'CUSTOM' && (s.customTitle || s.customImage)) {
+      if (s?.type === 'CUSTOM' && s.customTitle) {
         return {
-          id: s.id, title: s.customTitle || 'لیان دید', link: s.customLink || '#',
+          id: s.id, title: s.customTitle, link: s.customLink || '#',
           description: s.customContent || '', image: s.customImage || '',
           source: 'لیان دید', sourceName: 'لیان دید',
           category: s.category || 'اختصاصی', publishedAt: null, isCustom: true,
@@ -119,26 +119,15 @@ async function getHomepageData() {
     const takeHeroPlaced = () => heroPlacedItems.find(i => !heroShownIds.has(i.id));
     const takePool = () => heroPool.find(i => !heroShownIds.has(i.id));
     const pickHero = (slotKey: string): Item | null => {
-      const slot = findSlot(slotKey);
-      const isCustom = slot?.type === 'CUSTOM';
-      if (isCustom) {
-        const r = resolve(slot);
-        if (r && !heroShownIds.has(r.id)) {
-          heroShownIds.add(r.id);
-          return r;
-        }
-      }
       const placed = takeHeroPlaced();
       if (placed) {
         heroShownIds.add(placed.id);
         return placed;
       }
-      if (!isCustom) {
-        const r = resolve(slot);
-        if (r && !heroShownIds.has(r.id)) {
-          heroShownIds.add(r.id);
-          return r;
-        }
+      const r = resolve(findSlot(slotKey));
+      if (r && !heroShownIds.has(r.id)) {
+        heroShownIds.add(r.id);
+        return r;
       }
       const f = takePool();
       if (f) {
