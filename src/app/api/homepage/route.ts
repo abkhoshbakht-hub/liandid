@@ -20,6 +20,7 @@ export async function GET() {
     const approvedNews = await prisma.externalNews.findMany({
       where: { status: 'APPROVED' },
       orderBy: { publishedAt: 'desc' },
+      take: 100,
       select: {
         id: true, title: true, link: true, description: true, image: true,
         source: true, sourceName: true, category: true, publishedAt: true,
