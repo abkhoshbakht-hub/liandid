@@ -26,6 +26,7 @@ export const rssSources: RssSource[] = [
   { name: 'مهر', url: 'https://www.mehrnews.com/rss', category: 'ملی' },
   { name: 'فارس', url: 'https://www.farsnews.ir/rss', category: 'ملی' },
   { name: 'تسنیم', url: 'https://www.tasnimnews.com/rss', category: 'ملی' },
+  { name: 'تسنیم بوشهر', url: 'https://www.tasnimnews.ir/fa/rss/feeds/53/0/13/1', category: 'بوشهر' },
   { name: 'انتخاب', url: 'https://www.entekhab.ir/fa/rss', category: 'ملی' },
   { name: 'عصر ایران', url: 'https://www.asriran.com/fa/rss/allnews', category: 'ملی' },
 
