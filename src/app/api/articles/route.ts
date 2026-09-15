@@ -32,7 +32,6 @@ export async function GET(req: NextRequest) {
     if (search) {
       where.OR = [
         { title: { contains: search } },
-        { content: { contains: search } },
         { excerpt: { contains: search } },
         { subtitle: { contains: search } },
       ];
@@ -41,7 +40,18 @@ export async function GET(req: NextRequest) {
     const [articles, total] = await Promise.all([
       prisma.article.findMany({
         where,
-        include: {
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          subtitle: true,
+          excerpt: true,
+          featuredImage: true,
+          status: true,
+          isFeatured: true,
+          isBreaking: true,
+          publishedAt: true,
+          viewCount: true,
           author: {
             select: { id: true, name: true, avatar: true },
           },
