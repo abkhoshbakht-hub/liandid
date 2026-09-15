@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['sharp'],
+  serverExternalPackages: ['sharp', '@prisma/client'],
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'media.mehrnews.com' },
